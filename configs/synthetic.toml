@@ -6,8 +6,7 @@ kkt_tolerance = 1.0e-6
 timeout_seconds = 300
 nystrom_rank = 128
 warmups = 1
-fast_repetitions = 3
-fast_threshold_seconds = 30
+repetitions = 3
 
 [[experiment.shapes]]
 n = 256

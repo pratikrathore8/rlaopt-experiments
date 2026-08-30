@@ -24,8 +24,7 @@ class ExperimentConfig:
     timeout_seconds: int
     nystrom_rank: int
     warmups: int
-    fast_repetitions: int
-    fast_threshold_seconds: int
+    repetitions: int
 
 
 def load_experiment(path: Path) -> ExperimentConfig:

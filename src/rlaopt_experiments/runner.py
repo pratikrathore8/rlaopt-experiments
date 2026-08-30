@@ -20,8 +20,8 @@ from rlaopt_experiments.tracking import log_record, wandb_run
 
 def run_job(*, n: int, p: int, alpha: float, seed: int, solver: str, backend: str,
             ridges: list[float], native_tolerance: float, kkt_tolerance: float,
-            timeout_seconds: int, rank: int, warmups: int, fast_repetitions: int,
-            fast_threshold_seconds: int, output_dir: Path) -> list[TrialRecord]:
+            timeout_seconds: int, rank: int, warmups: int, repetitions: int,
+            output_dir: Path) -> list[TrialRecord]:
     device = torch.device("cuda" if backend == "cuda" else "cpu")
     torch.set_default_dtype(torch.float64)
     problem = generate_problem(ProblemSpec(n, p, alpha, derive_seed(seed, "factors"),
@@ -55,9 +55,10 @@ def run_job(*, n: int, p: int, alpha: float, seed: int, solver: str, backend: st
             torch.cuda.reset_peak_memory_stats()
         first = run_once(ridge, maximum_iterations)
         results = [first]
-        if first.runtime_seconds < fast_threshold_seconds:
+        first_accuracy = adjudicate(problem, ridge, first, kkt_tolerance)
+        if first_accuracy.success:
             results.extend(run_once(ridge, maximum_iterations)
-                           for _ in range(fast_repetitions - 1))
+                           for _ in range(repetitions - 1))
         runtimes = [result.runtime_seconds for result in results]
         for repetition, result in enumerate(results):
             accuracy = adjudicate(problem, ridge, result, kkt_tolerance)

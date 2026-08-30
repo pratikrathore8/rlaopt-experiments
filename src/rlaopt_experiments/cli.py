@@ -50,8 +50,7 @@ def main() -> None:
                 backend=args.backend, ridges=list(config.lambdas), native_tolerance=tolerance,
                 kkt_tolerance=config.kkt_tolerance, timeout_seconds=config.timeout_seconds,
                 rank=config.nystrom_rank, warmups=config.warmups,
-                fast_repetitions=config.fast_repetitions,
-                fast_threshold_seconds=config.fast_threshold_seconds, output_dir=args.output)
+                repetitions=config.repetitions, output_dir=args.output)
     else:
         from rlaopt_experiments.plotting import make_figures
         make_figures(args.input, args.output)
