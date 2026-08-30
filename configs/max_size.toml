@@ -1,0 +1,20 @@
+[experiment]
+alphas = [1.0]
+lambdas = [0.0001]
+seeds = [0]
+kkt_tolerance = 1.0e-6
+timeout_seconds = 300
+nystrom_rank = 128
+warmups = 0
+repetitions = 1
+
+[[experiment.shapes]]
+n = 262144
+p = 4096
+family = "fixed_p"
+
+[backends.cpu]
+solvers = ["rlaopt_nystrom_pcg"]
+
+[backends.cuda]
+solvers = ["rlaopt_nystrom_pcg"]

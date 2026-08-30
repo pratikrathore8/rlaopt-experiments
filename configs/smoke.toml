@@ -1,0 +1,20 @@
+[experiment]
+alphas = [1.0]
+lambdas = [0.01]
+seeds = [0]
+kkt_tolerance = 1.0e-6
+timeout_seconds = 60
+nystrom_rank = 64
+warmups = 1
+repetitions = 1
+
+[[experiment.shapes]]
+n = 256
+p = 256
+family = "square"
+
+[backends.cpu]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "scipy_lsqr", "torch_qr"]
+
+[backends.cuda]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "cuml_lsmr", "torch_qr"]

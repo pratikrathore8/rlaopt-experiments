@@ -61,7 +61,14 @@ d_{\mathrm{eff}}(\lambda)
 = \sum_{k=1}^{r}\frac{s_k^2}{s_k^2+\lambda},
 $$
 
-the standard condition number $\kappa(X^{\mathsf T}X+\lambda I)=(1+\lambda)/\lambda$, and the ratios $r/p$ and $r/d_{\mathrm{eff}}$.
+the standard condition number
+
+$$
+\kappa(X^{\mathsf T}X+\lambda I)
+= \frac{1+\lambda}{p^{-\alpha}+\lambda},
+$$
+
+and the ratios $r/p$ and $r/d_{\mathrm{eff}}$. This formula uses the fact that every configured shape has $n\ge p$ and therefore $X$ has full column rank.
 
 ## Synthetic ridge suite: fixed experiment grid
 
@@ -89,7 +96,7 @@ $$
 = \begin{bmatrix}y\\0\end{bmatrix},
 $$
 
-since `torch.linalg.lstsq` has no ridge argument. cuML uses `Ridge(alpha=lambda, fit_intercept=False, solver="lsmr")`.
+since `torch.linalg.lstsq` has no ridge argument. The adapter is named `torch_lstsq_qr` in code and selects the QR-based `gelsy` driver on CPU and `gels` on CUDA; the stable manifest identifier remains `torch_qr`. cuML uses `Ridge(alpha=lambda, fit_intercept=False, solver="lsmr")`.
 
 ## Synthetic ridge suite: accuracy, stopping, and timing
 
@@ -103,11 +110,13 @@ $$
 
 Native solver status alone never counts as success. Relative error to $w_\star$ is a secondary diagnostic.
 
-Native tolerances live in `configs/tolerances.toml`. Calibrate one tolerance per solver/backend on representative easy, middle, and hard cases, choose the loosest value that passes every external KKT check, then freeze the file before the production sweep. rlaopt records a residual point per iteration; SciPy records its LSQR diagnostics; cuML records `n_iter_` when exposed. Direct QR has no iteration history.
+Native tolerances live in `configs/tolerances.toml`. Calibrate one tolerance per solver/backend on representative easy, middle, and hard cases, choose the loosest value that passes every external KKT check, then freeze the file before the production sweep. rlaopt stores a residual point per iteration in both the atomic JSON record and W&B; SciPy records its final LSQR diagnostics; cuML records `n_iter_` when exposed. Direct QR has no iteration history.
 
-Iterative solvers stop at native convergence, $2p$ iterations, or five minutes, whichever comes first. QR has only the five-minute process timeout. The Slurm wrapper provides a hard process boundary; rlaopt additionally checks elapsed time cooperatively on every iteration. A timeout or a native “success” that misses KKT is displayed as a failure, never silently dropped.
+Run calibration with, for example, `uv run rlaopt-bench calibrate --backend cpu --solver scipy_lsqr --candidates 1e-4 1e-5 1e-6 1e-7 1e-8`. The command writes all underlying records plus `calibration.json`; copy the selected value into `configs/tolerances.toml` only after inspecting every case.
 
-Problem generation, analytic oracle work, CPU pinning, and host-to-device transfer are excluded from runtime. Timed regions include preconditioner construction, factorization, and all internal solver setup. GPU timings synchronize immediately before and after the solve and therefore describe GPU-resident inputs. One warm-up is untimed. Every configuration whose first timed run passes the external KKT criterion receives three timed repetitions, summarized by its median/min/max. A first-run timeout or accuracy failure is recorded once during the primary sweep and flagged for manual audit rather than automatically consuming two more production attempts. Peak CUDA allocator memory is recorded (CPU peak RSS should be supplied by the scheduler).
+Iterative solvers stop at native convergence, $2p$ iterations, or five minutes, whichever comes first. QR has only the five-minute timeout. A persistent spawned worker retains the generated problem but places every timed native call behind a parent-enforced process boundary; if a solver exceeds five minutes, the parent terminates that worker and regenerates the same deterministic problem before continuing with the next ridge value. rlaopt additionally checks elapsed time cooperatively on every iteration. A timeout, exception, or native “success” that misses KKT is written as a structured failure, never silently dropped.
+
+Problem generation, analytic oracle work, CPU pinning, and host-to-device transfer are excluded from runtime. Timed regions include preconditioner construction, factorization, and all internal solver setup. GPU timings synchronize immediately before and after the solve and therefore describe GPU-resident inputs. One warm-up is untimed. Every configuration whose first timed run passes the external KKT criterion receives three timed repetitions, summarized by its median/min/max. A first-run timeout or accuracy failure is recorded once during the primary sweep and flagged for manual audit rather than automatically consuming two more production attempts. Records include peak process RSS on CPU and peak PyTorch allocator use on CUDA; scheduler and `nvidia-smi` accounting remain necessary because the CUDA allocator value does not include every cuML allocation.
 
 ## Reproducible environment
 
@@ -118,7 +127,7 @@ curl -LsSf https://astral.sh/uv/0.12.7/install.sh | sh
 uv sync --frozen
 ```
 
-The project pins Python 3.12, uv 0.12.7, rlaopt 0.1.0 from PyPI, NumPy 2.5.2, SciPy 1.18.1, PyTorch 2.13.0, matplotlib 3.11.1, and W&B 0.29.0. `uv.lock` pins the transitive CPU environment. cuML/RAPIDS 26.08 is supplied only on the H200 through the image in `containers/rapids.env`; replace its placeholder with the immutable registry digest before production. A mutable tag is not sufficient evidence of the GPU environment.
+The project pins Python 3.12, uv 0.12.7, rlaopt 0.1.0 from PyPI, NumPy 2.5.2, SciPy 1.18.1, PyTorch 2.13.0, matplotlib 3.11.1, and W&B 0.29.0. `uv.lock` pins the transitive CPU environment. cuML/RAPIDS 26.08 is supplied only on the H200 through the official `26.08-cuda13-py3.12` base image in `containers/rapids.env`; CUDA 13 requires an NVIDIA driver of at least version 580 for this RAPIDS release. Replace the digest placeholder with the immutable registry digest before production. A mutable tag is not sufficient evidence of the GPU environment.
 
 W&B defaults to offline mode. Atomic JSON files under `artifacts/records/` are the source of truth and remain recoverable if W&B fails; sync them later with `wandb sync` if desired.
 
@@ -131,6 +140,8 @@ uv run rlaopt-bench manifest --backend cpu --output artifacts/cpu.jsonl
 uv run rlaopt-bench manifest --backend cuda --output artifacts/cuda.jsonl
 ```
 
+Use `configs/smoke.toml` for one tiny case per solver, `configs/pilot.toml` for the reduced pre-production sweep, and `configs/max_size.toml` for the largest-shape memory probe. Pass the desired file through `--config` when creating a manifest and running its jobs.
+
 Run a small calibration/smoke case before freezing tolerances:
 
 ```bash
@@ -138,19 +149,24 @@ WANDB_MODE=offline uv run rlaopt-bench run-job \
   --n 256 --p 256 --alpha 1 --seed 0 --solver scipy_lsqr --backend cpu
 ```
 
-Submit a manifest (the CPU manifest has 288 lines):
+Submit a manifest using an array sized from the file (the full CPU manifest has 288 lines):
 
 ```bash
-BACKEND=cpu MANIFEST=artifacts/cpu.jsonl sbatch --array=0-287 slurm/run_array.sh
+BACKEND=cpu MANIFEST=artifacts/cpu.jsonl \
+  sbatch --array="0-$(($(wc -l < artifacts/cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
-For the GPU allocation, add the site-specific GPU constraint and execute the same script inside the pinned RAPIDS digest. Generate figures only after auditing failures:
+For the GPU smoke test, add the site-specific GPU constraint and set `ALLOW_MUTABLE_RAPIDS_TAG=1` if the digest has not yet been frozen. Production CUDA jobs refuse to start while `RAPIDS_IMAGE_DIGEST` is the placeholder. Run `scripts/resolve_rapids_digest.sh`, copy the reported digest into `containers/rapids.env`, pull the digest-qualified image with the cluster's container runtime, and then execute the same array inside that image.
+
+For the maximum-size CPU probe, use `/usr/bin/time -v` around one `run-job` command and compare its maximum resident set size with the `peak_memory_bytes` record. On CUDA, compare the recorded peak PyTorch allocation with `nvidia-smi` and scheduler accounting; allocator memory does not include every cuML/CUDA allocation.
+
+Generate figures only after auditing failures:
 
 ```bash
 uv run rlaopt-bench plot --input artifacts/records --output artifacts/figures
 ```
 
-The figure command creates log-log runtime scatterplots for fixed-$p$, fixed-$n$, and square families and a machine-readable failure summary. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Never connect points across different $\alpha$ or $\lambda$ without facet/legend separation.
+The figure command creates log-log runtime scatterplots for fixed-$p$, fixed-$n$, and square families, faceted by $\alpha$ and $\lambda$, plus a machine-readable failure summary. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Points from different spectral profiles or ridge values are never placed in the same panel.
 
 ## Synthetic ridge suite: expected cost and limitations
 
