@@ -1,0 +1,51 @@
+[experiment]
+alphas = [0.5, 1.0, 2.0]
+lambdas = [0.01, 0.0001, 0.000001]
+seeds = [0, 1, 2]
+kkt_tolerance = 1.0e-6
+timeout_seconds = 300
+nystrom_rank = 128
+warmups = 1
+fast_repetitions = 3
+fast_threshold_seconds = 30
+
+[[experiment.shapes]]
+n = 256
+p = 256
+family = "square"
+[[experiment.shapes]]
+n = 1024
+p = 1024
+family = "square"
+[[experiment.shapes]]
+n = 4096
+p = 4096
+family = "square"
+[[experiment.shapes]]
+n = 16384
+p = 4096
+family = "fixed_p"
+[[experiment.shapes]]
+n = 65536
+p = 4096
+family = "fixed_p"
+[[experiment.shapes]]
+n = 262144
+p = 4096
+family = "fixed_p"
+[[experiment.shapes]]
+n = 262144
+p = 256
+family = "fixed_n"
+[[experiment.shapes]]
+n = 262144
+p = 1024
+family = "fixed_n"
+
+[backends.cpu]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "scipy_lsqr", "torch_qr"]
+hardware = "64 physical CPU cores (soal-8/soal-9)"
+
+[backends.cuda]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "cuml_lsmr", "torch_qr"]
+hardware = "NVIDIA H200 NVL (soal-12)"

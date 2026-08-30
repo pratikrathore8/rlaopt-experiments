@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rlaopt-experiments"
+version = "0.1.0"
+description = "Reproducible synthetic ridge-regression benchmarks for rlaopt"
+readme = "README.md"
+requires-python = "==3.12.*"
+dependencies = [
+  "matplotlib==3.11.1",
+  "numpy==2.5.2",
+  "rlaopt==0.1.0",
+  "scipy==1.18.1",
+  "torch==2.13.0",
+  "wandb==0.29.0",
+]
+
+[project.scripts]
+rlaopt-bench = "rlaopt_experiments.cli:main"
+
+[dependency-groups]
+dev = ["pytest==9.0.2", "ruff==0.15.6"]
+
+[tool.uv]
+required-version = "==0.12.7"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rlaopt_experiments"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
