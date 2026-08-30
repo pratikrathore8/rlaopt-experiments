@@ -173,6 +173,8 @@ MANIFEST=artifacts/smoke-cpu.jsonl \
 
 For the GPU smoke test, add the site-specific GPU constraint and set `ALLOW_MUTABLE_RAPIDS_TAG=1` if the digest has not yet been frozen. Production CUDA jobs refuse to start while `RAPIDS_IMAGE_DIGEST` is the placeholder. Run `scripts/resolve_rapids_digest.sh`, copy the reported digest into `containers/rapids.env`, pull the digest-qualified image with the cluster's container runtime, and then execute the same array inside that image.
 
+On the soal cluster, submit `sbatch slurm/check_rapids.sh` before the GPU smoke grid. It stages the immutable image in node-local storage, checks cuML/CuPy on one H200 NVL, and reports whether the frozen project environment can import RAPIDS together with PyTorch and rlaopt. Inspect `rapids-check-<job-id>.out` after completion.
+
 For the maximum-size CPU probe, use `/usr/bin/time -v` around one `run-job` command and compare its maximum resident set size with the `peak_memory_bytes` record. On CUDA, compare the recorded peak PyTorch allocation with `nvidia-smi` and scheduler accounting; allocator memory does not include every cuML/CUDA allocation.
 
 Generate figures only after auditing failures:
