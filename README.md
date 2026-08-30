@@ -30,7 +30,7 @@ $$
 and
 
 $$
-X = U \operatorname{diag}(s) V^{\mathsf T}.
+X = U\,\mathrm{diag}(s)\,V^{\mathsf T}.
 $$
 
 Thus the nonzero eigenvalues of $X^{\mathsf T}X$ are exactly $k^{-\alpha}$ and $\lVert X\rVert_2=1$. The three profiles are $\alpha \in \{1/2,1,2\}$. This normalization is equivalent to starting from the statistical convention $G/\sqrt{n}$ and then prescribing the population spectrum; it prevents sample count from changing the regularization scale.
@@ -44,15 +44,14 @@ $$
 Every method solves, in float64,
 
 $$
-\min_w \; \frac{1}{2}\lVert Xw-y\rVert_2^2
-+ \frac{\lambda}{2}\lVert w\rVert_2^2,
+\min_w \frac{1}{2}\lVert Xw-y\rVert_2^2 + \frac{\lambda}{2}\lVert w\rVert_2^2,
 $$
 
 for $\lambda \in \{10^{-2},10^{-4},10^{-6}\}$. The exact reference solution is derived from the known SVD—not from a separate numerical solve:
 
 $$
 w_\star
-= V\operatorname{diag}\!\left(\frac{s_k}{s_k^2+\lambda}\right)\widehat z.
+= V\,\mathrm{diag}\left(\frac{s_k}{s_k^2+\lambda}\right)\widehat z.
 $$
 
 This is the closed-form ridge solution for this construction, not a special “Tropp formula.” The design follows the normalized prescribed-spectrum models used in randomized numerical linear algebra. We deliberately do not add a second entrywise Gaussian noise matrix: doing so would destroy the exact spectrum and oracle. Here $\lambda$ supplies the isotropic floor in the normal equations.
@@ -161,7 +160,7 @@ The figure command creates log-log runtime scatterplots for fixed-$p$, fixed-$n$
 
 With all target nodes available concurrently, the sweep should take roughly 4–10 wall-clock hours; queueing, retries, and slow tail jobs make one to two days a realistic end-to-end allowance. The reduced $n\le 2^{18}$ grid and five-minute cap keep the study tractable.
 
-Reviewer-visible limitations are intentional: the response lies in $\operatorname{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs, but they must be labeled separately from this confirmatory grid.
+Reviewer-visible limitations are intentional: the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs, but they must be labeled separately from this confirmatory grid.
 
 ## Implementation history
 
