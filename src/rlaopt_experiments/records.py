@@ -25,11 +25,12 @@ class TrialRecord:
     runtime_seconds: float
     iterations: int | None
     native_status: str
-    relative_kkt: float
-    relative_solution_error: float
+    relative_kkt: float | None
+    relative_solution_error: float | None
     success: bool
     timed_out: bool
     peak_memory_bytes: int | None = None
+    trace: list[dict[str, float]] = field(default_factory=list)
     diagnostics: dict[str, float] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
