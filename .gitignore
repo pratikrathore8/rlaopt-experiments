@@ -220,3 +220,4 @@ __marimo__/
 artifacts/
 wandb/
 .venv/
+rapids-check-*.out

@@ -21,8 +21,10 @@ fi
 
 export APPTAINER_CACHEDIR="/tmp/$USER/apptainer-cache-$SLURM_JOB_ID"
 export APPTAINER_TMPDIR="/tmp/$USER/apptainer-tmp-$SLURM_JOB_ID"
+GPU_ENVIRONMENT="/tmp/$USER/rlaopt-gpu-env-$SLURM_JOB_ID"
+UVX_BIN="$(command -v uvx)"
 mkdir -p "$APPTAINER_CACHEDIR" "$APPTAINER_TMPDIR"
-trap 'rm -rf "$APPTAINER_CACHEDIR" "$APPTAINER_TMPDIR"' EXIT
+trap 'rm -rf "$APPTAINER_CACHEDIR" "$APPTAINER_TMPDIR" "$GPU_ENVIRONMENT"' EXIT
 
 RAPIDS_REFERENCE="docker://${RAPIDS_IMAGE%:*}@${RAPIDS_IMAGE_DIGEST}"
 
@@ -54,28 +56,22 @@ print("GPU:", name)
 '
 
 echo "=== project uv environment interoperability ==="
-set +e
-apptainer exec --nv --bind "$REPOSITORY:$REPOSITORY" "$RAPIDS_REFERENCE" \
-  bash -lc "cd '$REPOSITORY' && uvx uv@0.12.7 run --frozen python -c '
-import cupy
-import cuml
-import rlaopt
-import torch
-print(\"rlaopt:\", rlaopt.__version__ if hasattr(rlaopt, \"__version__\") else \"0.1.0\")
-print(\"torch:\", torch.__version__)
-print(\"cuML:\", cuml.__version__)
-print(\"CuPy:\", cupy.__version__)
-print(\"torch CUDA:\", torch.version.cuda)
-print(\"torch GPU:\", torch.cuda.get_device_name(0))
-'"
-PROJECT_STATUS=$?
-set -e
+apptainer exec --nv --bind "$REPOSITORY:$REPOSITORY" --bind /tmp:/tmp \
+  "$RAPIDS_REFERENCE" bash -s -- "$REPOSITORY" "$GPU_ENVIRONMENT" "$UVX_BIN" <<'ENVIRONMENT_SETUP'
+set -euo pipefail
+REPOSITORY="$1"
+GPU_ENVIRONMENT="$2"
+UVX_BIN="$3"
+cd "$REPOSITORY"
 
-if [[ $PROJECT_STATUS -ne 0 ]]; then
-  echo "PROJECT_ENVIRONMENT_INTEROPERABLE=false"
-  echo "The RAPIDS base image works, but the isolated project environment cannot see all packages."
-else
-  echo "PROJECT_ENVIRONMENT_INTEROPERABLE=true"
-fi
+"$UVX_BIN" uv@0.12.7 venv \
+  --clear \
+  --system-site-packages \
+  --python /opt/conda/bin/python \
+  "$GPU_ENVIRONMENT"
 
-exit "$PROJECT_STATUS"
+UV_PROJECT_ENVIRONMENT="$GPU_ENVIRONMENT" \
+  "$UVX_BIN" uv@0.12.7 sync --frozen --inexact
+
+"$GPU_ENVIRONMENT/bin/python" scripts/check_gpu_environment.py
+ENVIRONMENT_SETUP
