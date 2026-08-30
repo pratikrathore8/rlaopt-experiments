@@ -33,7 +33,7 @@ hostname
 echo "SLURM_JOB_ID=$SLURM_JOB_ID"
 echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}"
 nvidia-smi
-echo "CUDA_IMAGE_SHA256=$(sha256sum "$DERIVED_IMAGE" | cut -d' ' -f1)"
+echo "CUDA_IMAGE_SHA256=$(cut -d' ' -f1 "$DERIVED_IMAGE.sha256")"
 apptainer inspect "$DERIVED_IMAGE"
 apptainer exec --nv --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
   "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python scripts/check_gpu_environment.py

@@ -22,7 +22,9 @@ sed \
 
 mkdir -p "$(dirname "$OUTPUT")"
 cd "$REPOSITORY"
-apptainer build --fakeroot "$OUTPUT" "$BUILD_DIRECTORY/cuda.def"
+apptainer build --force --fakeroot "$OUTPUT" "$BUILD_DIRECTORY/cuda.def"
 apptainer inspect "$OUTPUT"
-sha256sum "$OUTPUT"
+IMAGE_SHA256="$(sha256sum "$OUTPUT" | cut -d' ' -f1)"
+printf '%s  %s\n' "$IMAGE_SHA256" "$(basename "$OUTPUT")" > "$OUTPUT.sha256"
+cat "$OUTPUT.sha256"
 echo "Built $OUTPUT"

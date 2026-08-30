@@ -223,3 +223,8 @@ wandb/
 cuda-check-*.out
 containers/*.sif
 cuda-build-*.out
+gpu-smoke-*.out
+cuda-calibrate-*.out
+cpu-calibrate-*.out
+cpu-smoke-*.out
+cpu-check-*.out
