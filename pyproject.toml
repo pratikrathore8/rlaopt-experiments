@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "rlaopt-experiments"
 version = "0.1.0"
-description = "Reproducible synthetic ridge-regression benchmarks for rlaopt"
+description = "Reproducible benchmarks for rlaopt"
 readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [
