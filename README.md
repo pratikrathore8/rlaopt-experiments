@@ -30,7 +30,7 @@ $$
 and
 
 $$
-X = U\,\mathrm{diag}(s)\,V^{\mathsf T}.
+X = U \mathrm{diag}(s) V^{\mathsf T}.
 $$
 
 Thus the nonzero eigenvalues of $X^{\mathsf T}X$ are exactly $k^{-\alpha}$ and $\lVert X\rVert_2=1$. The three profiles are $\alpha \in \{1/2,1,2\}$. This normalization is equivalent to starting from the statistical convention $G/\sqrt{n}$ and then prescribing the population spectrum; it prevents sample count from changing the regularization scale.
@@ -47,14 +47,12 @@ $$
 \min_w \frac{1}{2}\lVert Xw-y\rVert_2^2 + \frac{\lambda}{2}\lVert w\rVert_2^2,
 $$
 
-for $\lambda \in \{10^{-2},10^{-4},10^{-6}\}$. The exact reference solution is derived from the known SVD—not from a separate numerical solve:
+for $\lambda \in \{10^{-2},10^{-4},10^{-6}\}$. The exact reference solution is derived from the known SVD:
 
 $$
 w_\star
 = V\,\mathrm{diag}\left(\frac{s_k}{s_k^2+\lambda}\right)\widehat z.
 $$
-
-This is the closed-form ridge solution for this construction, not a special “Tropp formula.” The design follows the normalized prescribed-spectrum models used in randomized numerical linear algebra. We deliberately do not add a second entrywise Gaussian noise matrix: doing so would destroy the exact spectrum and oracle. Here $\lambda$ supplies the isotropic floor in the normal equations.
 
 We report the effective dimension
 
@@ -63,7 +61,7 @@ d_{\mathrm{eff}}(\lambda)
 = \sum_{k=1}^{r}\frac{s_k^2}{s_k^2+\lambda},
 $$
 
-the full condition number $(1+\lambda)/\lambda$, the active condition number $(1+\lambda)/(s_r^2+\lambda)$, and the ratios $r/p$ and $r/d_{\mathrm{eff}}$.
+the standard condition number $\kappa(X^{\mathsf T}X+\lambda I)=(1+\lambda)/\lambda$, and the ratios $r/p$ and $r/d_{\mathrm{eff}}$.
 
 ## Synthetic ridge suite: fixed experiment grid
 
@@ -75,16 +73,16 @@ There are eight unique shapes:
 | sample scaling ($p=2^{12}$) | $(2^{14},2^{12})$, $(2^{16},2^{12})$, $(2^{18},2^{12})$ |
 | feature scaling ($n=2^{18}$) | $(2^{18},2^8)$, $(2^{18},2^{10})$ |
 
-Each shape uses three decay profiles, three master seeds, and three ridge values. Factor, response, and Nyström randomness use separately derived deterministic streams. A job is $(\text{hardware},\text{solver},\text{shape},\alpha,\text{seed})$ and reuses one resident $X$ for all three ridge values: 288 jobs per backend, 576 total, and 1,728 ridge trials before timing repetitions.
+Each shape uses three decay profiles, three master seeds, and three ridge values. Factor, response, and Nyström randomness use separately derived deterministic streams. A job is $(\text{hardware},\text{solver},\text{shape},\alpha,\text{seed})$ and reuses the same data matrix $X$ for all three ridge values: 288 jobs per backend, 576 total, and 1,728 ridge trials before timing repetitions.
 
-Only the intended paper hardware is in scope for now:
+We use the following hardware and solver combinations:
 
 | backend | hardware | solvers |
 |---|---|---|
 | CPU | 64 physical cores on soal-8/soal-9 | rlaopt Nyström-PCG, rlaopt identity-PCG (CG), SciPy LSQR, PyTorch augmented QR |
 | GPU | NVIDIA H200 NVL on soal-12 | both rlaopt variants, cuML Ridge/LSMR, PyTorch augmented QR |
 
-rlaopt always receives the matrix-free $X^{\mathsf T}X$ operator and $B=X^{\mathsf T}y$, with `reg=lambda`. Nyström-PCG fixes $\mathtt{rank\_init}=\mathtt{rank\_max}=\min(128,p)$, `base_damping=lambda`, and adaptive damping. Ridge is not folded into the operator, so it is never counted twice. SciPy uses a `LinearOperator` for $X$ and $\mathtt{damp}=\sqrt{\lambda}$. PyTorch uses the augmented system
+rlaopt always receives $X^{\mathsf T}X$ as a linear operator (i.e., it never forms the Gram matrix) and $B=X^{\mathsf T}y$, with `reg=lambda`. Nyström PCG fixes $\mathtt{rank\_init}=\mathtt{rank\_max}=\min(128,p)$, `base_damping=lambda`, and adaptive damping. Ridge is not folded into the operator, so it is never counted twice. SciPy uses a `LinearOperator` for $X$ and $\mathtt{damp}=\sqrt{\lambda}$. PyTorch uses the augmented system
 
 $$
 \begin{bmatrix}X\\ \sqrt{\lambda}I\end{bmatrix}w
@@ -103,7 +101,7 @@ $$
 \le 10^{-6}.
 $$
 
-Native solver status alone never counts as success. Relative error to $w_\star$ is a secondary diagnostic. Normwise backward error and objective gap are omitted because they add little beyond KKT residual plus exact solution error for this controlled quadratic.
+Native solver status alone never counts as success. Relative error to $w_\star$ is a secondary diagnostic.
 
 Native tolerances live in `configs/tolerances.toml`. Calibrate one tolerance per solver/backend on representative easy, middle, and hard cases, choose the loosest value that passes every external KKT check, then freeze the file before the production sweep. rlaopt records a residual point per iteration; SciPy records its LSQR diagnostics; cuML records `n_iter_` when exposed. Direct QR has no iteration history.
 
@@ -121,8 +119,6 @@ uv sync --frozen
 ```
 
 The project pins Python 3.12, uv 0.12.7, rlaopt 0.1.0 from PyPI, NumPy 2.5.2, SciPy 1.18.1, PyTorch 2.13.0, matplotlib 3.11.1, and W&B 0.29.0. `uv.lock` pins the transitive CPU environment. cuML/RAPIDS 26.08 is supplied only on the H200 through the image in `containers/rapids.env`; replace its placeholder with the immutable registry digest before production. A mutable tag is not sufficient evidence of the GPU environment.
-
-We do not store multi-gigabyte matrices or their checksums. A stable problem ID plus the pinned code, package lock, dimensions, exponents, and explicit seeds reproduce each matrix. Record the git commit, Slurm job ID, node, driver, CUDA runtime, GPU model, thread variables, and final container digest alongside paper artifacts.
 
 W&B defaults to offline mode. Atomic JSON files under `artifacts/records/` are the source of truth and remain recoverable if W&B fails; sync them later with `wandb sync` if desired.
 
@@ -158,10 +154,6 @@ The figure command creates log-log runtime scatterplots for fixed-$p$, fixed-$n$
 
 ## Synthetic ridge suite: expected cost and limitations
 
-With all target nodes available concurrently, the sweep should take roughly 4–10 wall-clock hours; queueing, retries, and slow tail jobs make one to two days a realistic end-to-end allowance. The reduced $n\le 2^{18}$ grid and five-minute cap keep the study tractable.
+With all target nodes available concurrently, the sweep should take roughly 4–10 wall-clock hours; queueing, retries, and slow tail jobs make one to two days a realistic end-to-end allowance.
 
-Reviewer-visible limitations are intentional: the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs, but they must be labeled separately from this confirmatory grid.
-
-## Implementation history
-
-The first suite's implementation history is split into reproducible environment, generator, solver adapters, calibration/diagnostics, tracking/orchestration, aggregation/figures, and documentation. Future suites should follow the same reviewable separation without treating ridge-specific mathematics or solver interfaces as repository-wide abstractions.
+Limitations: the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs.

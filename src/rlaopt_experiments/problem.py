@@ -45,11 +45,9 @@ class RidgeProblem:
         eig = self.singular_values.square()
         d_eff = float((eig / (eig + ridge)).sum())
         full_condition = float((eig[0] + ridge) / ridge)
-        active_condition = float((eig[0] + ridge) / (eig[-1] + ridge))
         return {
             "effective_dimension": d_eff,
             "full_condition_number": full_condition,
-            "active_condition_number": active_condition,
             "rank_over_p": self.spec.rank / self.spec.p,
             "rank_over_effective_dimension": self.spec.rank / d_eff,
         }
