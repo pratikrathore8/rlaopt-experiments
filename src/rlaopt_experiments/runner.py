@@ -184,3 +184,58 @@ def run_job(*, n: int, p: int, alpha: float, seed: int, solver: str, backend: st
     finally:
         worker.close()
     return records
+
+
+def run_tolerance_sweep(*, n: int, p: int, alpha: float, ridge: float, seed: int,
+                        solver: str, backend: str, candidates: list[float],
+                        kkt_tolerance: float, timeout_seconds: int, rank: int,
+                        output_dir: Path, case_index: int) -> dict[float, TrialRecord]:
+    """Generate one problem and evaluate several native tolerances against it."""
+    problem_spec = ProblemSpec(n, p, alpha, derive_seed(seed, "factors"),
+                               derive_seed(seed, "response"))
+    specification = {
+        "n": n, "p": p, "alpha": alpha,
+        "factor_seed": problem_spec.factor_seed,
+        "response_seed": problem_spec.response_seed,
+    }
+    maximum_iterations = 2 * p
+    records: dict[float, TrialRecord] = {}
+
+    def start_worker() -> tuple[ProblemWorker, dict[str, Any]]:
+        new_worker = ProblemWorker(specification, backend)
+        return new_worker, new_worker.wait_until_ready(timeout_seconds)
+
+    worker, ready = start_worker()
+    try:
+        for candidate in sorted(set(candidates), reverse=True):
+            if not worker.alive:
+                worker.close()
+                worker, ready = start_worker()
+            command = {
+                "solver": solver,
+                "native_tolerance": candidate,
+                "kkt_tolerance": kkt_tolerance,
+                "timeout_seconds": timeout_seconds,
+                "rank": rank,
+                "nystrom_seed": derive_seed(seed, "nystrom"),
+                "ridge": ridge,
+                "max_iters": maximum_iterations,
+            }
+            if ready["kind"] == "ready":
+                outcome = worker.solve(command, timeout_seconds)
+            else:
+                outcome = ready | {"runtime_seconds": 0.0}
+            solver_metadata = outcome.get("solver_metadata", {}) | {
+                "native_tolerance": candidate,
+            }
+            outcome = outcome | {"solver_metadata": solver_metadata}
+            candidate_output = output_dir / f"tol-{candidate:g}" / f"case-{case_index}"
+            records[candidate] = _record(
+                problem_spec=problem_spec, solver=solver, backend=backend,
+                ridge=ridge, seed=seed, repetition=0, outcome=outcome,
+                runtimes=[outcome["runtime_seconds"]], output_dir=candidate_output,
+                worker_metadata=ready.get("worker_metadata", {}),
+            )
+    finally:
+        worker.close()
+    return records

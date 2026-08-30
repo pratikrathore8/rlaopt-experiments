@@ -44,6 +44,12 @@ def _rlaopt(problem: RidgeProblem, ridge: float, tolerance: float, max_iters: in
     x = problem.X
     x_op = aslinearoperator(x)
     normal_op = x_op.T @ x_op
+    # torch-linops 0.2.0 does not propagate a wrapped tensor's device to
+    # MatrixOperator or composed operators. rlaopt uses A.device to allocate
+    # the Nyström sketch, so attach the known device explicitly.
+    x_op.device = x.device
+    x_op.T.device = x.device
+    normal_op.device = x.device
     rhs = (x.mT @ problem.y).unsqueeze(-1)
     if nystrom_rank is None:
         preconditioner = IdentityConfig()

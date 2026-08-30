@@ -73,7 +73,9 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
                     "iterations": result.iterations,
                     "native_status": result.native_status,
                     "trace": result.trace,
-                    "solver_metadata": result.metadata,
+                    "solver_metadata": result.metadata | {
+                        "native_tolerance": command["native_tolerance"],
+                    },
                     "accuracy": asdict(accuracy),
                     "diagnostics": problem.diagnostics(ridge),
                     "peak_memory_bytes": (

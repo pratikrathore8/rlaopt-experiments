@@ -1,0 +1,31 @@
+[experiment]
+alphas = [0.5, 1.0, 2.0]
+lambdas = [0.01, 0.0001, 0.000001]
+seeds = [0]
+kkt_tolerance = 1.0e-6
+timeout_seconds = 300
+nystrom_rank = 128
+# Calibration measures accuracy, not runtime; avoid an extra native call per case.
+warmups = 0
+repetitions = 1
+
+[[experiment.shapes]]
+n = 256
+p = 256
+family = "square"
+
+[[experiment.shapes]]
+n = 4096
+p = 4096
+family = "square"
+
+[[experiment.shapes]]
+n = 16384
+p = 4096
+family = "fixed_p"
+
+[backends.cpu]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "scipy_lsqr"]
+
+[backends.cuda]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "cuml_lsmr"]

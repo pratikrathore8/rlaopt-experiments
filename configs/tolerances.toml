@@ -1,13 +1,12 @@
-# Freeze only after running `rlaopt-bench calibrate` on both target backends.
-# Values below are provisional smoke-tested tolerances until that calibration is complete.
+# Selected by `rlaopt-bench calibrate`; validate again on the held-out pilot cases.
 [cpu]
 rlaopt_nystrom_pcg = 1.0e-6
 rlaopt_cg = 1.0e-6
-scipy_lsqr = 1.0e-8
+scipy_lsqr = 1.0e-9
 torch_qr = 0.0
 
 [cuda]
 rlaopt_nystrom_pcg = 1.0e-6
 rlaopt_cg = 1.0e-6
-cuml_lsmr = 1.0e-6
+cuml_lsmr = 1.0e-9
 torch_qr = 0.0
