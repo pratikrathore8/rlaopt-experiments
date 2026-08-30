@@ -1,8 +1,25 @@
-# rlaopt synthetic ridge benchmarks
+# rlaopt experiments
 
-This repository compares rlaopt 0.1.0 with standard CPU and GPU methods on controlled synthetic ridge-regression problems. It is intentionally a fixed-budget testbed, not a claim that rank 128 is optimal for every spectrum.
+This repository contains reproducible benchmark suites comparing rlaopt with other optimization and numerical linear-algebra methods. It is intended to grow beyond least squares and ridge regression: each problem family should define its own mathematical model, competitors, accuracy contract, configuration, runner, and analysis while sharing the repository's environment, result-tracking, and orchestration conventions.
 
-## Mathematical model
+The first implemented suite is controlled synthetic ridge regression. Its fixed-budget design is documented below; it is not a claim that rank 128 is optimal for every spectrum or that its solver set applies to future problem families.
+
+## Benchmark-suite organization
+
+Repository-level dependencies and reproducibility policy live in `pyproject.toml`, `uv.lock`, and `containers/`. The current ridge suite uses `configs/synthetic.toml` and the `problem.py`, `solvers.py`, `diagnostics.py`, `runner.py`, and `plotting.py` modules. As additional benchmark families are introduced, their problem-specific configuration and implementation should be placed in named subpackages rather than added as conditionals to the ridge model. Shared concerns—stable run identifiers, atomic records, W&B recovery, hardware metadata, and Slurm submission—should remain reusable across suites.
+
+Every suite must document:
+
+- its mathematical problem and data-generating process;
+- the normalization and parameter scales used across problem sizes;
+- solver-specific mappings and a method-independent success criterion;
+- what setup, transfers, and synchronization are included in runtime;
+- resource limits, failure handling, and the exact hardware scope; and
+- suite-specific limitations and confirmatory versus exploratory analyses.
+
+The sections that follow describe only the synthetic ridge suite.
+
+## Synthetic ridge suite: mathematical model
 
 For every shape `(n,p)`, let `r=min(n,p)`. Draw independent Gaussian matrices, compute thin QR factorizations, and canonicalize each QR sign using the diagonal of `R`. This gives deterministic orthonormal factors `U in R^(n x r)` and `V in R^(p x r)`. For decay exponent `alpha`, define
 
@@ -35,7 +52,7 @@ This is the closed-form ridge solution for this construction, not a special “T
 
 We report effective dimension `sum_k s_k^2/(s_k^2+lambda)`, full condition number `(1+lambda)/lambda`, active condition number `(1+lambda)/(s_r^2+lambda)`, `r/p`, and `r/d_eff`.
 
-## Fixed experiment grid
+## Synthetic ridge suite: fixed experiment grid
 
 There are eight unique shapes:
 
@@ -56,7 +73,7 @@ Only the intended paper hardware is in scope for now:
 
 rlaopt always receives the matrix-free `X^T X` operator and `B=X^T y`, with `reg=lambda`. Nyström-PCG fixes `rank_init=rank_max=min(128,p)`, `base_damping=lambda`, and adaptive damping. Ridge is not folded into the operator, so it is never counted twice. SciPy uses a `LinearOperator` for `X` and `damp=sqrt(lambda)`. PyTorch uses the augmented system `[X; sqrt(lambda)I]w=[y;0]`, since `torch.linalg.lstsq` has no ridge argument. cuML uses `Ridge(alpha=lambda, fit_intercept=False, solver="lsmr")`.
 
-## Accuracy, stopping, and timing
+## Synthetic ridge suite: accuracy, stopping, and timing
 
 The cross-method success criterion is the externally recomputed relative KKT residual
 
@@ -87,7 +104,7 @@ We do not store multi-gigabyte matrices or their checksums. A stable problem ID 
 
 W&B defaults to offline mode. Atomic JSON files under `artifacts/records/` are the source of truth and remain recoverable if W&B fails; sync them later with `wandb sync` if desired.
 
-## Workflow
+## Synthetic ridge suite: workflow
 
 Create one manifest per backend:
 
@@ -117,12 +134,12 @@ uv run rlaopt-bench plot --input artifacts/records --output artifacts/figures
 
 The figure command creates log-log runtime scatterplots for fixed-`p`, fixed-`n`, and square families and a machine-readable failure summary. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Never connect points across different `alpha` or `lambda` without facet/legend separation.
 
-## Expected cost and limitations
+## Synthetic ridge suite: expected cost and limitations
 
 With all target nodes available concurrently, the sweep should take roughly 4–10 wall-clock hours; queueing, retries, and slow tail jobs make one to two days a realistic end-to-end allowance. The reduced `n<=2^18` grid and five-minute cap keep the study tractable.
 
 Reviewer-visible limitations are intentional: the response lies in `range(X)` and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs, but they must be labeled separately from this confirmatory grid.
 
-## Commit structure
+## Implementation history
 
-The implementation history is split into reproducible environment, generator, solver adapters, calibration/diagnostics, tracking/orchestration, aggregation/figures, and this documentation. This makes each experimental design choice independently reviewable.
+The first suite's implementation history is split into reproducible environment, generator, solver adapters, calibration/diagnostics, tracking/orchestration, aggregation/figures, and documentation. Future suites should follow the same reviewable separation without treating ridge-specific mathematics or solver interfaces as repository-wide abstractions.
