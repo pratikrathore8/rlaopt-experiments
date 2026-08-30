@@ -44,7 +44,8 @@ class RidgeProblem:
     def diagnostics(self, ridge: float) -> dict[str, float]:
         eig = self.singular_values.square()
         d_eff = float((eig / (eig + ridge)).sum())
-        full_condition = float((eig[0] + ridge) / ridge)
+        smallest_eigenvalue = eig[-1] if self.spec.rank == self.spec.p else 0.0
+        full_condition = float((eig[0] + ridge) / (smallest_eigenvalue + ridge))
         return {
             "effective_dimension": d_eff,
             "full_condition_number": full_condition,

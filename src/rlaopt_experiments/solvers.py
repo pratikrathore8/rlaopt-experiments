@@ -104,7 +104,8 @@ def scipy_lsqr(problem: RidgeProblem, ridge: float, tolerance: float,
                                  "acond": acond, "arnorm": arnorm, "xnorm": xnorm})
 
 
-def torch_qr(problem: RidgeProblem, ridge: float, **_: Any) -> SolveResult:
+def torch_lstsq_qr(problem: RidgeProblem, ridge: float, **_: Any) -> SolveResult:
+    """Solve the augmented ridge problem with PyTorch's QR-based lstsq driver."""
     x, y = problem.X, problem.y
     def factor_and_solve() -> tuple:
         augmented_x = torch.cat((
@@ -138,8 +139,9 @@ def cuml_lsmr(problem: RidgeProblem, ridge: float, tolerance: float,
                   max_iter=max_iters, output_type="cupy")
     runtime, _ = _timed(problem.X.device, lambda: (model.fit(x_cp, y_cp),))
     solution = torch.from_dlpack(model.coef_)
-    return SolveResult(solution, runtime, int(model.n_iter_) if model.n_iter_ is not None else None,
-                       "native_complete")
+    native_iterations = getattr(model, "n_iter_", None)
+    iterations = int(np.asarray(native_iterations).max()) if native_iterations is not None else None
+    return SolveResult(solution, runtime, iterations, "native_complete")
 
 
 def solve(name: str, problem: RidgeProblem, ridge: float, tolerance: float,
@@ -150,7 +152,11 @@ def solve(name: str, problem: RidgeProblem, ridge: float, tolerance: float,
         return _rlaopt(**kwargs, nystrom_rank=nystrom_rank)
     if name == "rlaopt_cg":
         return _rlaopt(**kwargs, nystrom_rank=None)
-    adapters = {"scipy_lsqr": scipy_lsqr, "torch_qr": torch_qr, "cuml_lsmr": cuml_lsmr}
+    adapters = {
+        "scipy_lsqr": scipy_lsqr,
+        "torch_qr": torch_lstsq_qr,
+        "cuml_lsmr": cuml_lsmr,
+    }
     try:
         return adapters[name](**kwargs)
     except KeyError as error:
