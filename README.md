@@ -127,7 +127,7 @@ curl -LsSf https://astral.sh/uv/0.12.7/install.sh | sh
 uv sync --frozen
 ```
 
-The project pins Python 3.12, uv 0.12.7, rlaopt 0.1.0 from PyPI, NumPy 2.5.2, SciPy 1.18.1, PyTorch 2.13.0, matplotlib 3.11.1, and W&B 0.29.0. `uv.lock` pins the transitive CPU environment. cuML/RAPIDS 26.08 is supplied only on the H200 through the official `26.08-cuda13-py3.12` base image in `containers/rapids.env`; CUDA 13 requires an NVIDIA driver of at least version 580 for this RAPIDS release. Replace the digest placeholder with the immutable registry digest before production. A mutable tag is not sufficient evidence of the GPU environment.
+The project pins Python 3.12, uv 0.12.7, rlaopt 0.1.0 from PyPI, NumPy 2.4.2, SciPy 1.18.1, PyTorch 2.13.0, matplotlib 3.11.1, and W&B 0.29.0. NumPy 2.4.2 is the newest release compatible with cuML 26.8.0's pinned Numba CUDA implementation; NumPy 2.5 removes `numpy.row_stack`, which that implementation still imports. `uv.lock` pins the transitive CPU environment and a separate `gpu` dependency group pins the standalone `cuml-cu13==26.8.0` wheel and its dependencies. GPU jobs use the official NVIDIA CUDA 13.0.2 devel image configured in `containers/cuda.env`; the devel flavor supplies NVRTC for Numba. Its `linux/amd64` base manifest is fixed by digest, and `containers/cuda.def.in` derives a project image containing uv, the frozen GPU environment, and the benchmark package. The H200 supports CUDA 13, and the soal cluster's driver is newer than CUDA 13's minimum requirement.
 
 W&B defaults to offline mode. Atomic JSON files under `artifacts/records/` are the source of truth and remain recoverable if W&B fails; sync them later with `wandb sync` if desired.
 
@@ -171,9 +171,15 @@ MANIFEST=artifacts/smoke-cpu.jsonl \
   sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
-For the GPU smoke test, add the site-specific GPU constraint and set `ALLOW_MUTABLE_RAPIDS_TAG=1` if the digest has not yet been frozen. Production CUDA jobs refuse to start while `RAPIDS_IMAGE_DIGEST` is the placeholder. Run `scripts/resolve_rapids_digest.sh`, copy the reported digest into `containers/rapids.env`, pull the digest-qualified image with the cluster's container runtime, and then execute the same array inside that image.
+Build the derived GPU image once from a login node by submitting:
 
-On the soal cluster, submit `sbatch slurm/check_rapids.sh` before the GPU smoke grid. It stages the immutable image in node-local storage, creates a Python 3.12 virtual environment with access to the container's system packages, syncs the frozen project lock into it, and performs a float64 cuML LSMR fit alongside PyTorch and rlaopt on one H200 NVL. Inspect `rapids-check-<job-id>.out` after completion; success ends with `PROJECT_ENVIRONMENT_INTEROPERABLE=true`.
+```bash
+sbatch slurm/build_cuda.sh
+```
+
+The build uses the immutable `linux/amd64` CUDA digest in `containers/cuda.env`, installs uv 0.12.7, and runs `uv sync --frozen --no-dev --group gpu` during the image build. The resulting `containers/rlaopt-cuda-13.0.2.sif` is intentionally ignored by Git. Preserve the SIF and its SHA-256 checksum with the experiment artifacts; rebuilding from the same inputs is auditable, but the checksum proves which exact image a run used. If the base tag changes, run `scripts/resolve_cuda_digest.sh` and review the new digest before editing `containers/cuda.env`.
+
+After the build succeeds, submit `sbatch slurm/check_cuda.sh` before the GPU smoke grid. It executes the baked environment and performs a float64 cuML LSMR fit alongside PyTorch and rlaopt on one H200 NVL. Inspect `cuda-check-<job-id>.out`; success ends with `PROJECT_ENVIRONMENT_INTEROPERABLE=true`. CUDA jobs submitted through `slurm/run_array.sh` use this SIF automatically, while CPU jobs continue to use `uv run --frozen` on the host.
 
 For the maximum-size CPU probe, use `/usr/bin/time -v` around one `run-job` command and compare its maximum resident set size with the `peak_memory_bytes` record. On CUDA, compare the recorded peak PyTorch allocation with `nvidia-smi` and scheduler accounting; allocator memory does not include every cuML/CUDA allocation.
 

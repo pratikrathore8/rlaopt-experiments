@@ -1,0 +1,40 @@
+Bootstrap: docker
+From: @CUDA_IMAGE_REFERENCE@
+
+%files
+    pyproject.toml /opt/rlaopt-experiments/pyproject.toml
+    uv.lock /opt/rlaopt-experiments/uv.lock
+    README.md /opt/rlaopt-experiments/README.md
+    src /opt/rlaopt-experiments/src
+
+%post
+    set -eu
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y --no-install-recommends ca-certificates curl python3.12 python3.12-venv
+    rm -rf /var/lib/apt/lists/*
+    export UV_UNMANAGED_INSTALL=/usr/local/bin
+    export UV_LINK_MODE=copy
+    curl -LsSf https://astral.sh/uv/0.12.7/install.sh | sh
+    cd /opt/rlaopt-experiments
+    uv venv --python /usr/bin/python3.12 .venv
+    UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
+        uv sync --frozen --no-dev --group gpu
+    uv --version
+
+%environment
+    export PATH=/opt/rlaopt-experiments/.venv/bin:$PATH
+    export UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv
+    export PYTHONNOUSERSITE=1
+
+%labels
+    org.opencontainers.image.title rlaopt-experiments-cuda
+    io.rlaopt.cuda.base.digest @CUDA_BASE_IMAGE_DIGEST@
+    io.rlaopt.cuda.version @CUDA_IMAGE_VERSION@
+    io.rlaopt.uv.version 0.12.7
+
+%test
+    export HOME=/tmp
+    export CUPY_CACHE_DIR=/tmp/cupy-cache
+    /opt/rlaopt-experiments/.venv/bin/python -c \
+        'import cupy, cuml, rlaopt, torch; print("container imports passed")'

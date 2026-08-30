@@ -220,4 +220,6 @@ __marimo__/
 artifacts/
 wandb/
 .venv/
-rapids-check-*.out
+cuda-check-*.out
+containers/*.sif
+cuda-build-*.out

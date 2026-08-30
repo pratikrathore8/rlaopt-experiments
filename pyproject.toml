@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [
   "matplotlib==3.11.1",
-  "numpy==2.5.2",
+  # cuML 26.8.0's numba-cuda still imports np.row_stack, removed in NumPy 2.5.
+  "numpy==2.4.2",
   "rlaopt==0.1.0",
   "scipy==1.18.1",
   "torch==2.13.0",
@@ -22,6 +23,7 @@ rlaopt-bench = "rlaopt_experiments.cli:main"
 
 [dependency-groups]
 dev = ["pytest==9.0.2", "ruff==0.15.6"]
+gpu = ["cuml-cu13==26.8.0"]
 
 [tool.uv]
 required-version = "==0.12.7"

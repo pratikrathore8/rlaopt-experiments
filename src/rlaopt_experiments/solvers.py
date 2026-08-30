@@ -132,7 +132,7 @@ def cuml_lsmr(problem: RidgeProblem, ridge: float, tolerance: float,
         import cupy as cp
         from cuml.linear_model import Ridge
     except ImportError as error:
-        raise RuntimeError("cuml_lsmr requires the pinned RAPIDS container") from error
+        raise RuntimeError("cuml_lsmr requires the pinned CUDA image") from error
     x_cp = cp.from_dlpack(problem.X)
     y_cp = cp.from_dlpack(problem.y)
     model = Ridge(alpha=ridge, fit_intercept=False, solver="lsmr", tol=tolerance,
