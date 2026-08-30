@@ -51,7 +51,8 @@ def make_figures(input_dir: Path, output_dir: Path) -> None:
                          label=f"{solver} ({backend})", alpha=0.75)
         axis.set(xscale="log", yscale="log", xlabel=label, ylabel="runtime (seconds)")
         axis.grid(True, which="both", alpha=0.2)
-        axis.legend(fontsize=7)
+        if series:
+            axis.legend(fontsize=7)
         figure.tight_layout()
         figure.savefig(output_dir / f"runtime_{family}.pdf")
         figure.savefig(output_dir / f"runtime_{family}.png", dpi=200)

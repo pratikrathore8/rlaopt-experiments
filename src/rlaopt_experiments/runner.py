@@ -38,17 +38,26 @@ def run_job(*, n: int, p: int, alpha: float, seed: int, solver: str, backend: st
         torch.cuda.synchronize()
 
     records: list[TrialRecord] = []
+    nystrom_seed = derive_seed(seed, "nystrom")
+
+    def run_once(ridge: float, maximum_iterations: int):
+        torch.manual_seed(nystrom_seed)
+        if backend == "cuda":
+            torch.cuda.manual_seed_all(nystrom_seed)
+        return solve(solver, problem, ridge, native_tolerance, maximum_iterations,
+                     timeout_seconds, rank)
+
     for ridge in ridges:
         maximum_iterations = 2 * p
         for _ in range(warmups):
-            solve(solver, problem, ridge, native_tolerance, min(maximum_iterations, 10),
-                  timeout_seconds, rank)
-        first = solve(solver, problem, ridge, native_tolerance, maximum_iterations,
-                      timeout_seconds, rank)
+            run_once(ridge, min(maximum_iterations, 10))
+        if backend == "cuda":
+            torch.cuda.reset_peak_memory_stats()
+        first = run_once(ridge, maximum_iterations)
         results = [first]
         if first.runtime_seconds < fast_threshold_seconds:
-            results.extend(solve(solver, problem, ridge, native_tolerance, maximum_iterations,
-                                 timeout_seconds, rank) for _ in range(fast_repetitions - 1))
+            results.extend(run_once(ridge, maximum_iterations)
+                           for _ in range(fast_repetitions - 1))
         runtimes = [result.runtime_seconds for result in results]
         for repetition, result in enumerate(results):
             accuracy = adjudicate(problem, ridge, result, kkt_tolerance)

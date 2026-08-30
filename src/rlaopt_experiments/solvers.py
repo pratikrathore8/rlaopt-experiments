@@ -54,9 +54,16 @@ def _rlaopt(problem: RidgeProblem, ridge: float, tolerance: float, max_iters: in
         )
 
     started = time.perf_counter()
-    solver = PCG(LinSys(normal_op, rhs, reg=float(ridge)), PCGConfig(
-        preconditioner_config=preconditioner
-    ))
+    # rlaopt 0.1.0's randomized error estimator creates one vector using the
+    # process default dtype. Keep that internal vector in benchmark float64.
+    previous_dtype = torch.get_default_dtype()
+    torch.set_default_dtype(x.dtype)
+    try:
+        solver = PCG(LinSys(normal_op, rhs, reg=float(ridge)), PCGConfig(
+            preconditioner_config=preconditioner
+        ))
+    finally:
+        torch.set_default_dtype(previous_dtype)
     estimate = torch.zeros_like(rhs)
     state = solver.init_state(estimate)
     rhs_norm = torch.linalg.vector_norm(rhs)
@@ -99,12 +106,22 @@ def scipy_lsqr(problem: RidgeProblem, ridge: float, tolerance: float,
 
 def torch_qr(problem: RidgeProblem, ridge: float, **_: Any) -> SolveResult:
     x, y = problem.X, problem.y
-    augmented_x = torch.cat((x, np.sqrt(ridge) * torch.eye(problem.spec.p, dtype=x.dtype,
-                                                           device=x.device)))
-    augmented_y = torch.cat((y, torch.zeros(problem.spec.p, dtype=y.dtype, device=y.device)))
-    runtime, output = _timed(x.device, lambda: torch.linalg.lstsq(
-        augmented_x, augmented_y, driver="gels" if x.device.type == "cuda" else "gelsy"
-    ))
+    def factor_and_solve() -> tuple:
+        augmented_x = torch.cat((
+            x,
+            np.sqrt(ridge) * torch.eye(problem.spec.p, dtype=x.dtype, device=x.device),
+        ))
+        augmented_y = torch.cat((
+            y,
+            torch.zeros(problem.spec.p, dtype=y.dtype, device=y.device),
+        ))
+        return torch.linalg.lstsq(
+            augmented_x,
+            augmented_y,
+            driver="gels" if x.device.type == "cuda" else "gelsy",
+        )
+
+    runtime, output = _timed(x.device, factor_and_solve)
     return SolveResult(output[0], runtime, None, "direct")
 
 
