@@ -40,19 +40,41 @@ def make_figures(input_dir: Path, output_dir: Path) -> None:
                                   ("fixed_n", "p", "features p"),
                                   ("square", "n", "square dimension n=p")):
         rows = _aggregate(records, family)
-        figure, axis = plt.subplots(figsize=(7, 4.5))
-        series: dict[tuple, list[dict]] = defaultdict(list)
-        for row in rows:
-            if row["runtime"] is not None:
-                series[(row["solver"], row["backend"])].append(row)
-        for (solver, backend), values in sorted(series.items()):
-            values.sort(key=lambda row: row[scale])
-            axis.scatter([row[scale] for row in values], [row["runtime"] for row in values],
-                         label=f"{solver} ({backend})", alpha=0.75)
-        axis.set(xscale="log", yscale="log", xlabel=label, ylabel="runtime (seconds)")
-        axis.grid(True, which="both", alpha=0.2)
-        if series:
-            axis.legend(fontsize=7)
+        if not rows:
+            continue
+        alphas = sorted({row["alpha"] for row in rows})
+        ridges = sorted({row["ridge"] for row in rows}, reverse=True)
+        figure, axes = plt.subplots(
+            len(alphas), len(ridges), figsize=(4 * len(ridges), 3.2 * len(alphas)),
+            sharex=True, sharey=True, squeeze=False,
+        )
+        legend_handles: dict[str, object] = {}
+        for alpha_index, alpha in enumerate(alphas):
+            for ridge_index, ridge in enumerate(ridges):
+                axis = axes[alpha_index][ridge_index]
+                series: dict[tuple, list[dict]] = defaultdict(list)
+                for row in rows:
+                    if row["runtime"] is not None and row["alpha"] == alpha and row["ridge"] == ridge:
+                        series[(row["solver"], row["backend"])].append(row)
+                for (solver, backend), values in sorted(series.items()):
+                    values.sort(key=lambda row: row[scale])
+                    series_label = f"{solver} ({backend})"
+                    handle = axis.scatter(
+                        [row[scale] for row in values], [row["runtime"] for row in values],
+                        label=series_label, alpha=0.75,
+                    )
+                    legend_handles.setdefault(series_label, handle)
+                axis.set(xscale="log", yscale="log",
+                         title=rf"$\alpha={alpha:g}$, $\lambda={ridge:g}$")
+                axis.grid(True, which="both", alpha=0.2)
+                if alpha_index == len(alphas) - 1:
+                    axis.set_xlabel(label)
+                if ridge_index == 0:
+                    axis.set_ylabel("runtime (seconds)")
+        if legend_handles:
+            figure.legend(legend_handles.values(), legend_handles.keys(), loc="outside lower center",
+                          ncol=min(4, len(legend_handles)), fontsize=8)
+            figure.subplots_adjust(bottom=0.12)
         figure.tight_layout()
         figure.savefig(output_dir / f"runtime_{family}.pdf")
         figure.savefig(output_dir / f"runtime_{family}.png", dpi=200)
