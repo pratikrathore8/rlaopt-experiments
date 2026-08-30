@@ -153,7 +153,22 @@ Submit a manifest using an array sized from the file (the full CPU manifest has 
 
 ```bash
 BACKEND=cpu MANIFEST=artifacts/cpu.jsonl \
+  CONFIG=configs/synthetic.toml \
   sbatch --array="0-$(($(wc -l < artifacts/cpu.jsonl)-1))" slurm/run_array.sh
+```
+
+`CONFIG` must be the same file used to generate `MANIFEST`; it defaults to `configs/synthetic.toml`. For example, submit the CPU smoke grid with
+
+```bash
+uv run rlaopt-bench manifest \
+  --config configs/smoke.toml \
+  --backend cpu \
+  --output artifacts/smoke-cpu.jsonl
+
+BACKEND=cpu \
+CONFIG=configs/smoke.toml \
+MANIFEST=artifacts/smoke-cpu.jsonl \
+  sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
 For the GPU smoke test, add the site-specific GPU constraint and set `ALLOW_MUTABLE_RAPIDS_TAG=1` if the digest has not yet been frozen. Production CUDA jobs refuse to start while `RAPIDS_IMAGE_DIGEST` is the placeholder. Run `scripts/resolve_rapids_digest.sh`, copy the reported digest into `containers/rapids.env`, pull the digest-qualified image with the cluster's container runtime, and then execute the same array inside that image.

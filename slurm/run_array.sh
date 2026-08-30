@@ -15,6 +15,7 @@ fi
 
 BACKEND="${BACKEND:?set BACKEND to cpu or cuda}"
 MANIFEST="${MANIFEST:?set MANIFEST to a JSONL manifest}"
+CONFIG="${CONFIG:-configs/synthetic.toml}"
 if [[ "$BACKEND" == "cuda" && ! "${RAPIDS_IMAGE_DIGEST:-}" =~ ^sha256:[0-9a-f]{64}$ \
       && "${ALLOW_MUTABLE_RAPIDS_TAG:-0}" != "1" ]]; then
   echo "Refusing CUDA production run without an immutable RAPIDS digest." >&2
@@ -22,7 +23,8 @@ if [[ "$BACKEND" == "cuda" && ! "${RAPIDS_IMAGE_DIGEST:-}" =~ ^sha256:[0-9a-f]{6
   exit 2
 fi
 LINE="$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$MANIFEST")"
-read -r N P ALPHA SEED SOLVER < <(python -c \
+read -r N P ALPHA SEED SOLVER < <(uv run --frozen python -c \
   'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
-timeout --signal=TERM 59m uv run rlaopt-bench run-job \
+timeout --signal=TERM 59m uv run --frozen rlaopt-bench run-job \
+  --config "$CONFIG" \
   --n "$N" --p "$P" --alpha "$ALPHA" --seed "$SEED" --solver "$SOLVER" --backend "$BACKEND"
