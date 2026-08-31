@@ -181,6 +181,8 @@ MANIFEST=artifacts/smoke-cpu.jsonl \
   sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
+For pilot and production CPU timing, split the manifest with `scripts/shard_cpu_manifest.py`. Submit the first shard sequentially on soal-8 with `--array=0-N%1 --nodelist=soal-8` and the second sequentially on soal-9 with `--array=0-N%1 --nodelist=soal-9`. The rotating assignment gives every problem two solvers per node and balances each solver across nodes without dropping or duplicating jobs.
+
 Build the derived GPU image once from a login node by submitting:
 
 ```bash
