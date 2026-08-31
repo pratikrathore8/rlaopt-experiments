@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --time=01:00:00
+#SBATCH --time=03:00:00
 #SBATCH --nodes=1
 #SBATCH --mem=128G
 #SBATCH --cpus-per-task=64
@@ -51,7 +51,7 @@ if [[ "$BACKEND" == "cuda" ]]; then
   read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
     /opt/rlaopt-experiments/.venv/bin/python -c \
     'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
-  timeout --signal=TERM 59m apptainer exec --nv \
+  timeout --signal=TERM 179m apptainer exec --nv \
     --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
     "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
     --config "$CONFIG" \
@@ -72,7 +72,7 @@ else
   read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
     /opt/rlaopt-experiments/.venv/bin/python -c \
     'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
-  timeout --signal=TERM 59m apptainer exec \
+  timeout --signal=TERM 179m apptainer exec \
     --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
     "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
     --config "$CONFIG" \
