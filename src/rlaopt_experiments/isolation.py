@@ -26,31 +26,32 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
         if os.environ.get("OMP_NUM_THREADS"):
             torch.set_num_threads(int(os.environ["OMP_NUM_THREADS"]))
         device = torch.device("cuda" if backend == "cuda" else "cpu")
-        problem = generate_problem(ProblemSpec(**specification))
+        problem = generate_problem(ProblemSpec(**specification), device=device)
         if backend == "cuda":
-            problem.X = problem.X.pin_memory().to(device, non_blocking=True)
-            problem.y = problem.y.pin_memory().to(device, non_blocking=True)
-            problem.singular_values = problem.singular_values.to(device)
-            problem.response_coordinates = problem.response_coordinates.to(device)
-            problem.right_signs = tuple(sign.to(device) for sign in problem.right_signs)
             torch.cuda.synchronize()
-        connection.send({
-            "kind": "ready",
-            "worker_metadata": {
-                "torch_version": torch.__version__,
-                "problem_generator": GENERATOR_VERSION,
-                "matrix_representation": "materialized_dense",
-                "torch_num_threads": torch.get_num_threads(),
-                "cuda_version": torch.version.cuda,
-                "cudnn_version": torch.backends.cudnn.version(),
-                "device_name": (
-                    torch.cuda.get_device_name(device) if backend == "cuda" else platform.processor()
-                ),
-                "device_capability": (
-                    list(torch.cuda.get_device_capability(device)) if backend == "cuda" else None
-                ),
-            },
-        })
+        connection.send(
+            {
+                "kind": "ready",
+                "worker_metadata": {
+                    "torch_version": torch.__version__,
+                    "problem_generator": GENERATOR_VERSION,
+                    "matrix_representation": "materialized_dense",
+                    "torch_num_threads": torch.get_num_threads(),
+                    "cuda_version": torch.version.cuda,
+                    "cudnn_version": torch.backends.cudnn.version(),
+                    "device_name": (
+                        torch.cuda.get_device_name(device)
+                        if backend == "cuda"
+                        else platform.processor()
+                    ),
+                    "device_capability": (
+                        list(torch.cuda.get_device_capability(device))
+                        if backend == "cuda"
+                        else None
+                    ),
+                },
+            }
+        )
 
         while True:
             command = connection.recv()
@@ -64,45 +65,57 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
             started = time.perf_counter()
             try:
                 result = solve(
-                    command["solver"], problem, ridge, command["native_tolerance"],
-                    command["max_iters"], command["timeout_seconds"], command["rank"],
+                    command["solver"],
+                    problem,
+                    ridge,
+                    command["native_tolerance"],
+                    command["max_iters"],
+                    command["timeout_seconds"],
+                    command["rank"],
                 )
                 accuracy = adjudicate(problem, ridge, result, command["kkt_tolerance"])
-                connection.send({
-                    "kind": "result",
-                    "runtime_seconds": result.runtime_seconds,
-                    "iterations": result.iterations,
-                    "native_status": result.native_status,
-                    "trace": result.trace,
-                    "solver_metadata": result.metadata | {
-                        "native_tolerance": command["native_tolerance"],
-                    },
-                    "accuracy": asdict(accuracy),
-                    "diagnostics": problem.diagnostics(ridge),
-                    "peak_memory_bytes": (
-                        torch.cuda.max_memory_allocated()
-                        if backend == "cuda"
-                        else resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
-                    ),
-                })
+                connection.send(
+                    {
+                        "kind": "result",
+                        "runtime_seconds": result.runtime_seconds,
+                        "iterations": result.iterations,
+                        "native_status": result.native_status,
+                        "trace": result.trace,
+                        "solver_metadata": result.metadata
+                        | {
+                            "native_tolerance": command["native_tolerance"],
+                        },
+                        "accuracy": asdict(accuracy),
+                        "diagnostics": problem.diagnostics(ridge),
+                        "peak_memory_bytes": (
+                            torch.cuda.max_memory_allocated()
+                            if backend == "cuda"
+                            else resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
+                        ),
+                    }
+                )
             except BaseException as error:  # Preserve native failures as data.
-                connection.send({
-                    "kind": "error",
-                    "runtime_seconds": time.perf_counter() - started,
-                    "native_status": "exception",
+                connection.send(
+                    {
+                        "kind": "error",
+                        "runtime_seconds": time.perf_counter() - started,
+                        "native_status": "exception",
+                        "error_type": type(error).__name__,
+                        "error_message": str(error),
+                        "traceback": traceback.format_exc(),
+                    }
+                )
+    except BaseException as error:
+        try:
+            connection.send(
+                {
+                    "kind": "startup_error",
+                    "native_status": "startup_exception",
                     "error_type": type(error).__name__,
                     "error_message": str(error),
                     "traceback": traceback.format_exc(),
-                })
-    except BaseException as error:
-        try:
-            connection.send({
-                "kind": "startup_error",
-                "native_status": "startup_exception",
-                "error_type": type(error).__name__,
-                "error_message": str(error),
-                "traceback": traceback.format_exc(),
-            })
+                }
+            )
         except BaseException:
             pass
     finally:
