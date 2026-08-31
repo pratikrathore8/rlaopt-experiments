@@ -19,10 +19,12 @@ from rlaopt_experiments.seeds import derive_seed
 
 def solve(problem, ridge: float, driver: str) -> tuple[float, torch.Tensor]:
     started = time.perf_counter()
-    augmented_x = torch.cat((
-        problem.X,
-        ridge**0.5 * torch.eye(problem.spec.p, dtype=problem.X.dtype),
-    ))
+    augmented_x = torch.cat(
+        (
+            problem.X,
+            ridge**0.5 * torch.eye(problem.spec.p, dtype=problem.X.dtype),
+        )
+    )
     augmented_y = torch.cat((problem.y, torch.zeros(problem.spec.p, dtype=problem.y.dtype)))
     solution = torch.linalg.lstsq(augmented_x, augmented_y, driver=driver).solution
     return time.perf_counter() - started, solution
@@ -55,9 +57,7 @@ def main() -> None:
                     "repetition": repetition,
                     "runtime_seconds": runtime,
                     "relative_kkt": relative_kkt(problem, solution, ridge),
-                    "relative_solution_error": relative_solution_error(
-                        problem, solution, ridge
-                    ),
+                    "relative_solution_error": relative_solution_error(problem, solution, ridge),
                 }
                 results.append(row)
                 print(json.dumps(row, sort_keys=True), flush=True)

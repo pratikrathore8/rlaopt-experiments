@@ -15,8 +15,9 @@ class Accuracy:
     success: bool
 
 
-def adjudicate(problem: RidgeProblem, ridge: float, result: SolveResult,
-               target: float = 1e-6) -> Accuracy:
+def adjudicate(
+    problem: RidgeProblem, ridge: float, result: SolveResult, target: float = 1e-6
+) -> Accuracy:
     kkt = relative_kkt(problem, result.solution, ridge)
     solution_error = relative_solution_error(problem, result.solution, ridge)
     return Accuracy(kkt, solution_error, kkt <= target)
@@ -24,8 +25,11 @@ def adjudicate(problem: RidgeProblem, ridge: float, result: SolveResult,
 
 def choose_native_tolerance(outcomes: dict[float, list[Accuracy]], target: float) -> float:
     """Choose the loosest candidate that meets the target for every calibration case."""
-    valid = [tol for tol, values in outcomes.items()
-             if values and all(item.relative_kkt <= target for item in values)]
+    valid = [
+        tol
+        for tol, values in outcomes.items()
+        if values and all(item.relative_kkt <= target for item in values)
+    ]
     if not valid:
         raise RuntimeError("no native tolerance passed every calibration case")
     return max(valid)

@@ -39,17 +39,23 @@ def main() -> None:
     checksum = float(q[0, 0] + r[0, 0])
     peak_cuda = torch.cuda.max_memory_allocated(device) if device.type == "cuda" else None
     peak_rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
-    print(json.dumps({
-        "backend": args.backend,
-        "dimension": args.dimension,
-        "dtype": "float64",
-        "allocation_seconds": allocation_seconds,
-        "qr_seconds": qr_seconds,
-        "checksum": checksum,
-        "peak_cuda_allocator_bytes": peak_cuda,
-        "peak_process_rss_bytes": peak_rss,
-        "torch_version": torch.__version__,
-    }, sort_keys=True), flush=True)
+    print(
+        json.dumps(
+            {
+                "backend": args.backend,
+                "dimension": args.dimension,
+                "dtype": "float64",
+                "allocation_seconds": allocation_seconds,
+                "qr_seconds": qr_seconds,
+                "checksum": checksum,
+                "peak_cuda_allocator_bytes": peak_cuda,
+                "peak_process_rss_bytes": peak_rss,
+                "torch_version": torch.__version__,
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

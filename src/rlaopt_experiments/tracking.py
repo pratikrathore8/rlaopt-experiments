@@ -22,8 +22,13 @@ def wandb_run(record: TrialRecord, output_dir: Path) -> Iterator[object | None]:
     config = asdict(record)
     config.pop("trace")
     try:
-        run = wandb.init(project="rlaopt-synthetic-ridge", id=record.run_id,
-                         dir=str(output_dir), config=config, resume="allow")
+        run = wandb.init(
+            project="rlaopt-synthetic-ridge",
+            id=record.run_id,
+            dir=str(output_dir),
+            config=config,
+            resume="allow",
+        )
     except Exception:
         yield None
         return
@@ -42,12 +47,14 @@ def log_record(run: object | None, record: TrialRecord, trace: list[dict[str, fl
     try:
         for point in trace:
             run.log({f"convergence/{key}": value for key, value in point.items()})
-        run.log({
-            "summary/runtime_seconds": record.runtime_seconds,
-            "summary/relative_kkt": record.relative_kkt,
-            "summary/relative_solution_error": record.relative_solution_error,
-            "summary/success": int(record.success),
-        })
+        run.log(
+            {
+                "summary/runtime_seconds": record.runtime_seconds,
+                "summary/relative_kkt": record.relative_kkt,
+                "summary/relative_solution_error": record.relative_solution_error,
+                "summary/success": int(record.success),
+            }
+        )
     except Exception:
         # The atomic JSON record is authoritative; telemetry must not stop a job.
         return
