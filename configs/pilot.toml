@@ -4,6 +4,7 @@ lambdas = [0.01, 0.000001]
 seeds = [0]
 kkt_tolerance = 1.0e-6
 timeout_seconds = 300
+startup_timeout_seconds = 900
 nystrom_rank = 128
 warmups = 1
 repetitions = 3

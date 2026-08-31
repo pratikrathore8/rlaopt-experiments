@@ -22,6 +22,7 @@ class ExperimentConfig:
     seeds: tuple[int, ...]
     kkt_tolerance: float
     timeout_seconds: int
+    startup_timeout_seconds: int
     nystrom_rank: int
     warmups: int
     repetitions: int
@@ -30,10 +31,13 @@ class ExperimentConfig:
 def load_experiment(path: Path) -> ExperimentConfig:
     data = tomllib.loads(path.read_text())["experiment"]
     shapes = tuple(Shape(**shape) for shape in data.pop("shapes"))
-    return ExperimentConfig(shapes=shapes, **{
-        key: tuple(value) if key in {"alphas", "lambdas", "seeds"} else value
-        for key, value in data.items()
-    })
+    return ExperimentConfig(
+        shapes=shapes,
+        **{
+            key: tuple(value) if key in {"alphas", "lambdas", "seeds"} else value
+            for key, value in data.items()
+        },
+    )
 
 
 def load_tolerances(path: Path, backend: str) -> dict[str, float]:
