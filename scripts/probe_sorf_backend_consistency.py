@@ -44,8 +44,7 @@ def main() -> None:
         torch.cuda.synchronize()
         cuda_seconds = time.perf_counter() - cuda_started
 
-        records.append(
-            {
+        record = {
                 "n": spec.n,
                 "p": spec.p,
                 "cpu_generation_seconds": cpu_seconds,
@@ -56,8 +55,14 @@ def main() -> None:
                 "cpu_oracle_kkt": relative_kkt(cpu, cpu.oracle(1e-4), 1e-4),
                 "cuda_oracle_kkt": relative_kkt(cuda, cuda.oracle(1e-4), 1e-4),
             }
-        )
+        for key in ("matrix", "response", "oracle"):
+            if record[key]["max_absolute_difference"] > 1e-12:
+                raise RuntimeError(f"CPU and CUDA {key} disagree for n={spec.n}")
+        if record["cpu_oracle_kkt"] > 1e-10 or record["cuda_oracle_kkt"] > 1e-10:
+            raise RuntimeError(f"oracle failed the KKT check for n={spec.n}")
+        records.append(record)
     print(json.dumps(records, indent=2, sort_keys=True), flush=True)
+    print("PROBLEM_BACKEND_EQUIVALENCE=true", flush=True)
 
 
 if __name__ == "__main__":
