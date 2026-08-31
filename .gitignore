@@ -238,3 +238,5 @@ pilot-rerun-cpu-qr-*.out
 torch-qr-drivers-*.out
 probe-qr-cpu-*.out
 probe-qr-cuda-*.out
+max-size-cpu-*.out
+max-size-cuda-*.out
