@@ -125,11 +125,11 @@ def torch_lstsq_qr(problem: RidgeProblem, ridge: float, **_: Any) -> SolveResult
         return torch.linalg.lstsq(
             augmented_x,
             augmented_y,
-            driver="gels" if x.device.type == "cuda" else "gelsy",
+            driver="gels",
         )
 
     runtime, output = _timed(x.device, factor_and_solve)
-    return SolveResult(output[0], runtime, None, "direct")
+    return SolveResult(output[0], runtime, None, "direct", metadata={"driver": "gels"})
 
 
 def cuml_lsmr(problem: RidgeProblem, ridge: float, tolerance: float,

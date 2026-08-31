@@ -228,3 +228,10 @@ cuda-calibrate-*.out
 cpu-calibrate-*.out
 cpu-smoke-*.out
 cpu-check-*.out
+
+pilot-cpu-*.out
+pilot-cuda-*.out
+pilot-rerun-cpu-qr-*.out
+torch-qr-drivers-*.out
+probe-qr-cpu-*.out
+probe-qr-cuda-*.out
