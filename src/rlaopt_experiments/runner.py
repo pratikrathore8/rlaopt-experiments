@@ -134,7 +134,7 @@ def _record(
     )
     write_record(output_dir / "records" / f"{run_id}.json", record)
     with wandb_run(record, output_dir) as run:
-        log_record(run, record, outcome.get("trace", []))
+        log_record(run, record)
     return record
 
 

@@ -34,47 +34,29 @@ export APPTAINERENV_RLAOPT_GIT_DIRTY="$RLAOPT_GIT_DIRTY"
 echo "RLAOPT_GIT_COMMIT=$RLAOPT_GIT_COMMIT"
 echo "RLAOPT_GIT_DIRTY=$RLAOPT_GIT_DIRTY"
 
-if [[ "$BACKEND" == "cuda" ]]; then
-  DERIVED_IMAGE="${RLAOPT_CUDA_IMAGE:-containers/rlaopt-cuda-${CUDA_IMAGE_VERSION}.sif}"
-  if [[ "$DERIVED_IMAGE" != /* ]]; then
-    DERIVED_IMAGE="$REPOSITORY/$DERIVED_IMAGE"
-  fi
-  if [[ ! -f "$DERIVED_IMAGE" ]]; then
-    echo "Derived image not found: $DERIVED_IMAGE" >&2
-    echo "Submit slurm/build_cuda.sh first." >&2
-    exit 2
-  fi
-  RLAOPT_CUDA_IMAGE_SHA256="$(cut -d' ' -f1 "$DERIVED_IMAGE.sha256")"
-  export RLAOPT_CUDA_IMAGE_SHA256
-  export APPTAINERENV_RLAOPT_CUDA_IMAGE_SHA256="$RLAOPT_CUDA_IMAGE_SHA256"
-  echo "RLAOPT_CUDA_IMAGE_SHA256=$RLAOPT_CUDA_IMAGE_SHA256"
-  read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
-    /opt/rlaopt-experiments/.venv/bin/python -c \
-    'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
-  timeout --signal=TERM 179m apptainer exec --nv \
-    --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
-    "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
-    --config "$CONFIG" \
-    --n "$N" --p "$P" --alpha "$ALPHA" --seed "$SEED" --solver "$SOLVER" --backend "$BACKEND"
-else
-  DERIVED_IMAGE="${RLAOPT_CUDA_IMAGE:-containers/rlaopt-cuda-${CUDA_IMAGE_VERSION}.sif}"
-  if [[ "$DERIVED_IMAGE" != /* ]]; then
-    DERIVED_IMAGE="$REPOSITORY/$DERIVED_IMAGE"
-  fi
-  if [[ ! -f "$DERIVED_IMAGE" ]]; then
-    echo "Benchmark image not found: $DERIVED_IMAGE" >&2
-    echo "Submit slurm/build_cuda.sh first." >&2
-    exit 2
-  fi
-  RLAOPT_CUDA_IMAGE_SHA256="$(cut -d' ' -f1 "$DERIVED_IMAGE.sha256")"
-  export APPTAINERENV_RLAOPT_CUDA_IMAGE_SHA256="$RLAOPT_CUDA_IMAGE_SHA256"
-  echo "RLAOPT_CUDA_IMAGE_SHA256=$RLAOPT_CUDA_IMAGE_SHA256"
-  read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
-    /opt/rlaopt-experiments/.venv/bin/python -c \
-    'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
-  timeout --signal=TERM 179m apptainer exec \
-    --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
-    "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
-    --config "$CONFIG" \
-    --n "$N" --p "$P" --alpha "$ALPHA" --seed "$SEED" --solver "$SOLVER" --backend "$BACKEND"
+DERIVED_IMAGE="${RLAOPT_CUDA_IMAGE:-containers/rlaopt-cuda-${CUDA_IMAGE_VERSION}.sif}"
+if [[ "$DERIVED_IMAGE" != /* ]]; then
+  DERIVED_IMAGE="$REPOSITORY/$DERIVED_IMAGE"
 fi
+if [[ ! -f "$DERIVED_IMAGE" ]]; then
+  echo "Benchmark image not found: $DERIVED_IMAGE" >&2
+  echo "Submit slurm/build_cuda.sh first." >&2
+  exit 2
+fi
+RLAOPT_CUDA_IMAGE_SHA256="$(cut -d' ' -f1 "$DERIVED_IMAGE.sha256")"
+export RLAOPT_CUDA_IMAGE_SHA256
+export APPTAINERENV_RLAOPT_CUDA_IMAGE_SHA256="$RLAOPT_CUDA_IMAGE_SHA256"
+echo "RLAOPT_CUDA_IMAGE_SHA256=$RLAOPT_CUDA_IMAGE_SHA256"
+
+read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
+  /opt/rlaopt-experiments/.venv/bin/python -c \
+  'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
+
+APPTAINER_ARGS=(--bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY")
+if [[ "$BACKEND" == "cuda" ]]; then
+  APPTAINER_ARGS=(--nv "${APPTAINER_ARGS[@]}")
+fi
+timeout --signal=TERM 179m apptainer exec "${APPTAINER_ARGS[@]}" \
+  "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
+  --config "$CONFIG" \
+  --n "$N" --p "$P" --alpha "$ALPHA" --seed "$SEED" --solver "$SOLVER" --backend "$BACKEND"

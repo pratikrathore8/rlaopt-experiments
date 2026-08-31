@@ -41,11 +41,11 @@ def wandb_run(record: TrialRecord, output_dir: Path) -> Iterator[object | None]:
             pass
 
 
-def log_record(run: object | None, record: TrialRecord, trace: list[dict[str, float]]) -> None:
+def log_record(run: object | None, record: TrialRecord) -> None:
     if run is None:
         return
     try:
-        for point in trace:
+        for point in record.trace:
             run.log({f"convergence/{key}": value for key, value in point.items()})
         run.log(
             {

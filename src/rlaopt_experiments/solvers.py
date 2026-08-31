@@ -56,7 +56,7 @@ def _rlaopt(
     x_op.device = x.device
     x_op.T.device = x.device
     normal_op.device = x.device
-    rhs = (x.mT @ problem.y).unsqueeze(-1)
+    rhs = problem.rhs().unsqueeze(-1)
     if nystrom_rank is None:
         preconditioner = IdentityConfig()
     else:

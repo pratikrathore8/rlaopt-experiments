@@ -42,3 +42,8 @@ def load_experiment(path: Path) -> ExperimentConfig:
 
 def load_tolerances(path: Path, backend: str) -> dict[str, float]:
     return tomllib.loads(path.read_text())[backend]
+
+
+def load_solvers(path: Path, backend: str) -> tuple[str, ...]:
+    data = tomllib.loads(path.read_text())
+    return tuple(data["backends"][backend]["solvers"])
