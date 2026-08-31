@@ -17,8 +17,12 @@ def _records(path: Path) -> list[dict]:
 def _aggregate(records: list[dict], family: str) -> list[dict]:
     groups: dict[tuple, list[dict]] = defaultdict(list)
     for row in records:
-        inferred = "square" if row["n"] == row["p"] else ("fixed_p" if row["p"] == 4096 else "fixed_n")
-        if inferred == family:
+        belongs = {
+            "square": row["n"] == row["p"],
+            "fixed_p": row["p"] == 16384 and row["n"] >= row["p"],
+            "fixed_n": row["n"] == 65536 and row["p"] <= row["n"],
+        }
+        if belongs[family]:
             groups[(row["solver"], row["backend"], row["n"], row["p"], row["alpha"],
                     row["ridge"])].append(row)
     result = []

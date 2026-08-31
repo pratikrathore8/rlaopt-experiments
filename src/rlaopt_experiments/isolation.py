@@ -19,7 +19,7 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
         import torch
 
         from rlaopt_experiments.diagnostics import adjudicate
-        from rlaopt_experiments.problem import ProblemSpec, generate_problem
+        from rlaopt_experiments.problem import GENERATOR_VERSION, ProblemSpec, generate_problem
         from rlaopt_experiments.solvers import solve
 
         torch.set_default_dtype(torch.float64)
@@ -30,15 +30,16 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
         if backend == "cuda":
             problem.X = problem.X.pin_memory().to(device, non_blocking=True)
             problem.y = problem.y.pin_memory().to(device, non_blocking=True)
-            problem.U = problem.U.to(device)
-            problem.V = problem.V.to(device)
             problem.singular_values = problem.singular_values.to(device)
             problem.response_coordinates = problem.response_coordinates.to(device)
+            problem.right_signs = tuple(sign.to(device) for sign in problem.right_signs)
             torch.cuda.synchronize()
         connection.send({
             "kind": "ready",
             "worker_metadata": {
                 "torch_version": torch.__version__,
+                "problem_generator": GENERATOR_VERSION,
+                "matrix_representation": "materialized_dense",
                 "torch_num_threads": torch.get_num_threads(),
                 "cuda_version": torch.version.cuda,
                 "cudnn_version": torch.backends.cudnn.version(),

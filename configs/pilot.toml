@@ -9,8 +9,8 @@ warmups = 1
 repetitions = 3
 
 [[experiment.shapes]]
-n = 256
-p = 256
+n = 1024
+p = 1024
 family = "square"
 [[experiment.shapes]]
 n = 4096
@@ -18,11 +18,11 @@ p = 4096
 family = "square"
 [[experiment.shapes]]
 n = 16384
-p = 4096
-family = "fixed_p"
+p = 16384
+family = "square"
 [[experiment.shapes]]
-n = 262144
-p = 1024
+n = 65536
+p = 4096
 family = "fixed_n"
 
 [backends.cpu]

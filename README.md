@@ -21,7 +21,13 @@ The sections that follow describe only the synthetic ridge suite.
 
 ## Synthetic ridge suite: mathematical model
 
-For every shape $(n,p)$, let $r=\min(n,p)$. Draw independent Gaussian matrices, compute thin QR factorizations, and canonicalize each QR sign using the diagonal of $R$. This gives deterministic orthonormal factors $U \in \mathbb{R}^{n \times r}$ and $V \in \mathbb{R}^{p \times r}$. For decay exponent $\alpha$, define
+For every shape $(n,p)$, let $r=\min(n,p)$. Large Haar factors are prohibitively expensive to generate by Gaussian QR, so the suite uses independent Structured Orthogonal Random Feature (SORF) factors. Let $H_d$ denote the normalized $d\times d$ Walsh--Hadamard matrix and let each $D_i$ be an independently seeded diagonal matrix of Rademacher signs. Following [Yu et al. (2016)](https://arxiv.org/abs/1610.09072), define
+
+$$
+Q_d = H_d D_1 H_d D_2 H_d D_3.
+$$
+
+Every factor in this product is orthogonal, so $Q_d$ is orthogonal. Independent sign streams give $Q_n^{(L)}$ and $Q_p^{(R)}$. For decay exponent $\alpha$, define
 
 $$
 s_k = k^{-\alpha/2}, \qquad k=1,\ldots,r,
@@ -30,15 +36,15 @@ $$
 and
 
 $$
-X = U \mathrm{diag}(s) V^{\mathsf T}.
+X = Q_n^{(L)}[:,1:r] \,\mathrm{diag}(s)\, Q_p^{(R)}[:,1:r]^{\mathsf T}.
 $$
 
-Thus the nonzero eigenvalues of $X^{\mathsf T}X$ are exactly $k^{-\alpha}$ and $\lVert X\rVert_2=1$. The three profiles are $\alpha \in \{1/2,1,2\}$. This normalization is equivalent to starting from the statistical convention $G/\sqrt{n}$ and then prescribing the population spectrum; it prevents sample count from changing the regularization scale.
+The implementation starts from the rectangular diagonal matrix containing $s$ and applies the SORF transforms directly along its row and column axes with the standard fast Walsh--Hadamard butterfly. It never materializes either dense singular-vector factor. The final $X$ is nevertheless an ordinary dense float64 tensor; the compact right-factor signs are retained only for the analytic oracle and are never used by a solver adapter. Thus the nonzero eigenvalues of $X^{\mathsf T}X$ are exactly $k^{-\alpha}$ and $\lVert X\rVert_2=1$. The three profiles are $\alpha \in \{1/2,1,2\}$. This normalization prevents sample count from changing the regularization scale.
 
 The response is generated from an independent Gaussian vector $z$, normalized as $\widehat z=z/\lVert z\rVert_2$, with
 
 $$
-y = U\widehat z, \qquad \lVert y\rVert_2=1.
+y = Q_n^{(L)}[:,1:r]\widehat z, \qquad \lVert y\rVert_2=1.
 $$
 
 Every method solves, in float64,
@@ -51,7 +57,7 @@ for $\lambda \in \{10^{-2},10^{-4},10^{-6}\}$. The exact reference solution is d
 
 $$
 w_\star
-= V\,\mathrm{diag}\left(\frac{s_k}{s_k^2+\lambda}\right)\widehat z.
+= Q_p^{(R)}[:,1:r] \,\mathrm{diag}\left(\frac{s_k}{s_k^2+\lambda}\right)\widehat z.
 $$
 
 We report the effective dimension
@@ -68,7 +74,8 @@ $$
 = \frac{1+\lambda}{p^{-\alpha}+\lambda},
 $$
 
-and the ratios $r/p$ and $r/d_{\mathrm{eff}}$. This formula uses the fact that every configured shape has $n\ge p$ and therefore $X$ has full column rank.
+and the ratios $r/p$ and $r/d_{\mathrm{eff}}$. Every configured shape has $n\ge p$, so $X$ has full column rank.
+
 
 ## Synthetic ridge suite: fixed experiment grid
 
@@ -76,9 +83,10 @@ There are eight unique shapes:
 
 | family | $(n,p)$ |
 |---|---|
-| square anchors | $(2^8,2^8)$, $(2^{10},2^{10})$, $(2^{12},2^{12})$ |
-| sample scaling ($p=2^{12}$) | $(2^{14},2^{12})$, $(2^{16},2^{12})$, $(2^{18},2^{12})$ |
-| feature scaling ($n=2^{18}$) | $(2^{18},2^8)$, $(2^{18},2^{10})$ |
+| square scaling | $(2^{10},2^{10})$, $(2^{12},2^{12})$, $(2^{14},2^{14})$, $(2^{16},2^{16})$ |
+| sample scaling ($p=2^{14}$) | $(2^{14},2^{14})$, $(2^{15},2^{14})$, $(2^{16},2^{14})$ |
+| feature scaling ($n=2^{16}$) | $(2^{16},2^{10})$, $(2^{16},2^{12})$, $(2^{16},2^{14})$, $(2^{16},2^{16})$ |
+
 
 Each shape uses three decay profiles, three master seeds, and three ridge values. Factor, response, and Nyström randomness use separately derived deterministic streams. A job is $(\text{hardware},\text{solver},\text{shape},\alpha,\text{seed})$ and reuses the same data matrix $X$ for all three ridge values: 288 jobs per backend, 576 total, and 1,728 ridge trials before timing repetitions.
 
@@ -89,14 +97,14 @@ We use the following hardware and solver combinations:
 | CPU | 64 physical cores on soal-8/soal-9 | rlaopt Nyström-PCG, rlaopt identity-PCG (CG), SciPy LSQR, PyTorch augmented QR |
 | GPU | NVIDIA H200 NVL on soal-12 | both rlaopt variants, cuML Ridge/LSMR, PyTorch augmented QR |
 
-rlaopt always receives $X^{\mathsf T}X$ as a linear operator (i.e., it never forms the Gram matrix) and $B=X^{\mathsf T}y$, with `reg=lambda`. Nyström PCG fixes $\mathtt{rank\_init}=\mathtt{rank\_max}=\min(128,p)$, `base_damping=lambda`, and adaptive damping. Ridge is not folded into the operator, so it is never counted twice. SciPy uses a `LinearOperator` for $X$ and $\mathtt{damp}=\sqrt{\lambda}$. PyTorch uses the augmented system
+rlaopt always receives $X^{\mathsf T}X$ as a linear operator over the fully materialized dense $X$ (i.e., it never forms the Gram matrix) and $B=X^{\mathsf T}y$, with `reg=lambda`. Nyström PCG fixes $\mathtt{rank\_init}=\mathtt{rank\_max}=\min(128,p)$, `base_damping=lambda`, and adaptive damping. Ridge is not folded into the operator, so it is never counted twice. It does not receive the SORF factors or a fast-transform operator; its products use the same dense $X$ supplied to every competitor. SciPy uses a `LinearOperator` wrapper around the same dense $X$ and $\mathtt{damp}=\sqrt{\lambda}$. PyTorch uses the augmented system
 
 $$
 \begin{bmatrix}X\\ \sqrt{\lambda}I\end{bmatrix}w
 = \begin{bmatrix}y\\0\end{bmatrix},
 $$
 
-since `torch.linalg.lstsq` has no ridge argument. The adapter is named `torch_lstsq_qr` in code and selects the QR-based `gelsy` driver on CPU and `gels` on CUDA; the stable manifest identifier remains `torch_qr`. cuML uses `Ridge(alpha=lambda, fit_intercept=False, solver="lsmr")`.
+since `torch.linalg.lstsq` has no ridge argument. The adapter is named `torch_lstsq_qr` in code and selects the unpivoted QR-based `gels` driver on both CPU and CUDA; the augmented matrix has full column rank for every positive ridge value; the stable manifest identifier remains `torch_qr`. cuML uses `Ridge(alpha=lambda, fit_intercept=False, solver="lsmr")`.
 
 ## Synthetic ridge suite: accuracy, stopping, and timing
 
@@ -114,11 +122,11 @@ Native tolerances live in `configs/tolerances.toml`. Calibrate one tolerance per
 
 Run calibration with, for example, `uv run rlaopt-bench calibrate --backend cpu --solver scipy_lsqr --candidates 1e-4 1e-5 1e-6 1e-7 1e-8`. The command writes all underlying records plus `calibration.json`; copy the selected value into `configs/tolerances.toml` only after inspecting every case.
 
-Use `configs/calibration.toml` for the fixed easy, middle, and hard calibration regimes. Each problem is generated once and retained while all candidate tolerances run with independently initialized solvers. These cases select a candidate; the largest cases in `configs/pilot.toml` are held out to check that the selected relative tolerance transfers to larger dimensions before it is frozen. CUDA calibration runs through `slurm/calibrate_cuda.sh` inside the pinned image, while 64-core CPU calibration runs through `slurm/calibrate_cpu.sh` on soal-8 or soal-9.
+Use `configs/calibration.toml` for the fixed easy, middle, and hard calibration regimes. Each problem is generated once and retained while all candidate tolerances run with independently initialized solvers. The current tolerances remain frozen after the switch to SORF because they are relative stopping criteria; they are not selected again on production endpoints. The cases in `configs/pilot.toml` instead provide held-out transfer checks. Any KKT failure is reported as evidence that a tolerance did not transfer and is not silently tuned away. CUDA calibration runs through `slurm/calibrate_cuda.sh` inside the pinned image, while 64-core CPU calibration runs through `slurm/calibrate_cpu.sh` on soal-8 or soal-9.
 
 Iterative solvers stop at native convergence, $2p$ iterations, or five minutes, whichever comes first. QR has only the five-minute timeout. A persistent spawned worker retains the generated problem but places every timed native call behind a parent-enforced process boundary; if a solver exceeds five minutes, the parent terminates that worker and regenerates the same deterministic problem before continuing with the next ridge value. rlaopt additionally checks elapsed time cooperatively on every iteration. A timeout, exception, or native “success” that misses KKT is written as a structured failure, never silently dropped.
 
-Problem generation, analytic oracle work, CPU pinning, and host-to-device transfer are excluded from runtime. Timed regions include preconditioner construction, factorization, and all internal solver setup. GPU timings synchronize immediately before and after the solve and therefore describe GPU-resident inputs. One warm-up is untimed. Every configuration whose first timed run passes the external KKT criterion receives three timed repetitions, summarized by its median/min/max. A first-run timeout or accuracy failure is recorded once during the primary sweep and flagged for manual audit rather than automatically consuming two more production attempts. Records include peak process RSS on CPU and peak PyTorch allocator use on CUDA; scheduler and `nvidia-smi` accounting remain necessary because the CUDA allocator value does not include every cuML allocation.
+SORF generation, dense materialization, analytic oracle work, CPU pinning, and host-to-device transfer are excluded from runtime. Timed regions include preconditioner construction, factorization, and all internal solver setup. GPU timings synchronize immediately before and after the solve and therefore describe GPU-resident inputs. One warm-up is untimed. Every configuration whose first timed run passes the external KKT criterion receives three timed repetitions, summarized by its median/min/max. A first-run timeout or accuracy failure is recorded once during the primary sweep and flagged for manual audit rather than automatically consuming two more production attempts. Records include peak process RSS on CPU and peak PyTorch allocator use on CUDA; scheduler and `nvidia-smi` accounting remain necessary because the CUDA allocator value does not include every cuML allocation.
 
 ## Reproducible environment
 
@@ -191,10 +199,10 @@ Generate figures only after auditing failures:
 uv run rlaopt-bench plot --input artifacts/records --output artifacts/figures
 ```
 
-The figure command creates log-log runtime scatterplots for fixed-$p$, fixed-$n$, and square families, faceted by $\alpha$ and $\lambda$, plus a machine-readable failure summary. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Points from different spectral profiles or ridge values are never placed in the same panel.
+The figure command creates log-log runtime scatterplots for fixed-$p$, fixed-$n$, and square families, faceted by $\alpha$ and $\lambda$, plus a machine-readable failure summary. Shared endpoints appear in each applicable scaling panel. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Points from different spectral profiles or ridge values are never placed in the same panel.
 
 ## Synthetic ridge suite: expected cost and limitations
 
-With all target nodes available concurrently, the sweep should take roughly 4–10 wall-clock hours; queueing, retries, and slow tail jobs make one to two days a realistic end-to-end allowance.
+The revised $2^{16}$ endpoints require a new pilot before assigning a production wall-clock estimate. Five-minute per-solve limits remain fixed; generation time and memory are measured separately during the maximum-size probe.
 
-Limitations: the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs.
+Limitations: SORF factors are structured random orthogonal matrices rather than Haar draws; the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. A smaller Gaussian-QR/Haar sensitivity grid at feasible dimensions should verify that qualitative solver ordering is not an artifact of SORF structure. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs.

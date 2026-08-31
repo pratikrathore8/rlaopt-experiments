@@ -9,12 +9,12 @@ warmups = 0
 repetitions = 1
 
 [[experiment.shapes]]
-n = 262144
-p = 4096
-family = "fixed_p"
+n = 65536
+p = 65536
+family = "square"
 
 [backends.cpu]
-solvers = ["rlaopt_nystrom_pcg"]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "scipy_lsqr", "torch_qr"]
 
 [backends.cuda]
-solvers = ["rlaopt_nystrom_pcg"]
+solvers = ["rlaopt_nystrom_pcg", "rlaopt_cg", "cuml_lsmr", "torch_qr"]

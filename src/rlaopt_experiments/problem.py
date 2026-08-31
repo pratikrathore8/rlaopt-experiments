@@ -1,10 +1,13 @@
-"""Deterministic prescribed-spectrum synthetic ridge problems."""
+"""Deterministic prescribed-spectrum problems with SORF singular vectors."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 import torch
+
+
+GENERATOR_VERSION = "sorf1"
 
 
 @dataclass(frozen=True)
@@ -21,7 +24,10 @@ class ProblemSpec:
 
     @property
     def problem_id(self) -> str:
-        return f"n{self.n}-p{self.p}-a{self.alpha:g}-f{self.factor_seed}-y{self.response_seed}"
+        return (
+            f"{GENERATOR_VERSION}-n{self.n}-p{self.p}-a{self.alpha:g}"
+            f"-f{self.factor_seed}-y{self.response_seed}"
+        )
 
 
 @dataclass
@@ -29,17 +35,19 @@ class RidgeProblem:
     spec: ProblemSpec
     X: torch.Tensor
     y: torch.Tensor
-    U: torch.Tensor
     singular_values: torch.Tensor
-    V: torch.Tensor
     response_coordinates: torch.Tensor
+    right_signs: tuple[torch.Tensor, torch.Tensor, torch.Tensor]
 
     def rhs(self) -> torch.Tensor:
         return self.X.mT @ self.y
 
     def oracle(self, ridge: float) -> torch.Tensor:
         weights = self.singular_values / (self.singular_values.square() + ridge)
-        return self.V @ (weights * self.response_coordinates)
+        embedded = torch.zeros(self.spec.p, dtype=self.X.dtype, device=self.X.device)
+        embedded[:self.spec.rank] = weights * self.response_coordinates
+        _sorf_(embedded, 0, self.right_signs)
+        return embedded
 
     def diagnostics(self, ridge: float) -> dict[str, float]:
         eig = self.singular_values.square()
@@ -54,37 +62,80 @@ class RidgeProblem:
         }
 
 
-def _generator(seed: int, device: torch.device) -> torch.Generator:
-    # Generate on CPU for identical CPU/GPU problem instances; move only after generation.
-    if device.type != "cpu":
-        raise ValueError("problem factors must be generated on CPU before device transfer")
-    return torch.Generator(device="cpu").manual_seed(seed)
+def _is_power_of_two(value: int) -> bool:
+    return value > 0 and value & (value - 1) == 0
 
 
-def _canonical_qr(matrix: torch.Tensor) -> torch.Tensor:
-    q, r = torch.linalg.qr(matrix, mode="reduced")
-    signs = torch.sign(torch.diagonal(r))
-    signs[signs == 0] = 1
-    return q * signs
+def _fwht_(tensor: torch.Tensor, dimension: int) -> None:
+    """Apply the normalized Walsh-Hadamard transform in place."""
+    size = tensor.shape[dimension]
+    if not _is_power_of_two(size):
+        raise ValueError("Hadamard dimensions must be positive powers of two")
+    width = 1
+    while width < size:
+        if tensor.ndim == 1:
+            blocks = tensor.view(size // (2 * width), 2 * width)
+            left = blocks[:, :width]
+            right = blocks[:, width:]
+        elif dimension == 0:
+            rows, columns = tensor.shape
+            blocks = tensor.view(rows // (2 * width), 2 * width, columns)
+            left = blocks[:, :width, :]
+            right = blocks[:, width:, :]
+        elif dimension == 1:
+            rows, columns = tensor.shape
+            blocks = tensor.view(rows, columns // (2 * width), 2 * width)
+            left = blocks[:, :, :width]
+            right = blocks[:, :, width:]
+        else:
+            raise ValueError("FWHT supports vectors and matrix dimensions 0 or 1")
+        saved_left = left.clone()
+        left.add_(right)
+        right.neg_().add_(saved_left)
+        width *= 2
+    tensor.div_(size**0.5)
+
+
+def _random_signs(size: int, generator: torch.Generator) -> torch.Tensor:
+    values = torch.randint(0, 2, (size,), dtype=torch.int8, generator=generator)
+    return values.mul_(2).sub_(1).to(torch.float64)
+
+
+def _sorf_(tensor: torch.Tensor, dimension: int,
+           signs: tuple[torch.Tensor, torch.Tensor, torch.Tensor]) -> None:
+    """Apply Q = H D1 H D2 H D3 along one tensor dimension."""
+    broadcast = [1] * tensor.ndim
+    broadcast[dimension] = tensor.shape[dimension]
+    for diagonal in reversed(signs):
+        tensor.mul_(diagonal.view(broadcast))
+        _fwht_(tensor, dimension)
 
 
 def generate_problem(spec: ProblemSpec) -> RidgeProblem:
-    """Generate X=U diag(k^(-alpha/2)) V^T and a unit response in range(X)."""
+    """Materialize X with independent SORF left and right singular vectors."""
+    if not _is_power_of_two(spec.n) or not _is_power_of_two(spec.p):
+        raise ValueError("n and p must be positive powers of two")
     dtype = torch.float64
-    cpu = torch.device("cpu")
-    r = spec.rank
-    factor_rng = _generator(spec.factor_seed, cpu)
-    u = _canonical_qr(torch.randn(spec.n, r, dtype=dtype, generator=factor_rng))
-    v = _canonical_qr(torch.randn(spec.p, r, dtype=dtype, generator=factor_rng))
-    indices = torch.arange(1, r + 1, dtype=dtype)
-    singular_values = indices.pow(-spec.alpha / 2)
-    x = (u * singular_values) @ v.mT
+    rank = spec.rank
+    factor_rng = torch.Generator(device="cpu").manual_seed(spec.factor_seed)
+    left_signs = tuple(_random_signs(spec.n, factor_rng) for _ in range(3))
+    right_signs = tuple(_random_signs(spec.p, factor_rng) for _ in range(3))
 
-    response_rng = _generator(spec.response_seed, cpu)
-    coordinates = torch.randn(r, dtype=dtype, generator=response_rng)
+    indices = torch.arange(1, rank + 1, dtype=dtype)
+    singular_values = indices.pow(-spec.alpha / 2)
+    x = torch.zeros((spec.n, spec.p), dtype=dtype)
+    diagonal = torch.arange(rank)
+    x[diagonal, diagonal] = singular_values
+    _sorf_(x, 0, left_signs)
+    _sorf_(x, 1, right_signs)
+
+    response_rng = torch.Generator(device="cpu").manual_seed(spec.response_seed)
+    coordinates = torch.randn(rank, dtype=dtype, generator=response_rng)
     coordinates /= torch.linalg.vector_norm(coordinates)
-    y = u @ coordinates
-    return RidgeProblem(spec, x, y, u, singular_values, v, coordinates)
+    y = torch.zeros(spec.n, dtype=dtype)
+    y[:rank] = coordinates
+    _sorf_(y, 0, left_signs)
+    return RidgeProblem(spec, x, y, singular_values, coordinates, right_signs)
 
 
 def relative_kkt(problem: RidgeProblem, estimate: torch.Tensor, ridge: float) -> float:
