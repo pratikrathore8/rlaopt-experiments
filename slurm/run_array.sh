@@ -3,6 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --mem=128G
 #SBATCH --cpus-per-task=64
+#SBATCH --hint=nomultithread
 set -euo pipefail
 
 export OMP_NUM_THREADS="${BENCHMARK_CPU_THREADS:-64}"

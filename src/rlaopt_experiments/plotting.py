@@ -33,6 +33,8 @@ def _aggregate(records: list[dict], family: str) -> list[dict]:
             dict(zip(("solver", "backend", "n", "p", "alpha", "ridge"), key))
             | {
                 "runtime": statistics.median(valid) if valid else None,
+                "runtime_min": min(valid) if valid else None,
+                "runtime_max": max(valid) if valid else None,
                 "success_rate": sum(item["success"] for item in values) / len(values),
             }
         )
@@ -84,6 +86,14 @@ def make_figures(input_dir: Path, output_dir: Path) -> None:
                         alpha=0.75,
                     )
                     legend_handles.setdefault(series_label, handle)
+                    color = handle.get_facecolor()[0]
+                    axis.vlines(
+                        [row[scale] for row in values],
+                        [row["runtime_min"] for row in values],
+                        [row["runtime_max"] for row in values],
+                        color=color,
+                        alpha=0.35,
+                    )
                 axis.set(
                     xscale="log", yscale="log", title=rf"$\alpha={alpha:g}$, $\lambda={ridge:g}$"
                 )

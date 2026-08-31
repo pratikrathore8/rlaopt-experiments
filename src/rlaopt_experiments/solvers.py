@@ -65,6 +65,7 @@ def _rlaopt(
             rank_init=rank, rank_max=rank, base_damping=ridge, damping_mode="adaptive"
         )
 
+    synchronize(x.device)
     started = time.perf_counter()
     # rlaopt 0.1.0's randomized error estimator creates one vector using the
     # process default dtype. Keep that internal vector in benchmark float64.
