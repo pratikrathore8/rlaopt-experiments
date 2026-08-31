@@ -159,12 +159,12 @@ WANDB_MODE=offline uv run rlaopt-bench run-job \
   --n 256 --p 256 --alpha 1 --seed 0 --solver scipy_lsqr --backend cpu
 ```
 
-Submit a manifest using an array sized from the file (the full CPU manifest has 288 lines):
+For a direct smoke grid, submit an array sized from the manifest and route it to a campaign-specific output directory:
 
 ```bash
-BACKEND=cpu MANIFEST=artifacts/cpu.jsonl \
-  CONFIG=configs/synthetic.toml \
-  sbatch --array="0-$(($(wc -l < artifacts/cpu.jsonl)-1))" slurm/run_array.sh
+BACKEND=cpu MANIFEST=artifacts/smoke-cpu.jsonl \
+  CONFIG=configs/smoke.toml OUTPUT_DIR=artifacts/smoke-campaign \
+  sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
 `CONFIG` must be the same file used to generate `MANIFEST`; it defaults to `configs/synthetic.toml`. For example, submit the CPU smoke grid with
@@ -178,10 +178,11 @@ uv run rlaopt-bench manifest \
 BACKEND=cpu \
 CONFIG=configs/smoke.toml \
 MANIFEST=artifacts/smoke-cpu.jsonl \
+OUTPUT_DIR=artifacts/smoke-campaign \
   sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
-For pilot and production CPU timing, split the manifest with `scripts/shard_cpu_manifest.py`. Submit the first shard sequentially on soal-8 with `--array=0-N%1 --nodelist=soal-8` and the second sequentially on soal-9 with `--array=0-N%1 --nodelist=soal-9`. The rotating assignment gives every problem two solvers per node and balances each solver across nodes without dropping or duplicating jobs.
+For production CPU timing, split the manifest with `scripts/shard_cpu_manifest.py`. The soal QOS counts every pending array element toward its 20-job submission limit, so do not submit the 288 manifest records as individual array elements. Instead, submit six chunks for each CPU shard and six chunks for CUDA. Each chunk executes its round-robin subset sequentially and continues after a launcher failure. Use `--array=0-5%1` for all three arrays, pin the CPU arrays to soal-8 and soal-9, and pin the CUDA array to soal-12. This creates 18 submitted tasks and runs at most one benchmark on each node. `CHUNK_COUNT` must equal the array size, and every array must share the same campaign-specific `OUTPUT_DIR`.
 
 Build the derived GPU image once from a login node by submitting:
 

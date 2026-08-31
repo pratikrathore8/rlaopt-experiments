@@ -18,11 +18,17 @@ fi
 BACKEND="${BACKEND:?set BACKEND to cpu or cuda}"
 MANIFEST="${MANIFEST:?set MANIFEST to a JSONL manifest}"
 CONFIG="${CONFIG:-configs/synthetic.toml}"
+OUTPUT_DIR="${OUTPUT_DIR:-artifacts}"
+MANIFEST_INDEX="${MANIFEST_INDEX:-${SLURM_ARRAY_TASK_ID:?set MANIFEST_INDEX or submit as an array}}"
 if [[ "$BACKEND" == "cuda" && ! "${CUDA_BASE_IMAGE_DIGEST:-}" =~ ^sha256:[0-9a-f]{64}$ ]]; then
   echo "Refusing CUDA run without an immutable base-image digest." >&2
   exit 2
 fi
-LINE="$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$MANIFEST")"
+LINE="$(sed -n "$((MANIFEST_INDEX + 1))p" "$MANIFEST")"
+if [[ -z "$LINE" ]]; then
+  echo "No manifest record at zero-based index $MANIFEST_INDEX in $MANIFEST" >&2
+  exit 2
+fi
 REPOSITORY="${SLURM_SUBMIT_DIR:?submit jobs from the repository root}"
 RLAOPT_GIT_COMMIT="$(git -C "$REPOSITORY" rev-parse HEAD)"
 if [[ -n "$(git -C "$REPOSITORY" status --porcelain)" ]]; then
@@ -59,5 +65,5 @@ if [[ "$BACKEND" == "cuda" ]]; then
 fi
 timeout --signal=TERM 179m apptainer exec "${APPTAINER_ARGS[@]}" \
   "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
-  --config "$CONFIG" \
+  --config "$CONFIG" --output "$OUTPUT_DIR" \
   --n "$N" --p "$P" --alpha "$ALPHA" --seed "$SEED" --solver "$SOLVER" --backend "$BACKEND"
