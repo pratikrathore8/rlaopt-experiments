@@ -19,26 +19,32 @@ from rlaopt_experiments.tracking import log_record, wandb_run
 
 
 def _environment_metadata() -> dict[str, Any]:
-    try:
-        git_commit = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-    except (OSError, subprocess.CalledProcessError):
-        git_commit = None
-    try:
-        git_dirty = bool(
-            subprocess.run(
-                ["git", "status", "--porcelain"],
+    git_commit = os.environ.get("RLAOPT_GIT_COMMIT")
+    if git_commit is None:
+        try:
+            git_commit = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
                 check=True,
                 capture_output=True,
                 text=True,
             ).stdout.strip()
-        )
-    except (OSError, subprocess.CalledProcessError):
-        git_dirty = None
+        except (OSError, subprocess.CalledProcessError):
+            git_commit = None
+    dirty_environment = os.environ.get("RLAOPT_GIT_DIRTY")
+    if dirty_environment is not None:
+        git_dirty = dirty_environment == "1"
+    else:
+        try:
+            git_dirty = bool(
+                subprocess.run(
+                    ["git", "status", "--porcelain"],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                ).stdout.strip()
+            )
+        except (OSError, subprocess.CalledProcessError):
+            git_dirty = None
     try:
         driver_version = subprocess.run(
             ["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],

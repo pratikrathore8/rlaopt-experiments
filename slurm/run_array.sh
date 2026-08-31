@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --time=01:00:00
+#SBATCH --nodes=1
 #SBATCH --mem=128G
 #SBATCH --cpus-per-task=64
 set -euo pipefail
@@ -21,9 +22,19 @@ if [[ "$BACKEND" == "cuda" && ! "${CUDA_BASE_IMAGE_DIGEST:-}" =~ ^sha256:[0-9a-f
   exit 2
 fi
 LINE="$(sed -n "$((SLURM_ARRAY_TASK_ID + 1))p" "$MANIFEST")"
+REPOSITORY="${SLURM_SUBMIT_DIR:?submit jobs from the repository root}"
+RLAOPT_GIT_COMMIT="$(git -C "$REPOSITORY" rev-parse HEAD)"
+if [[ -n "$(git -C "$REPOSITORY" status --porcelain)" ]]; then
+  RLAOPT_GIT_DIRTY=1
+else
+  RLAOPT_GIT_DIRTY=0
+fi
+export APPTAINERENV_RLAOPT_GIT_COMMIT="$RLAOPT_GIT_COMMIT"
+export APPTAINERENV_RLAOPT_GIT_DIRTY="$RLAOPT_GIT_DIRTY"
+echo "RLAOPT_GIT_COMMIT=$RLAOPT_GIT_COMMIT"
+echo "RLAOPT_GIT_DIRTY=$RLAOPT_GIT_DIRTY"
 
 if [[ "$BACKEND" == "cuda" ]]; then
-  REPOSITORY="${SLURM_SUBMIT_DIR:?submit CUDA jobs from the repository root}"
   DERIVED_IMAGE="${RLAOPT_CUDA_IMAGE:-containers/rlaopt-cuda-${CUDA_IMAGE_VERSION}.sif}"
   if [[ "$DERIVED_IMAGE" != /* ]]; then
     DERIVED_IMAGE="$REPOSITORY/$DERIVED_IMAGE"
@@ -46,7 +57,6 @@ if [[ "$BACKEND" == "cuda" ]]; then
     --config "$CONFIG" \
     --n "$N" --p "$P" --alpha "$ALPHA" --seed "$SEED" --solver "$SOLVER" --backend "$BACKEND"
 else
-  REPOSITORY="${SLURM_SUBMIT_DIR:?submit CPU jobs from the repository root}"
   DERIVED_IMAGE="${RLAOPT_CUDA_IMAGE:-containers/rlaopt-cuda-${CUDA_IMAGE_VERSION}.sif}"
   if [[ "$DERIVED_IMAGE" != /* ]]; then
     DERIVED_IMAGE="$REPOSITORY/$DERIVED_IMAGE"

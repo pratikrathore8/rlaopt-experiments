@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 # Benchmark outputs
 artifacts/
+artifacts-archive-*/
 probe-sorf-generation-*.out
 probe-sorf-consistency-*.out
 wandb/
