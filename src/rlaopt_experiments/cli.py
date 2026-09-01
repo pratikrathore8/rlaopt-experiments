@@ -47,6 +47,7 @@ def main() -> None:
         solvers = load_solvers(args.config, args.backend)
         jobs = [
             {
+                "suite": config.suite,
                 "n": shape.n,
                 "p": shape.p,
                 "family": shape.family,
@@ -81,6 +82,7 @@ def main() -> None:
             warmups=config.warmups,
             repetitions=config.repetitions,
             output_dir=args.output,
+            suite=config.suite,
         )
     elif args.command == "calibrate":
         from rlaopt_experiments.calibration import calibrate

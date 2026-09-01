@@ -78,6 +78,7 @@ def _environment_metadata() -> dict[str, Any]:
 
 def _record(
     *,
+    suite: str,
     problem_spec: ProblemSpec,
     solver: str,
     backend: str,
@@ -90,7 +91,8 @@ def _record(
     worker_metadata: dict[str, Any],
 ) -> TrialRecord:
     run_id = uuid.uuid5(
-        uuid.NAMESPACE_URL, (f"{problem_spec.problem_id}/{solver}/{backend}/{ridge}/{repetition}")
+        uuid.NAMESPACE_URL,
+        f"{suite}/{problem_spec.problem_id}/{solver}/{backend}/{ridge}/{repetition}",
     ).hex
     accuracy = outcome.get("accuracy", {})
     success = bool(accuracy.get("success", False))
@@ -100,9 +102,6 @@ def _record(
         | outcome.get("solver_metadata", {})
         | {
             "worker_outcome": outcome["kind"],
-            "runtime_median_seconds": statistics.median(runtimes),
-            "runtime_min_seconds": min(runtimes),
-            "runtime_max_seconds": max(runtimes),
             "timing_scope": "device-resident; includes setup, excludes data generation",
         }
     )
@@ -112,24 +111,31 @@ def _record(
     record = TrialRecord(
         run_id=run_id,
         problem_id=problem_spec.problem_id,
+        suite=suite,
         solver=solver,
         backend=backend,
-        n=problem_spec.n,
-        p=problem_spec.p,
-        alpha=problem_spec.alpha,
-        ridge=ridge,
         seed=seed,
         repetition=repetition,
-        runtime_seconds=outcome["runtime_seconds"],
+        timings={
+            "runtime_seconds": outcome["runtime_seconds"],
+            "runtime_median_seconds": statistics.median(runtimes),
+            "runtime_min_seconds": min(runtimes),
+            "runtime_max_seconds": max(runtimes),
+        },
         iterations=outcome.get("iterations"),
         native_status=outcome["native_status"],
-        relative_kkt=accuracy.get("relative_kkt"),
-        relative_solution_error=accuracy.get("relative_solution_error"),
+        metrics=accuracy,
         success=success,
         timed_out=outcome["kind"] == "timeout" or outcome["native_status"] == "timeout",
+        problem={
+            "n": problem_spec.n,
+            "p": problem_spec.p,
+            "alpha": problem_spec.alpha,
+            "ridge": ridge,
+            "diagnostics": outcome.get("diagnostics", {}),
+        },
         peak_memory_bytes=outcome.get("peak_memory_bytes"),
         trace=outcome.get("trace", []),
-        diagnostics=outcome.get("diagnostics", {}),
         metadata=metadata,
     )
     write_record(output_dir / "records" / f"{run_id}.json", record)
@@ -155,6 +161,7 @@ def run_job(
     warmups: int,
     repetitions: int,
     output_dir: Path,
+    suite: str,
 ) -> list[TrialRecord]:
     problem_spec = ProblemSpec(
         n, p, alpha, derive_seed(seed, "factors"), derive_seed(seed, "response")
@@ -177,7 +184,7 @@ def run_job(
     records: list[TrialRecord] = []
 
     def start_worker() -> tuple[ProblemWorker, dict[str, Any]]:
-        new_worker = ProblemWorker(specification, backend)
+        new_worker = ProblemWorker(specification, backend, suite)
         return new_worker, new_worker.wait_until_ready(startup_timeout_seconds)
 
     worker, ready = start_worker()
@@ -187,6 +194,7 @@ def run_job(
             outcome = ready | {"runtime_seconds": 0.0}
             records.append(
                 _record(
+                    suite=suite,
                     problem_spec=problem_spec,
                     solver=solver,
                     backend=backend,
@@ -211,6 +219,7 @@ def run_job(
                     outcome = ready | {"runtime_seconds": 0.0}
                     records.append(
                         _record(
+                            suite=suite,
                             problem_spec=problem_spec,
                             solver=solver,
                             backend=backend,
@@ -238,6 +247,7 @@ def run_job(
                 if warmup["kind"] != "result":
                     records.append(
                         _record(
+                            suite=suite,
                             problem_spec=problem_spec,
                             solver=solver,
                             backend=backend,
@@ -281,6 +291,7 @@ def run_job(
             for repetition, outcome in enumerate(outcomes):
                 records.append(
                     _record(
+                        suite=suite,
                         problem_spec=problem_spec,
                         solver=solver,
                         backend=backend,
@@ -314,6 +325,7 @@ def run_tolerance_sweep(
     rank: int,
     output_dir: Path,
     case_index: int,
+    suite: str,
 ) -> dict[float, TrialRecord]:
     """Generate one problem and evaluate several native tolerances against it."""
     problem_spec = ProblemSpec(
@@ -330,7 +342,7 @@ def run_tolerance_sweep(
     records: dict[float, TrialRecord] = {}
 
     def start_worker() -> tuple[ProblemWorker, dict[str, Any]]:
-        new_worker = ProblemWorker(specification, backend)
+        new_worker = ProblemWorker(specification, backend, suite)
         return new_worker, new_worker.wait_until_ready(startup_timeout_seconds)
 
     worker, ready = start_worker()
@@ -359,6 +371,7 @@ def run_tolerance_sweep(
             outcome = outcome | {"solver_metadata": solver_metadata}
             candidate_output = output_dir / f"tol-{candidate:g}" / f"case-{case_index}"
             records[candidate] = _record(
+                suite=suite,
                 problem_spec=problem_spec,
                 solver=solver,
                 backend=backend,

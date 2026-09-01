@@ -8,25 +8,25 @@ import platform
 import resource
 import time
 import traceback
-from dataclasses import asdict
 from multiprocessing.connection import Connection
 from typing import Any
 
 
-def _worker(connection: Connection, specification: dict[str, Any], backend: str) -> None:
+def _worker(
+    connection: Connection, suite_name: str, specification: dict[str, Any], backend: str
+) -> None:
     """Generate one problem, retain it, and execute commands from the parent."""
     try:
         import torch
 
-        from rlaopt_experiments.diagnostics import adjudicate
-        from rlaopt_experiments.problem import GENERATOR_VERSION, ProblemSpec, generate_problem
-        from rlaopt_experiments.solvers import solve
+        from rlaopt_experiments.suites import get_suite
 
         torch.set_default_dtype(torch.float64)
         if os.environ.get("OMP_NUM_THREADS"):
             torch.set_num_threads(int(os.environ["OMP_NUM_THREADS"]))
         device = torch.device("cuda" if backend == "cuda" else "cpu")
-        problem = generate_problem(ProblemSpec(**specification), device=device)
+        suite = get_suite(suite_name)
+        problem = suite.generate(specification, device=device)
         if backend == "cuda":
             torch.cuda.synchronize()
         connection.send(
@@ -34,8 +34,7 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
                 "kind": "ready",
                 "worker_metadata": {
                     "torch_version": torch.__version__,
-                    "problem_generator": GENERATOR_VERSION,
-                    "matrix_representation": "materialized_dense",
+                    **suite.problem_metadata(problem),
                     "torch_num_threads": torch.get_num_threads(),
                     "cuda_version": torch.version.cuda,
                     "cudnn_version": torch.backends.cudnn.version(),
@@ -57,36 +56,15 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
             command = connection.recv()
             if command["kind"] == "stop":
                 return
-            ridge = command["ridge"]
-            torch.manual_seed(command["nystrom_seed"])
             if backend == "cuda":
-                torch.cuda.manual_seed_all(command["nystrom_seed"])
                 torch.cuda.reset_peak_memory_stats()
             started = time.perf_counter()
             try:
-                result = solve(
-                    command["solver"],
-                    problem,
-                    ridge,
-                    command["native_tolerance"],
-                    command["max_iters"],
-                    command["timeout_seconds"],
-                    command["rank"],
-                )
-                accuracy = adjudicate(problem, ridge, result, command["kkt_tolerance"])
+                result = suite.execute(problem, command, backend)
                 connection.send(
                     {
                         "kind": "result",
-                        "runtime_seconds": result.runtime_seconds,
-                        "iterations": result.iterations,
-                        "native_status": result.native_status,
-                        "trace": result.trace,
-                        "solver_metadata": result.metadata
-                        | {
-                            "native_tolerance": command["native_tolerance"],
-                        },
-                        "accuracy": asdict(accuracy),
-                        "diagnostics": problem.diagnostics(ridge),
+                        **result,
                         "peak_memory_bytes": (
                             torch.cuda.max_memory_allocated()
                             if backend == "cuda"
@@ -125,11 +103,16 @@ def _worker(connection: Connection, specification: dict[str, Any], backend: str)
 class ProblemWorker:
     """Own a generated problem and enforce a timeout on every solve command."""
 
-    def __init__(self, specification: dict[str, Any], backend: str):
+    def __init__(
+        self,
+        specification: dict[str, Any],
+        backend: str,
+        suite: str,
+    ):
         context = mp.get_context("spawn")
         parent, child = context.Pipe()
         self._connection = parent
-        self._process = context.Process(target=_worker, args=(child, specification, backend))
+        self._process = context.Process(target=_worker, args=(child, suite, specification, backend))
         self._process.start()
         child.close()
 

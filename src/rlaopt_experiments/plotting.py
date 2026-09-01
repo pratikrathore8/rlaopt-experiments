@@ -9,11 +9,12 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
+from rlaopt_experiments.records import read_record
 from rlaopt_experiments.config import load_experiment, load_solvers
 
 
 def _records(path: Path) -> list[dict]:
-    return [json.loads(file.read_text()) for file in sorted(path.glob("*.json"))]
+    return [read_record(file) for file in sorted(path.glob("*.json"))]
 
 
 def _native_success(row: dict) -> bool:
@@ -66,7 +67,8 @@ def _aggregate(records: list[dict], family: str) -> list[dict]:
 
 def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    records = _records(input_dir)
+    config = load_experiment(config_path)
+    records = [row for row in _records(input_dir) if row["suite"] == config.suite]
     if not records:
         raise RuntimeError(f"no JSON records found in {input_dir}")
     for family, scale, label in (
@@ -139,7 +141,6 @@ def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
         figure.savefig(output_dir / f"runtime_{family}.png", dpi=200)
         plt.close(figure)
 
-    config = load_experiment(config_path)
     expected = {
         (backend, solver, shape.n, shape.p, alpha, ridge, seed, repetition)
         for backend in ("cpu", "cuda")
