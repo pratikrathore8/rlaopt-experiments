@@ -9,9 +9,31 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
+from rlaopt_experiments.config import load_experiment, load_solvers
+
 
 def _records(path: Path) -> list[dict]:
     return [json.loads(file.read_text()) for file in sorted(path.glob("*.json"))]
+
+
+def _native_success(row: dict) -> bool:
+    if row["metadata"].get("worker_outcome") != "result":
+        return False
+    status = row["native_status"]
+    return status in {"native_converged", "native_complete", "direct", "istop_1", "istop_2"}
+
+
+def _record_key(row: dict) -> tuple:
+    return (
+        row["backend"],
+        row["solver"],
+        row["n"],
+        row["p"],
+        row["alpha"],
+        row["ridge"],
+        row["seed"],
+        row["repetition"],
+    )
 
 
 def _aggregate(records: list[dict], family: str) -> list[dict]:
@@ -28,20 +50,21 @@ def _aggregate(records: list[dict], family: str) -> list[dict]:
             ].append(row)
     result = []
     for key, values in groups.items():
-        valid = [item["runtime_seconds"] for item in values if item["success"]]
+        valid = [item["runtime_seconds"] for item in values if _native_success(item)]
         result.append(
             dict(zip(("solver", "backend", "n", "p", "alpha", "ridge"), key))
             | {
                 "runtime": statistics.median(valid) if valid else None,
                 "runtime_min": min(valid) if valid else None,
                 "runtime_max": max(valid) if valid else None,
-                "success_rate": sum(item["success"] for item in values) / len(values),
+                "native_success_rate": sum(_native_success(item) for item in values) / len(values),
+                "external_kkt_success_rate": sum(item["success"] for item in values) / len(values),
             }
         )
     return result
 
 
-def make_figures(input_dir: Path, output_dir: Path) -> None:
+def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     records = _records(input_dir)
     if not records:
@@ -116,12 +139,46 @@ def make_figures(input_dir: Path, output_dir: Path) -> None:
         figure.savefig(output_dir / f"runtime_{family}.png", dpi=200)
         plt.close(figure)
 
-    failures = output_dir / "failure_summary.json"
+    config = load_experiment(config_path)
+    expected = {
+        (backend, solver, shape.n, shape.p, alpha, ridge, seed, repetition)
+        for backend in ("cpu", "cuda")
+        for solver in load_solvers(config_path, backend)
+        for shape in config.shapes
+        for alpha in config.alphas
+        for ridge in config.lambdas
+        for seed in config.seeds
+        for repetition in range(config.repetitions)
+    }
+    missing = expected - {_record_key(row) for row in records}
     summary: dict[str, dict[str, int]] = defaultdict(
-        lambda: {"success": 0, "failure": 0, "timeout": 0}
+        lambda: {
+            "native_success": 0,
+            "external_kkt_pass": 0,
+            "external_kkt_miss": 0,
+            "timeout": 0,
+            "error": 0,
+            "missing": 0,
+        }
     )
     for row in records:
         bucket = summary[f"{row['solver']}:{row['backend']}"]
-        bucket["success" if row["success"] else "failure"] += 1
+        bucket["native_success"] += int(_native_success(row))
+        bucket["external_kkt_pass"] += int(row["success"])
+        bucket["external_kkt_miss"] += int(
+            row["metadata"].get("worker_outcome") == "result" and not row["success"]
+        )
         bucket["timeout"] += int(row["timed_out"])
-    failures.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+        bucket["error"] += int(row["metadata"].get("worker_outcome") == "error")
+    for backend, solver, *_ in missing:
+        summary[f"{solver}:{backend}"]["missing"] += 1
+    (output_dir / "failure_summary.json").write_text(
+        json.dumps(summary, indent=2, sort_keys=True) + "\n"
+    )
+    missing_rows = [
+        dict(zip(("backend", "solver", "n", "p", "alpha", "ridge", "seed", "repetition"), key))
+        for key in sorted(missing)
+    ]
+    (output_dir / "missing_records.json").write_text(
+        json.dumps(missing_rows, indent=2, sort_keys=True) + "\n"
+    )

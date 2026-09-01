@@ -35,6 +35,7 @@ def _parser() -> argparse.ArgumentParser:
     calibration.add_argument("--output", type=Path, default=Path("artifacts/calibration"))
     plot = subparsers.add_parser("plot")
     plot.add_argument("--input", type=Path, default=Path("artifacts/records"))
+    plot.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     plot.add_argument("--output", type=Path, default=Path("artifacts/figures"))
     return parser
 
@@ -95,4 +96,4 @@ def main() -> None:
     else:
         from rlaopt_experiments.plotting import make_figures
 
-        make_figures(args.input, args.output)
+        make_figures(args.input, args.output, args.config)
