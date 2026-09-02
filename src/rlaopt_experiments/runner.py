@@ -70,29 +70,34 @@ def _environment_metadata() -> dict[str, Any]:
         "git_dirty": git_dirty,
         "nvidia_driver_version": driver_version,
         "rlaopt_version": version("rlaopt"),
+        "jax_version": version("jax"),
+        "jaxopt_version": version("jaxopt"),
         "numpy_version": version("numpy"),
         "scipy_version": version("scipy"),
         "wandb_version": version("wandb"),
     }
 
 
-def _record(
+def record_outcome(
     *,
     suite: str,
-    problem_spec: ProblemSpec,
+    problem_id: str,
+    run_key: str,
+    problem: dict[str, Any],
     solver: str,
     backend: str,
-    ridge: float,
     seed: int,
     repetition: int,
     outcome: dict[str, Any],
     runtimes: list[float],
     output_dir: Path,
     worker_metadata: dict[str, Any],
+    timing_scope: str,
 ) -> TrialRecord:
+    """Persist and optionally log one suite-neutral worker outcome."""
     run_id = uuid.uuid5(
         uuid.NAMESPACE_URL,
-        f"{suite}/{problem_spec.problem_id}/{solver}/{backend}/{ridge}/{repetition}",
+        f"{suite}/{problem_id}/{solver}/{backend}/{run_key}/{repetition}",
     ).hex
     accuracy = outcome.get("accuracy", {})
     success = bool(accuracy.get("success", False))
@@ -102,7 +107,7 @@ def _record(
         | outcome.get("solver_metadata", {})
         | {
             "worker_outcome": outcome["kind"],
-            "timing_scope": "device-resident; includes setup, excludes data generation",
+            "timing_scope": timing_scope,
         }
     )
     for key in ("error_type", "error_message", "traceback"):
@@ -110,7 +115,7 @@ def _record(
             metadata[key] = outcome[key]
     record = TrialRecord(
         run_id=run_id,
-        problem_id=problem_spec.problem_id,
+        problem_id=problem_id,
         suite=suite,
         solver=solver,
         backend=backend,
@@ -127,13 +132,7 @@ def _record(
         metrics=accuracy,
         success=success,
         timed_out=outcome["kind"] == "timeout" or outcome["native_status"] == "timeout",
-        problem={
-            "n": problem_spec.n,
-            "p": problem_spec.p,
-            "alpha": problem_spec.alpha,
-            "ridge": ridge,
-            "diagnostics": outcome.get("diagnostics", {}),
-        },
+        problem=problem | {"diagnostics": outcome.get("diagnostics", {})},
         peak_memory_bytes=outcome.get("peak_memory_bytes"),
         trace=outcome.get("trace", []),
         metadata=metadata,
@@ -142,6 +141,43 @@ def _record(
     with wandb_run(record, output_dir) as run:
         log_record(run, record)
     return record
+
+
+def _record(
+    *,
+    suite: str,
+    problem_spec: ProblemSpec,
+    solver: str,
+    backend: str,
+    ridge: float,
+    seed: int,
+    repetition: int,
+    outcome: dict[str, Any],
+    runtimes: list[float],
+    output_dir: Path,
+    worker_metadata: dict[str, Any],
+) -> TrialRecord:
+    """Preserve the synthetic-ridge record identity and problem fields."""
+    return record_outcome(
+        suite=suite,
+        problem_id=problem_spec.problem_id,
+        run_key=str(ridge),
+        problem={
+            "n": problem_spec.n,
+            "p": problem_spec.p,
+            "alpha": problem_spec.alpha,
+            "ridge": ridge,
+        },
+        solver=solver,
+        backend=backend,
+        seed=seed,
+        repetition=repetition,
+        outcome=outcome,
+        runtimes=runtimes,
+        output_dir=output_dir,
+        worker_metadata=worker_metadata,
+        timing_scope="device-resident; includes setup, excludes data generation",
+    )
 
 
 def run_job(
