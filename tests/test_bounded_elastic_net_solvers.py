@@ -19,6 +19,7 @@ from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import 
     solve_clarabel_qdldl,
     solve_rlaopt_admm,
     solve_scs,
+    solve_scs_cuda,
 )
 from rlaopt_experiments.clarabel_bridge import ClarabelRuntime
 
@@ -188,6 +189,7 @@ def test_scs_records_direct_native_diagnostics(problem) -> None:
         max_iterations=5_000,
     )
 
+    assert result.native_error is None
     assert result.metadata["conic_preparation_seconds"] >= 0
     assert result.metadata["linear_solver"] == "cpu_direct"
     assert result.metadata["raw_status"] == "solved"
@@ -322,6 +324,23 @@ def test_scs_does_not_treat_inaccurate_status_as_native_convergence(
 
     assert result.native_status != "converged"
     assert "inaccurate" in result.native_status
+
+
+def test_scs_cuda_never_falls_back_when_gpu_module_is_missing(
+    problem, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers._require_device",
+        lambda *_args: None,
+    )
+    monkeypatch.setitem(sys.modules, "scs._scs_gpu", None)
+
+    with pytest.raises(RuntimeError, match="not built with its CUDA indirect backend"):
+        solve_scs_cuda(
+            problem,
+            native_tolerance=1e-8,
+            max_iterations=100,
+        )
 
 
 def test_bounded_adapters_reject_unbounded_problem(problem) -> None:

@@ -19,6 +19,11 @@ if [[ ! "$CUCLARABEL_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
   exit 2
 fi
 
+if [[ ! "$SCS_SDIST_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+  echo "containers/cuda.env does not contain a valid SCS sdist SHA-256" >&2
+  exit 2
+fi
+
 OUTPUT="${1:-$REPOSITORY/$RLAOPT_CUDA_IMAGE}"
 BUILD_DIRECTORY="$(mktemp -d "${TMPDIR:-/tmp}/rlaopt-apptainer-build.XXXXXX")"
 trap 'rm -rf "$BUILD_DIRECTORY"' EXIT
@@ -31,6 +36,8 @@ sed \
   -e "s|@JULIA_VERSION@|$JULIA_VERSION|g" \
   -e "s|@JULIA_SHA256@|$JULIA_SHA256|g" \
   -e "s|@CUCLARABEL_COMMIT@|$CUCLARABEL_COMMIT|g" \
+  -e "s|@SCS_VERSION@|$SCS_VERSION|g" \
+  -e "s|@SCS_SDIST_SHA256@|$SCS_SDIST_SHA256|g" \
   "$REPOSITORY/containers/cuda.def.in" > "$BUILD_DIRECTORY/cuda.def"
 
 mkdir -p "$(dirname "$OUTPUT")"

@@ -244,10 +244,51 @@ def solve_scs(
     max_iterations: int,
 ) -> BoundedElasticNetSolverResult:
     """Solve through SCS's direct Python interface using its CPU direct solver."""
+    return _solve_scs(
+        problem,
+        expected_device="cpu",
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
+        use_gpu=False,
+    )
+
+
+def solve_scs_cuda(
+    problem: ElasticNetProblem,
+    *,
+    native_tolerance: float,
+    max_iterations: int,
+) -> BoundedElasticNetSolverResult:
+    """Solve through SCS's float64 CUDA indirect linear-system backend."""
+    return _solve_scs(
+        problem,
+        expected_device="cuda",
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
+        use_gpu=True,
+    )
+
+
+def _solve_scs(
+    problem: ElasticNetProblem,
+    *,
+    expected_device: str,
+    native_tolerance: float,
+    max_iterations: int,
+    use_gpu: bool,
+) -> BoundedElasticNetSolverResult:
     _validate_problem(problem)
     _validate_controls(native_tolerance, max_iterations)
-    _require_device(problem, "cpu", "SCS")
+    _require_device(problem, expected_device, "SCS")
     import scs
+
+    if use_gpu:
+        try:
+            from scs import _scs_gpu
+        except ImportError as error:
+            raise RuntimeError("SCS was not built with its CUDA indirect backend") from error
+        if _scs_gpu.sizeof_float() != 8 or _scs_gpu.sizeof_int() != 4:
+            raise RuntimeError("SCS CUDA must use float64 values and 32-bit indices")
 
     preparation_started = time.perf_counter()
     conic = build_bounded_elastic_net_conic_form(problem)
@@ -259,37 +300,47 @@ def solve_scs(
     }
     cone = {"z": conic.zero_cone_dim, "l": conic.nonnegative_cone_dim}
     preparation_seconds = time.perf_counter() - preparation_started
+    settings = {
+        "eps_abs": native_tolerance,
+        "eps_rel": native_tolerance,
+        "max_iters": max_iterations,
+        "verbose": False,
+    }
+    if use_gpu:
+        settings |= {"gpu": True, "use_indirect": True}
+    _synchronize(problem.X.device)
     started = time.perf_counter()
-    native_result = scs.solve(
-        data,
-        cone,
-        eps_abs=native_tolerance,
-        eps_rel=native_tolerance,
-        max_iters=max_iterations,
-        verbose=False,
-    )
+    native_result = scs.solve(data, cone, **settings)
+    _synchronize(problem.X.device)
     runtime_seconds = time.perf_counter() - started
     info = native_result["info"]
     raw_status = str(info["status"])
     native_status = "converged" if raw_status.lower() == "solved" else raw_status
+    extraction_started = time.perf_counter()
     weights, intercept = conic.extract_primal(np.asarray(native_result["x"], dtype=np.float64))
-    residuals = [abs(float(info[name])) for name in ("res_pri", "res_dual", "gap")]
+    if use_gpu:
+        weights = weights.to(problem.X.device)
+        intercept = intercept.to(problem.X.device)
+    extraction_seconds = time.perf_counter() - extraction_started
     return BoundedElasticNetSolverResult(
         weights=weights,
         intercept=intercept,
         runtime_seconds=runtime_seconds,
         iterations=int(info["iter"]),
         native_status=native_status,
-        native_error=max(residuals),
+        # SCS exposes separate feasibility and gap stopping quantities,
+        # not one canonical scalar native error.
+        native_error=None,
         metadata={
             "conic_preparation_seconds": preparation_seconds,
-            "linear_solver": "cpu_direct",
+            "linear_solver": "gpu_indirect" if use_gpu else "cpu_direct",
             "native_duality_gap": float(info["gap"]),
             "native_primal_residual": float(info["res_pri"]),
             "native_dual_residual": float(info["res_dual"]),
             "native_setup_time_milliseconds": float(info["setup_time"]),
             "native_solve_time_milliseconds": float(info["solve_time"]),
             "raw_status": raw_status,
+            "solution_extraction_seconds": extraction_seconds,
         },
     )
 

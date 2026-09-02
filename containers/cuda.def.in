@@ -13,7 +13,9 @@ From: @CUDA_IMAGE_REFERENCE@
     set -eu
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install -y --no-install-recommends ca-certificates curl git python3.12 python3.12-venv
+    apt-get install -y --no-install-recommends \
+        build-essential ca-certificates curl git libopenblas-dev pkg-config \
+        python3.12 python3.12-dev python3.12-venv
     rm -rf /var/lib/apt/lists/*
     export UV_UNMANAGED_INSTALL=/usr/local/bin
     export UV_LINK_MODE=copy
@@ -22,6 +24,18 @@ From: @CUDA_IMAGE_REFERENCE@
     uv venv --python /usr/bin/python3.12 .venv
     UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
         uv sync --frozen --no-dev --group gpu
+    curl -fL \
+        "https://files.pythonhosted.org/packages/9e/59/5cb7f9612a5a3ff6efd4ab2d899902a536cc5974a7edb589084c5577291c/scs-@SCS_VERSION@.tar.gz" \
+        -o /tmp/scs.tar.gz
+    echo "@SCS_SDIST_SHA256@  /tmp/scs.tar.gz" | sha256sum --check --strict
+    UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
+        uv pip install --python /opt/rlaopt-experiments/.venv/bin/python \
+        --reinstall --no-deps \
+        --config-setting=setup-args=-Duse_gpu=true \
+        --config-setting=setup-args=-Dint32=true \
+        --config-setting=setup-args=-Dgpu_atrans=true \
+        /tmp/scs.tar.gz
+    rm /tmp/scs.tar.gz
     curl -fL "https://julialang-s3.julialang.org/bin/linux/x64/1.10/julia-@JULIA_VERSION@-linux-x86_64.tar.gz" \
         -o /tmp/julia.tar.gz
     echo "@JULIA_SHA256@  /tmp/julia.tar.gz" | sha256sum --check --strict
@@ -57,12 +71,14 @@ From: @CUDA_IMAGE_REFERENCE@
     io.rlaopt.uv.version 0.12.7
     io.rlaopt.julia.version @JULIA_VERSION@
     io.rlaopt.cuclarabel.commit @CUCLARABEL_COMMIT@
+    io.rlaopt.scs.version @SCS_VERSION@
+    io.rlaopt.scs.gpu_backend indirect
 
 %test
     export HOME=/tmp
     export CUPY_CACHE_DIR=/tmp/cupy-cache
     /opt/rlaopt-experiments/.venv/bin/python -c \
-        'import cupy, cuml, juliacall, rlaopt, torch; print("container imports passed")'
+        'import cupy, cuml, juliacall, rlaopt, torch; from scs import _scs_gpu; assert _scs_gpu.sizeof_float() == 8; assert _scs_gpu.sizeof_int() == 4; print("container imports passed")'
     JULIA_DEPOT_PATH=/opt/julia-depot julia \
         --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
         'using Clarabel; println("CuClarabel import passed")'
