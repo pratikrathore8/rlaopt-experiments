@@ -5,13 +5,16 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import torch
 from scipy import sparse
 
 from rlaopt_experiments.problems.synthetic_erm import ElasticNetProblem
+
+if TYPE_CHECKING:
+    from rlaopt_experiments.clarabel_bridge import ClarabelRuntime
 
 
 @dataclass(frozen=True)
@@ -92,7 +95,6 @@ def build_bounded_elastic_net_conic_form(
     the l1 penalty is the linear term ``lambda_l1 * sum(w)``.
     """
     _validate_problem(problem)
-    _require_device(problem, "cpu", "conic-form construction")
     n = problem.spec.n
     p = problem.spec.p
     variable_count = n + p + 1
@@ -111,7 +113,7 @@ def build_bounded_elastic_net_conic_form(
     residual_equalities = sparse.hstack(
         (
             sparse.eye(n, format="csc"),
-            -sparse.csc_matrix(problem.X.detach().numpy()),
+            -sparse.csc_matrix(problem.X.detach().cpu().numpy()),
             -sparse.csc_matrix(np.ones((n, 1), dtype=np.float64)),
         ),
         format="csc",
@@ -129,7 +131,7 @@ def build_bounded_elastic_net_conic_form(
     constraints = sparse.vstack((residual_equalities, lower, upper), format="csc")
     rhs = np.concatenate(
         (
-            -problem.y.detach().numpy(),
+            -problem.y.detach().cpu().numpy(),
             np.zeros(p, dtype=np.float64),
             np.ones(p, dtype=np.float64),
         )
@@ -289,4 +291,119 @@ def solve_scs(
             "native_solve_time_milliseconds": float(info["solve_time"]),
             "raw_status": raw_status,
         },
+    )
+
+
+def _solve_clarabel(
+    problem: ElasticNetProblem,
+    *,
+    runtime: ClarabelRuntime,
+    expected_backend: str,
+    native_tolerance: float,
+    max_iterations: int,
+) -> BoundedElasticNetSolverResult:
+    _validate_problem(problem)
+    _validate_controls(native_tolerance, max_iterations)
+    _require_device(problem, expected_backend, "Clarabel")
+    if runtime.backend != expected_backend:
+        raise ValueError(
+            f"Clarabel runtime backend is {runtime.backend}, expected {expected_backend}"
+        )
+
+    preparation_started = time.perf_counter()
+    conic = build_bounded_elastic_net_conic_form(problem)
+    prepared = runtime.prepare(
+        conic.quadratic,
+        conic.linear,
+        conic.constraints,
+        conic.rhs,
+    )
+    preparation_seconds = time.perf_counter() - preparation_started
+
+    _synchronize(problem.X.device)
+    started = time.perf_counter()
+    solver = runtime.solve(
+        prepared,
+        equality_dim=conic.zero_cone_dim,
+        inequality_dim=conic.nonnegative_cone_dim,
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
+    )
+    _synchronize(problem.X.device)
+    runtime_seconds = time.perf_counter() - started
+
+    extraction_started = time.perf_counter()
+    solution = solver.solution
+    primal = np.asarray(solution.x, dtype=np.float64).copy()
+    weights, intercept = conic.extract_primal(primal)
+    if expected_backend == "cuda":
+        weights = weights.to(problem.X.device)
+        intercept = intercept.to(problem.X.device)
+    extraction_seconds = time.perf_counter() - extraction_started
+
+    raw_status = str(solution.status)
+    native_status = "converged" if raw_status.upper() == "SOLVED" else raw_status
+    primal_residual = abs(float(solution.r_prim))
+    dual_residual = abs(float(solution.r_dual))
+    primal_objective = float(solution.obj_val)
+    dual_objective = float(solution.obj_val_dual)
+    absolute_gap = abs(primal_objective - dual_objective)
+    relative_gap = absolute_gap / max(1.0, abs(primal_objective), abs(dual_objective))
+    return BoundedElasticNetSolverResult(
+        weights=weights,
+        intercept=intercept,
+        runtime_seconds=runtime_seconds,
+        iterations=int(solution.iterations),
+        native_status=native_status,
+        # Clarabel exposes separate feasibility and gap stopping quantities,
+        # not one canonical scalar native error.
+        native_error=None,
+        metadata={
+            "conic_preparation_seconds": preparation_seconds,
+            "linear_solver": "qdldl" if expected_backend == "cpu" else "cudss",
+            "native_absolute_duality_gap": absolute_gap,
+            "native_dual_objective": dual_objective,
+            "native_dual_residual": dual_residual,
+            "native_primal_objective": primal_objective,
+            "native_primal_residual": primal_residual,
+            "native_relative_duality_gap": relative_gap,
+            "native_setup_time_seconds": float(solution.setup_phase_time),
+            "native_solve_time_seconds": float(solution.solve_phase_time),
+            "raw_status": raw_status,
+            "solution_extraction_seconds": extraction_seconds,
+        },
+    )
+
+
+def solve_clarabel_qdldl(
+    problem: ElasticNetProblem,
+    *,
+    runtime: ClarabelRuntime,
+    native_tolerance: float,
+    max_iterations: int,
+) -> BoundedElasticNetSolverResult:
+    """Solve a CPU problem through Clarabel.jl's direct QDLDL backend."""
+    return _solve_clarabel(
+        problem,
+        runtime=runtime,
+        expected_backend="cpu",
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
+    )
+
+
+def solve_cuclarabel_cudss(
+    problem: ElasticNetProblem,
+    *,
+    runtime: ClarabelRuntime,
+    native_tolerance: float,
+    max_iterations: int,
+) -> BoundedElasticNetSolverResult:
+    """Solve a CUDA problem through CuClarabel's full-float64 cuDSS backend."""
+    return _solve_clarabel(
+        problem,
+        runtime=runtime,
+        expected_backend="cuda",
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
     )

@@ -1,95 +1,38 @@
-"""Smoke-test CuClarabel's direct Julia interface on one bounded elastic-net QP."""
+"""Smoke-test the production Clarabel adapters on one bounded elastic-net QP."""
 
 from __future__ import annotations
 
 import argparse
 import json
-import time
-from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from rlaopt_experiments.clarabel_bridge import (
+    ClarabelRuntime,
+    initialize_clarabel_runtime,
+)
+
 if TYPE_CHECKING:
     from rlaopt_experiments.problems.synthetic_erm import ElasticNetProblem
-
-
-_JULIA_HELPERS = r"""
-using Clarabel, PythonCall, SparseArrays
-
-function rlaopt_solve_cpu(P, q, A, b, equality_dim, inequality_dim)
-    settings = Clarabel.Settings(
-        direct_solve_method = :qdldl,
-        verbose = false,
-        tol_gap_abs = 1e-10,
-        tol_gap_rel = 1e-10,
-        tol_feas = 1e-10,
+    from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import (
+        BoundedElasticNetSolverResult,
     )
-    cones = [Clarabel.ZeroConeT(equality_dim), Clarabel.NonnegativeConeT(inequality_dim)]
-    solver = Clarabel.Solver(P, q, A, b, cones, settings)
-    Clarabel.solve!(solver)
-    return solver
-end
-
-function rlaopt_solve_gpu(P, q, A, b, equality_dim, inequality_dim)
-    settings = Clarabel.Settings(
-        direct_solve_method = :cudss,
-        verbose = false,
-        tol_gap_abs = 1e-10,
-        tol_gap_rel = 1e-10,
-        tol_feas = 1e-10,
-    )
-    cones = [Clarabel.ZeroConeT(equality_dim), Clarabel.NonnegativeConeT(inequality_dim)]
-    solver = Clarabel.Solver(P, q, A, b, cones, settings)
-    Clarabel.solve!(solver)
-    CUDA.synchronize()
-    return solver
-end
-"""
 
 
-@dataclass(frozen=True)
-class QuadraticProgram:
-    canonical: ElasticNetProblem
-    p_matrix: np.ndarray
-    q_vector: np.ndarray
-    a_matrix: np.ndarray
-    b_vector: np.ndarray
-
-    @property
-    def equality_dim(self) -> int:
-        return self.canonical.spec.n
-
-    @property
-    def inequality_dim(self) -> int:
-        return 2 * self.canonical.spec.p
-
-
-@dataclass(frozen=True)
-class SolveResult:
-    backend: str
-    solution: np.ndarray
-    status: str
-    iterations: int
-    elapsed_seconds: float
-    native_setup_seconds: float
-    native_solve_seconds: float
-    objective: float
-    stationarity: float
-    constraint_violation: float
-
-
-def make_problem(*, n_samples: int = 32, n_features: int = 8) -> QuadraticProgram:
-    """Construct a deterministic bounded elastic-net problem in Clarabel form."""
+def make_problem(
+    *,
+    device: str,
+    n_samples: int = 32,
+    n_features: int = 8,
+) -> ElasticNetProblem:
+    """Construct the same deterministic bounded elastic-net problem on either device."""
     from rlaopt_experiments.problems.synthetic_erm import (
         ElasticNetSpec,
         generate_elastic_net_problem,
     )
-    from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import (
-        build_bounded_elastic_net_conic_form,
-    )
 
-    canonical = generate_elastic_net_problem(
+    return generate_elastic_net_problem(
         ElasticNetSpec(
             n=n_samples,
             p=n_features,
@@ -101,161 +44,63 @@ def make_problem(*, n_samples: int = 32, n_features: int = 8) -> QuadraticProgra
             regularization_fraction=0.05,
         ),
         bounded=True,
-        device="cpu",
-    )
-    conic = build_bounded_elastic_net_conic_form(canonical)
-    return QuadraticProgram(
-        canonical=canonical,
-        p_matrix=conic.quadratic.toarray(),
-        q_vector=conic.linear,
-        a_matrix=conic.constraints.toarray(),
-        b_vector=conic.rhs,
+        device=device,
     )
 
 
-def initialize_julia() -> Any:
-    from juliacall import Main as jl
+def solve(
+    runtime: ClarabelRuntime,
+    problem: ElasticNetProblem,
+) -> BoundedElasticNetSolverResult:
+    from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import (
+        solve_clarabel_qdldl,
+        solve_cuclarabel_cudss,
+    )
 
-    jl.seval("using Clarabel, PythonCall, SparseArrays, CUDA, CUDA.CUSPARSE")
-    jl.seval(_JULIA_HELPERS)
-    return jl
+    adapter = solve_clarabel_qdldl if runtime.backend == "cpu" else solve_cuclarabel_cudss
+    return adapter(
+        problem,
+        runtime=runtime,
+        native_tolerance=1e-10,
+        max_iterations=200,
+    )
 
 
-def _external_metrics(
-    problem: QuadraticProgram, solution: np.ndarray
+def validate(
+    problem: ElasticNetProblem,
+    result: BoundedElasticNetSolverResult,
 ) -> tuple[float, float, float]:
-    import torch
-
-    n_samples = problem.canonical.spec.n
-    n_features = problem.canonical.spec.p
-    w = solution[n_samples : n_samples + n_features]
-    intercept = solution[-1]
-    weights = torch.from_numpy(w)
-    objective = float(problem.canonical.objective(weights, intercept))
+    if result.native_status != "converged":
+        raise RuntimeError(f"{result.metadata['linear_solver']} returned {result.native_status}")
+    objective = float(problem.objective(result.weights, result.intercept))
     stationarity = float(
-        problem.canonical.kkt_residual(
-            weights,
-            intercept,
-            activity_tolerance=1e-8,
-        )
+        problem.kkt_residual(result.weights, result.intercept, activity_tolerance=1e-8)
     )
-    constraint_violation = float(problem.canonical.constraint_violation(weights))
-    return objective, stationarity, constraint_violation
+    feasibility = float(problem.constraint_violation(result.weights))
+    if stationarity > 1e-7:
+        raise RuntimeError(f"stationarity is {stationarity:.3e}")
+    if feasibility > 1e-8:
+        raise RuntimeError(f"constraint violation is {feasibility:.3e}")
+    return objective, stationarity, feasibility
 
 
-def _extract_result(
-    problem: QuadraticProgram,
-    solver: Any,
-    *,
-    backend: str,
-    elapsed_seconds: float,
-) -> SolveResult:
-    solution = np.asarray(solver.solution.x, dtype=np.float64).copy()
-    objective, stationarity, constraint_violation = _external_metrics(problem, solution)
-    return SolveResult(
-        backend=backend,
-        solution=solution,
-        status=str(solver.solution.status),
-        iterations=int(solver.solution.iterations),
-        elapsed_seconds=elapsed_seconds,
-        native_setup_seconds=float(solver.solution.setup_phase_time),
-        native_solve_seconds=float(solver.solution.solve_phase_time),
-        objective=objective,
-        stationarity=stationarity,
-        constraint_violation=constraint_violation,
-    )
-
-
-def solve_cpu(jl: Any, problem: QuadraticProgram) -> SolveResult:
-    # Conversion is intentionally outside the solver-timing region.
-    p_matrix = jl.sparse(jl.Matrix[jl.Float64](problem.p_matrix))
-    q_vector = jl.Vector[jl.Float64](problem.q_vector)
-    a_matrix = jl.sparse(jl.Matrix[jl.Float64](problem.a_matrix))
-    b_vector = jl.Vector[jl.Float64](problem.b_vector)
-    started = time.perf_counter()
-    solver = jl.rlaopt_solve_cpu(
-        p_matrix,
-        q_vector,
-        a_matrix,
-        b_vector,
-        problem.equality_dim,
-        problem.inequality_dim,
-    )
-    elapsed_seconds = time.perf_counter() - started
-    return _extract_result(problem, solver, backend="cpu-qdldl", elapsed_seconds=elapsed_seconds)
-
-
-def solve_gpu(jl: Any, problem: QuadraticProgram) -> SolveResult:
-    import cupy as cp
-    from cupyx.scipy.sparse import csr_matrix
-
-    pyext = jl.Base.get_extension(jl.Clarabel, jl.Symbol("PythonExt"))
-
-    # CuClarabel's bridge adds one to CSR indices and row pointers in place. These
-    # dedicated arrays must never be reused, and their owners must outlive solve!.
-    p_owner = csr_matrix(cp.asarray(problem.p_matrix, dtype=cp.float64))
-    q_owner = cp.asarray(problem.q_vector, dtype=cp.float64)
-    a_owner = csr_matrix(cp.asarray(problem.a_matrix, dtype=cp.float64))
-    b_owner = cp.asarray(problem.b_vector, dtype=cp.float64)
-    owners = (p_owner, q_owner, a_owner, b_owner)
-
-    def wrap_vector(array: Any) -> Any:
-        return pyext.cupy_to_cuvector(jl.Float64, int(array.data.ptr), array.size)
-
-    def wrap_csr(matrix: Any) -> Any:
-        return pyext.cupy_to_cucsrmat(
-            jl.Float64,
-            int(matrix.data.data.ptr),
-            int(matrix.indices.data.ptr),
-            int(matrix.indptr.data.ptr),
-            matrix.shape[0],
-            matrix.shape[1],
-            matrix.nnz,
-        )
-
-    # Pointer wrapping and the bridge's index conversion are not solver time.
-    p_matrix = wrap_csr(p_owner)
-    q_vector = wrap_vector(q_owner)
-    a_matrix = wrap_csr(a_owner)
-    b_vector = wrap_vector(b_owner)
-    started = time.perf_counter()
-    solver = jl.rlaopt_solve_gpu(
-        p_matrix,
-        q_vector,
-        a_matrix,
-        b_vector,
-        problem.equality_dim,
-        problem.inequality_dim,
-    )
-    cp.cuda.get_current_stream().synchronize()
-    elapsed_seconds = time.perf_counter() - started
-    result = _extract_result(problem, solver, backend="gpu-cudss", elapsed_seconds=elapsed_seconds)
-    del owners
-    return result
-
-
-def _validate(result: SolveResult) -> None:
-    if result.status != "SOLVED":
-        raise RuntimeError(f"{result.backend} returned status {result.status}")
-    if result.stationarity > 1e-7:
-        raise RuntimeError(f"{result.backend} stationarity is {result.stationarity:.3e}")
-    if result.constraint_violation > 1e-8:
-        raise RuntimeError(
-            f"{result.backend} constraint violation is {result.constraint_violation:.3e}"
-        )
-
-
-def _summary(result: SolveResult) -> dict[str, Any]:
+def summary(
+    result: BoundedElasticNetSolverResult,
+    metrics: tuple[float, float, float],
+) -> dict[str, Any]:
+    objective, stationarity, feasibility = metrics
     return {
-        "backend": result.backend,
-        "status": result.status,
+        "backend": result.metadata["linear_solver"],
+        "status": result.native_status,
         "iterations": result.iterations,
-        "elapsed_seconds": result.elapsed_seconds,
-        "native_setup_seconds": result.native_setup_seconds,
-        "native_solve_seconds": result.native_solve_seconds,
-        "objective": result.objective,
-        "stationarity": result.stationarity,
-        "constraint_violation": result.constraint_violation,
+        "elapsed_seconds": result.runtime_seconds,
+        "native_setup_seconds": result.metadata["native_setup_time_seconds"],
+        "native_solve_seconds": result.metadata["native_solve_time_seconds"],
+        "preparation_seconds": result.metadata["conic_preparation_seconds"],
+        "extraction_seconds": result.metadata["solution_extraction_seconds"],
+        "objective": objective,
+        "stationarity": stationarity,
+        "constraint_violation": feasibility,
     }
 
 
@@ -264,30 +109,35 @@ def main() -> None:
     parser.add_argument("--backend", choices=("cpu", "cuda", "both"), default="both")
     args = parser.parse_args()
 
-    jl = initialize_julia()
-    # Importing the canonical problem module imports PyTorch. JuliaCall must be
-    # initialized first to avoid a known shared-library conflict.
-    problem = make_problem()
-    methods = []
-    if args.backend in {"cpu", "both"}:
-        methods.append(solve_cpu)
-    if args.backend in {"cuda", "both"}:
-        methods.append(solve_gpu)
+    backends = ["cpu", "cuda"] if args.backend == "both" else [args.backend]
+    # Initialize every requested Julia backend before make_problem imports PyTorch.
+    runtimes = {backend: initialize_clarabel_runtime(backend) for backend in backends}
+    problems = {backend: make_problem(device=backend) for backend in backends}
 
-    results: list[SolveResult] = []
-    for method in methods:
-        # The first solve is an untimed JIT warmup. The measured solve uses fresh
-        # solver state and, on GPU, fresh CSR buffers.
-        _validate(method(jl, problem))
-        result = method(jl, problem)
-        _validate(result)
-        results.append(result)
-        print(json.dumps(_summary(result), sort_keys=True))
+    results: dict[str, BoundedElasticNetSolverResult] = {}
+    metrics: dict[str, tuple[float, float, float]] = {}
+    for backend in backends:
+        # The first solve is an untimed JIT warmup. The measured solve creates
+        # fresh native solver state and fresh CuPy CSR buffers.
+        validate(problems[backend], solve(runtimes[backend], problems[backend]))
+        result = solve(runtimes[backend], problems[backend])
+        result_metrics = validate(problems[backend], result)
+        results[backend] = result
+        metrics[backend] = result_metrics
+        print(json.dumps(summary(result, result_metrics), sort_keys=True))
 
     if len(results) == 2:
-        objective_difference = abs(results[0].objective - results[1].objective)
+        cpu_result = results["cpu"]
+        cuda_result = results["cuda"]
+        objective_difference = abs(metrics["cpu"][0] - metrics["cuda"][0])
+        cpu_solution = np.concatenate(
+            (cpu_result.weights.cpu().numpy(), [float(cpu_result.intercept)])
+        )
+        cuda_solution = np.concatenate(
+            (cuda_result.weights.cpu().numpy(), [float(cuda_result.intercept)])
+        )
         coefficient_difference = float(
-            np.linalg.norm(results[0].solution - results[1].solution, ord=np.inf)
+            np.linalg.norm(cpu_solution - cuda_solution, ord=np.inf)
         )
         if objective_difference > 1e-9 or coefficient_difference > 1e-6:
             raise RuntimeError(

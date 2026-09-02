@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import subprocess
+import sys
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -13,9 +16,59 @@ from rlaopt_experiments.problems.synthetic_erm import (
 from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import (
     _build_rlaopt_objective,
     build_bounded_elastic_net_conic_form,
+    solve_clarabel_qdldl,
     solve_rlaopt_admm,
     solve_scs,
 )
+from rlaopt_experiments.clarabel_bridge import ClarabelRuntime
+
+
+class FakeClarabelRuntime:
+    backend = "cpu"
+
+    def __init__(self, solution):
+        self.solution = solution
+        self.prepared = None
+        self.controls = None
+
+    def prepare(self, quadratic, linear, constraints, rhs):
+        self.prepared = (quadratic, linear, constraints, rhs)
+        return self.prepared
+
+    def solve(self, data, **controls):
+        assert data is self.prepared
+        self.controls = controls
+        return SimpleNamespace(solution=self.solution)
+
+
+class FakeVectorFactory:
+    def __getitem__(self, _dtype):
+        return lambda values: np.asarray(values).copy()
+
+
+class FakeJuliaMain:
+    Float64 = "Float64"
+    Int64 = "Int64"
+    Vector = FakeVectorFactory()
+
+    @staticmethod
+    def SparseMatrixCSC(rows, columns, column_pointers, row_indices, values):
+        return (rows, columns, column_pointers, row_indices, values)
+
+
+def test_importing_clarabel_bridge_does_not_import_torch() -> None:
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys; import rlaopt_experiments.clarabel_bridge; "
+            "assert 'torch' not in sys.modules",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 @pytest.fixture(scope="module")
@@ -142,6 +195,107 @@ def test_scs_records_direct_native_diagnostics(problem) -> None:
     assert result.metadata["native_solve_time_milliseconds"] >= 0
     assert result.metadata["native_primal_residual"] >= 0
     assert result.metadata["native_dual_residual"] >= 0
+
+
+def test_clarabel_cpu_adapter_records_controls_and_native_diagnostics(problem) -> None:
+    reference = solve_scs(problem, native_tolerance=1e-10, max_iterations=5_000)
+    residual = problem.X @ reference.weights + reference.intercept - problem.y
+    primal = torch.cat((residual, reference.weights, reference.intercept.reshape(1))).numpy()
+    objective = float(problem.objective(reference.weights, reference.intercept))
+    solution = SimpleNamespace(
+        x=primal,
+        status="SOLVED",
+        iterations=9,
+        r_prim=2e-9,
+        r_dual=3e-9,
+        obj_val=objective,
+        obj_val_dual=objective - 4e-9,
+        setup_phase_time=0.02,
+        solve_phase_time=0.03,
+    )
+    runtime = FakeClarabelRuntime(solution)
+
+    result = solve_clarabel_qdldl(
+        problem,
+        runtime=runtime,
+        native_tolerance=1e-8,
+        max_iterations=123,
+    )
+
+    assert result.native_status == "converged"
+    assert result.native_error is None
+    assert result.iterations == 9
+    torch.testing.assert_close(result.weights, reference.weights)
+    torch.testing.assert_close(result.intercept, reference.intercept)
+    assert runtime.controls == {
+        "equality_dim": problem.spec.n,
+        "inequality_dim": 2 * problem.spec.p,
+        "native_tolerance": 1e-8,
+        "max_iterations": 123,
+    }
+    assert result.metadata["linear_solver"] == "qdldl"
+    assert result.metadata["native_primal_residual"] == pytest.approx(2e-9)
+    assert result.metadata["native_dual_residual"] == pytest.approx(3e-9)
+    assert result.metadata["native_setup_time_seconds"] == pytest.approx(0.02)
+    assert result.metadata["native_solve_time_seconds"] == pytest.approx(0.03)
+    assert result.metadata["conic_preparation_seconds"] >= 0
+    assert result.metadata["solution_extraction_seconds"] >= 0
+
+
+def test_clarabel_does_not_treat_almost_solved_as_native_convergence(problem) -> None:
+    variable_count = problem.spec.n + problem.spec.p + 1
+    solution = SimpleNamespace(
+        x=np.zeros(variable_count, dtype=np.float64),
+        status="ALMOST_SOLVED",
+        iterations=10,
+        r_prim=1e-6,
+        r_dual=1e-6,
+        obj_val=1.0,
+        obj_val_dual=0.9,
+        setup_phase_time=0.0,
+        solve_phase_time=0.0,
+    )
+    result = solve_clarabel_qdldl(
+        problem,
+        runtime=FakeClarabelRuntime(solution),
+        native_tolerance=1e-8,
+        max_iterations=10,
+    )
+
+    assert result.native_status == "ALMOST_SOLVED"
+
+
+def test_cpu_clarabel_bridge_preserves_sparse_inputs_and_uses_one_based_indices(problem) -> None:
+    conic = build_bounded_elastic_net_conic_form(problem)
+    original_indptr = conic.constraints.indptr.copy()
+    original_indices = conic.constraints.indices.copy()
+    runtime = ClarabelRuntime(FakeJuliaMain(), "cpu")
+
+    prepared = runtime.prepare(
+        conic.quadratic,
+        conic.linear,
+        conic.constraints,
+        conic.rhs,
+    )
+
+    _, _, column_pointers, row_indices, _ = prepared.constraints
+    np.testing.assert_array_equal(column_pointers, original_indptr + 1)
+    np.testing.assert_array_equal(row_indices, original_indices + 1)
+    np.testing.assert_array_equal(conic.constraints.indptr, original_indptr)
+    np.testing.assert_array_equal(conic.constraints.indices, original_indices)
+    assert prepared.owners == ()
+
+
+def test_clarabel_adapter_rejects_runtime_for_other_backend(problem) -> None:
+    runtime = FakeClarabelRuntime(None)
+    runtime.backend = "cuda"
+    with pytest.raises(ValueError, match="runtime backend"):
+        solve_clarabel_qdldl(
+            problem,
+            runtime=runtime,
+            native_tolerance=1e-8,
+            max_iterations=100,
+        )
 
 
 def test_scs_does_not_treat_inaccurate_status_as_native_convergence(
