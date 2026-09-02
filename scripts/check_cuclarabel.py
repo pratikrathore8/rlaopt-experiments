@@ -85,6 +85,9 @@ def make_problem(*, n_samples: int = 32, n_features: int = 8) -> QuadraticProgra
         ElasticNetSpec,
         generate_elastic_net_problem,
     )
+    from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import (
+        build_bounded_elastic_net_conic_form,
+    )
 
     canonical = generate_elastic_net_problem(
         ElasticNetSpec(
@@ -100,40 +103,13 @@ def make_problem(*, n_samples: int = 32, n_features: int = 8) -> QuadraticProgra
         bounded=True,
         device="cpu",
     )
-    x = canonical.X.numpy()
-    y = canonical.y.numpy()
-
-    # z = [r, w, intercept], with r = Xw + intercept - y.
-    n_variables = n_samples + n_features + 1
-    p_matrix = np.zeros((n_variables, n_variables), dtype=np.float64)
-    p_matrix[:n_samples, :n_samples] = np.eye(n_samples) / n_samples
-    p_matrix[n_samples : n_samples + n_features, n_samples : n_samples + n_features] = (
-        canonical.lambda_l2 * np.eye(n_features)
-    )
-    q_vector = np.zeros(n_variables, dtype=np.float64)
-    q_vector[n_samples : n_samples + n_features] = canonical.lambda_l1
-
-    equality = np.column_stack(
-        (
-            np.eye(n_samples),
-            -x,
-            -np.ones(n_samples, dtype=np.float64),
-        )
-    )
-    lower = np.zeros((n_features, n_variables), dtype=np.float64)
-    upper = np.zeros((n_features, n_variables), dtype=np.float64)
-    feature_columns = np.arange(n_samples, n_samples + n_features)
-    lower[np.arange(n_features), feature_columns] = -1.0
-    upper[np.arange(n_features), feature_columns] = 1.0
-    a_matrix = np.vstack((equality, lower, upper))
-    b_vector = np.concatenate((-y, np.zeros(n_features), np.ones(n_features)))
-
+    conic = build_bounded_elastic_net_conic_form(canonical)
     return QuadraticProgram(
         canonical=canonical,
-        p_matrix=p_matrix,
-        q_vector=q_vector,
-        a_matrix=a_matrix,
-        b_vector=b_vector,
+        p_matrix=conic.quadratic.toarray(),
+        q_vector=conic.linear,
+        a_matrix=conic.constraints.toarray(),
+        b_vector=conic.rhs,
     )
 
 

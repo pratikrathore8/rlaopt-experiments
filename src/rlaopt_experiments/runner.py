@@ -75,6 +75,7 @@ def _environment_metadata() -> dict[str, Any]:
         "numpy_version": version("numpy"),
         "scipy_version": version("scipy"),
         "scikit_learn_version": version("scikit-learn"),
+        "scs_version": version("scs"),
         "wandb_version": version("wandb"),
     }
 
