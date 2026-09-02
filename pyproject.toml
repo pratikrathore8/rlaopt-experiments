@@ -15,6 +15,7 @@ dependencies = [
   # cuML 26.8.0's numba-cuda still imports np.row_stack, removed in NumPy 2.5.
   "numpy==2.4.2",
   "rlaopt==0.1.0",
+  "scikit-learn==1.9.0",
   "scipy==1.18.1",
   "torch==2.13.0",
   "wandb==0.29.0",
