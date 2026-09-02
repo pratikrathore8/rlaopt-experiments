@@ -9,6 +9,8 @@ description = "Reproducible benchmarks for rlaopt"
 readme = "README.md"
 requires-python = "==3.12.*"
 dependencies = [
+  "jax==0.11.1",
+  "jaxopt==0.8.5",
   "matplotlib==3.11.1",
   # cuML 26.8.0's numba-cuda still imports np.row_stack, removed in NumPy 2.5.
   "numpy==2.4.2",
@@ -26,6 +28,7 @@ dev = ["pytest==9.0.2", "ruff==0.15.6"]
 gpu = [
     "cuml-cu13==26.8.0",
     "cupy-cuda13x==14.2.0",
+    "jax[cuda13]==0.11.1",
     "juliacall==0.9.31",
 ]
 
