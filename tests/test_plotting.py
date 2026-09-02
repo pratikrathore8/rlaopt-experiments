@@ -2,6 +2,7 @@ from rlaopt_experiments.plotting import _aggregate, _native_success
 
 
 def _row(*, status: str, outcome: str, success: bool, runtime: float) -> dict:
+    native_success = outcome == "result" and status == "native_complete"
     return {
         "solver": "cuml_lsmr",
         "backend": "cuda",
@@ -12,6 +13,9 @@ def _row(*, status: str, outcome: str, success: bool, runtime: float) -> dict:
         "runtime_seconds": runtime,
         "native_status": status,
         "success": success,
+        "external_success": success,
+        "native_success": native_success,
+        "runtime_eligible": native_success,
         "metadata": {"worker_outcome": outcome},
     }
 

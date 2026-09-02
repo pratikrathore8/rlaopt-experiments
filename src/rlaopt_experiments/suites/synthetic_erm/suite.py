@@ -89,14 +89,17 @@ class SyntheticErmSuite:
         )
         feasibility = float(problem.constraint_violation(result.coefficients))
         objective = float(problem.objective(result.coefficients))
-        success = (
+        external_success = (
             stationarity <= command["stationarity_tolerance"]
             and feasibility <= command["feasibility_tolerance"]
         )
+        native_success = result.native_status == "converged"
         return {
             "runtime_seconds": result.runtime_seconds,
             "iterations": result.iterations,
             "native_status": result.native_status,
+            "native_success": native_success,
+            "runtime_eligible": native_success,
             "trace": [],
             "solver_metadata": result.metadata
             | {
@@ -107,7 +110,7 @@ class SyntheticErmSuite:
                 "stationarity": stationarity,
                 "feasibility": feasibility,
                 "objective": objective,
-                "success": success,
+                "external_success": external_success,
             },
             "diagnostics": problem.diagnostics(),
         }

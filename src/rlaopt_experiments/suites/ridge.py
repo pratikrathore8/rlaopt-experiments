@@ -52,12 +52,23 @@ class RidgeSuite:
             command["rank"],
         )
         accuracy = adjudicate(problem, ridge, result, command["kkt_tolerance"])
+        accuracy_values = asdict(accuracy)
+        external_success = accuracy_values.pop("success")
+        native_success = result.native_status in {
+            "direct",
+            "istop_1",
+            "istop_2",
+            "native_complete",
+            "native_converged",
+        }
         return {
             "runtime_seconds": result.runtime_seconds,
             "iterations": result.iterations,
             "native_status": result.native_status,
+            "native_success": native_success,
+            "runtime_eligible": native_success,
             "trace": result.trace,
             "solver_metadata": result.metadata | {"native_tolerance": command["native_tolerance"]},
-            "accuracy": asdict(accuracy),
+            "accuracy": accuracy_values | {"external_success": external_success},
             "diagnostics": problem.diagnostics(ridge),
         }

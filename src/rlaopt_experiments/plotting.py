@@ -18,6 +18,8 @@ def _records(path: Path) -> list[dict]:
 
 
 def _native_success(row: dict) -> bool:
+    if "runtime_eligible" in row:
+        return bool(row["runtime_eligible"])
     if row["metadata"].get("worker_outcome") != "result":
         return False
     status = row["native_status"]
@@ -59,7 +61,10 @@ def _aggregate(records: list[dict], family: str) -> list[dict]:
                 "runtime_min": min(valid) if valid else None,
                 "runtime_max": max(valid) if valid else None,
                 "native_success_rate": sum(_native_success(item) for item in values) / len(values),
-                "external_kkt_success_rate": sum(item["success"] for item in values) / len(values),
+                "external_kkt_success_rate": sum(
+                    item.get("external_success", item.get("success", False)) for item in values
+                )
+                / len(values),
             }
         )
     return result
@@ -165,9 +170,10 @@ def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
     for row in records:
         bucket = summary[f"{row['solver']}:{row['backend']}"]
         bucket["native_success"] += int(_native_success(row))
-        bucket["external_kkt_pass"] += int(row["success"])
+        external_success = row.get("external_success", row.get("success", False))
+        bucket["external_kkt_pass"] += int(external_success)
         bucket["external_kkt_miss"] += int(
-            row["metadata"].get("worker_outcome") == "result" and not row["success"]
+            row["metadata"].get("worker_outcome") == "result" and not external_success
         )
         bucket["timeout"] += int(row["timed_out"])
         bucket["error"] += int(row["metadata"].get("worker_outcome") == "error")

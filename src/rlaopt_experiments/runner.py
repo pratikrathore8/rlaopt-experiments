@@ -99,8 +99,15 @@ def record_outcome(
         uuid.NAMESPACE_URL,
         f"{suite}/{problem_id}/{solver}/{backend}/{run_key}/{repetition}",
     ).hex
-    accuracy = outcome.get("accuracy", {})
-    success = bool(accuracy.get("success", False))
+    accuracy = dict(outcome.get("accuracy", {}))
+    if outcome["kind"] == "result":
+        external_success = bool(accuracy.pop("external_success"))
+        native_success = bool(outcome["native_success"])
+        runtime_eligible = bool(outcome["runtime_eligible"])
+    else:
+        external_success = False
+        native_success = False
+        runtime_eligible = False
     metadata = (
         _environment_metadata()
         | worker_metadata
@@ -130,7 +137,9 @@ def record_outcome(
         iterations=outcome.get("iterations"),
         native_status=outcome["native_status"],
         metrics=accuracy,
-        success=success,
+        native_success=native_success,
+        external_success=external_success,
+        runtime_eligible=runtime_eligible,
         timed_out=outcome["kind"] == "timeout" or outcome["native_status"] == "timeout",
         problem=problem | {"diagnostics": outcome.get("diagnostics", {})},
         peak_memory_bytes=outcome.get("peak_memory_bytes"),
@@ -310,7 +319,7 @@ def run_job(
                 timeout_seconds,
             )
             outcomes = [first]
-            if first["kind"] == "result" and first["accuracy"]["success"]:
+            if first["kind"] == "result" and first["runtime_eligible"]:
                 for _ in range(repetitions - 1):
                     repeated = worker.solve(
                         command

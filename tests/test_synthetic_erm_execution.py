@@ -19,6 +19,7 @@ CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_smoke.toml"
 
 class FakeWorker:
     instances: list[FakeWorker] = []
+    external_success = True
 
     def __init__(
         self,
@@ -54,11 +55,13 @@ class FakeWorker:
             "runtime_seconds": runtime,
             "iterations": 7,
             "native_status": "converged",
+            "native_success": True,
+            "runtime_eligible": True,
             "accuracy": {
                 "stationarity": 1e-8,
                 "feasibility": 0.0,
                 "objective": 0.5,
-                "success": True,
+                "external_success": self.external_success,
             },
             "solver_metadata": {
                 "native_error": 1e-8,
@@ -76,6 +79,7 @@ class FakeWorker:
 @pytest.fixture(autouse=True)
 def reset_fake_workers() -> None:
     FakeWorker.instances.clear()
+    FakeWorker.external_success = True
 
 
 def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
@@ -116,6 +120,9 @@ def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
     assert records[0].problem["n"] == job["problem_spec"]["n"]
     assert records[0].metrics["stationarity"] == 1e-8
     assert records[0].success
+    assert records[0].native_success
+    assert records[0].external_success
+    assert records[0].runtime_eligible
     assert records[0].metadata["native_tolerance"] == 1e-7
     assert records[0].metadata["execution_phase"] == "measurement"
     assert records[0].metadata["max_iterations"] == 500
@@ -127,6 +134,42 @@ def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
     paths = sorted((tmp_path / "records").glob("*.json"))
     assert len(paths) == 2
     assert read_record(paths[0])["problem_type"] == "multinomial"
+
+
+def test_native_success_controls_repetitions_when_external_metric_misses(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = replace(
+        load_synthetic_erm_config(CONFIG),
+        warmups=0,
+        repetitions=2,
+    )
+    job = next(job for job in build_manifest(CONFIG, "cpu") if job["solver"] == "jaxopt_lbfgsb")
+    FakeWorker.external_success = False
+    monkeypatch.setattr(
+        "rlaopt_experiments.suites.synthetic_erm.execution.ProblemWorker",
+        FakeWorker,
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.runner.wandb_run",
+        lambda *_args, **_kwargs: nullcontext(None),
+    )
+
+    records = run_multinomial_job(
+        job,
+        config,
+        native_tolerance=1e-7,
+        max_iterations=500,
+        batch_size=256,
+        output_dir=tmp_path,
+    )
+
+    assert len(FakeWorker.instances[0].commands) == 2
+    assert len(records) == 2
+    assert all(record.native_success for record in records)
+    assert all(record.runtime_eligible for record in records)
+    assert not any(record.external_success for record in records)
 
 
 def test_readiness_exception_closes_worker(

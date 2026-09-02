@@ -9,7 +9,16 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
+
+_LEGACY_NATIVE_SUCCESS_STATUSES = {
+    "converged",
+    "direct",
+    "istop_1",
+    "istop_2",
+    "native_complete",
+    "native_converged",
+}
 
 
 @dataclass
@@ -27,7 +36,9 @@ class TrialRecord:
     iterations: int | None
     native_status: str
     metrics: dict[str, float | bool | None]
-    success: bool
+    native_success: bool
+    external_success: bool
+    runtime_eligible: bool
     timed_out: bool
     problem: dict[str, Any] = field(default_factory=dict)
     peak_memory_bytes: int | None = None
@@ -63,23 +74,56 @@ class TrialRecord:
     def relative_solution_error(self) -> float | None:
         return self.metrics.get("relative_solution_error")
 
+    @property
+    def success(self) -> bool:
+        """Backward-compatible alias for external mathematical success."""
+        return self.external_success
+
+
+def _infer_legacy_native_success(data: dict[str, Any]) -> bool:
+    worker_outcome = data.get("metadata", {}).get("worker_outcome")
+    if worker_outcome is not None and worker_outcome != "result":
+        return False
+    return data.get("native_status") in _LEGACY_NATIVE_SUCCESS_STATUSES
+
+
+def _add_outcome_semantics(data: dict[str, Any]) -> dict[str, Any]:
+    """Normalize old records while retaining success as an analysis alias."""
+    external_success = bool(data.get("external_success", data.get("success", False)))
+    native_success = bool(data.get("native_success", _infer_legacy_native_success(data)))
+    runtime_eligible = bool(data.get("runtime_eligible", native_success))
+    return data | {
+        "native_success": native_success,
+        "external_success": external_success,
+        "runtime_eligible": runtime_eligible,
+        "success": external_success,
+    }
+
 
 def record_view(data: dict[str, Any]) -> dict[str, Any]:
     """Return a flat analysis view for either a legacy or current record."""
-    if data.get("schema_version", 1) == 1:
-        return {"suite": "synthetic_ridge", **data}
-    if data["schema_version"] != SCHEMA_VERSION:
+    version = data.get("schema_version", 1)
+    if version == 1:
+        return _add_outcome_semantics({"suite": "synthetic_ridge", **data})
+    if version not in {2, SCHEMA_VERSION}:
         raise ValueError(f"unsupported record schema version: {data['schema_version']}")
+    if version == SCHEMA_VERSION:
+        required = {"native_success", "external_success", "runtime_eligible"}
+        missing = required - data.keys()
+        if missing:
+            raise ValueError(f"schema-v3 record is missing outcome fields: {sorted(missing)}")
 
     problem = dict(data.get("problem", {}))
     diagnostics = problem.pop("diagnostics", {})
-    return {
-        **data,
-        **problem,
-        **data.get("timings", {}),
-        **data.get("metrics", {}),
-        "diagnostics": diagnostics,
-    }
+    return _add_outcome_semantics(
+        {
+            **data,
+            **problem,
+            **data.get("timings", {}),
+            **data.get("metrics", {}),
+            "diagnostics": diagnostics,
+        }
+    )
 
 
 def read_record(path: Path) -> dict[str, Any]:

@@ -52,7 +52,9 @@ def log_record(run: object | None, record: TrialRecord) -> None:
             f"summary/{key}": value for key, value in record.metrics.items() if value is not None
         }
         summary |= {f"summary/{key}": value for key, value in record.timings.items()}
-        summary["summary/success"] = int(record.success)
+        summary["summary/native_success"] = int(record.native_success)
+        summary["summary/external_success"] = int(record.external_success)
+        summary["summary/runtime_eligible"] = int(record.runtime_eligible)
         run.log(summary)
     except Exception:
         # The atomic JSON record is authoritative; telemetry must not stop a job.

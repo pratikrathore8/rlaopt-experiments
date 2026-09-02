@@ -48,7 +48,9 @@ def test_problem_worker_dispatches_selected_ridge_suite():
         )
 
         assert outcome["kind"] == "result"
-        assert outcome["accuracy"]["success"]
+        assert outcome["native_success"]
+        assert outcome["runtime_eligible"]
+        assert outcome["accuracy"]["external_success"]
         assert outcome["accuracy"]["relative_kkt"] < 1e-6
         assert outcome["diagnostics"]["full_condition_number"] > 1
     finally:

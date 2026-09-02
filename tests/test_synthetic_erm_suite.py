@@ -42,7 +42,9 @@ def test_multinomial_suite_executes_and_adjudicates_jaxopt_lbfgsb() -> None:
     )
 
     assert outcome["native_status"] == "converged"
-    assert outcome["accuracy"]["success"]
+    assert outcome["native_success"]
+    assert outcome["runtime_eligible"]
+    assert outcome["accuracy"]["external_success"]
     assert outcome["accuracy"]["stationarity"] <= 1e-6
     assert outcome["accuracy"]["feasibility"] <= 1e-8
     assert outcome["solver_metadata"]["native_tolerance"] == 1e-7

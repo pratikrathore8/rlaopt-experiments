@@ -182,7 +182,7 @@ def run_multinomial_job(
 
         first = worker.solve(command, config.timeout_seconds)
         outcomes = [first]
-        if first["kind"] == "result" and first["accuracy"]["success"]:
+        if first["kind"] == "result" and first["runtime_eligible"]:
             for _ in range(config.repetitions - 1):
                 repeated = worker.solve(command, config.timeout_seconds)
                 outcomes.append(repeated)
