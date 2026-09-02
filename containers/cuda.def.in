@@ -6,12 +6,14 @@ From: @CUDA_IMAGE_REFERENCE@
     uv.lock /opt/rlaopt-experiments/uv.lock
     README.md /opt/rlaopt-experiments/README.md
     src /opt/rlaopt-experiments/src
+    julia/cuclarabel/Project.toml /opt/rlaopt-experiments/julia/cuclarabel/Project.toml
+    julia/cuclarabel/Manifest.toml /opt/rlaopt-experiments/julia/cuclarabel/Manifest.toml
 
 %post
     set -eu
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install -y --no-install-recommends ca-certificates curl python3.12 python3.12-venv
+    apt-get install -y --no-install-recommends ca-certificates curl git python3.12 python3.12-venv
     rm -rf /var/lib/apt/lists/*
     export UV_UNMANAGED_INSTALL=/usr/local/bin
     export UV_LINK_MODE=copy
@@ -20,21 +22,47 @@ From: @CUDA_IMAGE_REFERENCE@
     uv venv --python /usr/bin/python3.12 .venv
     UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
         uv sync --frozen --no-dev --group gpu
+    curl -fL "https://julialang-s3.julialang.org/bin/linux/x64/1.10/julia-@JULIA_VERSION@-linux-x86_64.tar.gz" \
+        -o /tmp/julia.tar.gz
+    echo "@JULIA_SHA256@  /tmp/julia.tar.gz" | sha256sum --check --strict
+    mkdir -p /opt/julia
+    tar -xzf /tmp/julia.tar.gz --strip-components=1 -C /opt/julia
+    rm /tmp/julia.tar.gz
+    ln -s /opt/julia/bin/julia /usr/local/bin/julia
+    export JULIA_DEPOT_PATH=/opt/julia-depot
+    export JULIA_PKG_PRECOMPILE_AUTO=0
+    export JULIA_CONDAPKG_BACKEND=Null
+    export JULIA_PYTHONCALL_EXE=/opt/rlaopt-experiments/.venv/bin/python
+    julia --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
+        'using Pkg; Pkg.instantiate(); Pkg.precompile(); using PythonCall, Clarabel, CUDA, CUDSS; @assert !isnothing(Base.get_extension(Clarabel, :PythonExt))'
     uv --version
+    julia --version
 
 %environment
     export PATH=/opt/rlaopt-experiments/.venv/bin:$PATH
     export UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv
     export PYTHONNOUSERSITE=1
+    export PYTHON_JULIACALL_EXE=/usr/local/bin/julia
+    export PYTHON_JULIACALL_PROJECT=/opt/rlaopt-experiments/julia/cuclarabel
+    export PYTHON_JULIACALL_THREADS=1
+    export JULIA_DEPOT_PATH="${TMPDIR:-/tmp}/rlaopt-julia-depot-${SLURM_JOB_ID:-local}:/opt/julia-depot"
+    export JULIA_PKG_OFFLINE=true
+    export JULIA_CONDAPKG_BACKEND=Null
+    export JULIA_PYTHONCALL_EXE=/opt/rlaopt-experiments/.venv/bin/python
 
 %labels
     org.opencontainers.image.title rlaopt-experiments-cuda
     io.rlaopt.cuda.base.digest @CUDA_BASE_IMAGE_DIGEST@
     io.rlaopt.cuda.version @CUDA_IMAGE_VERSION@
     io.rlaopt.uv.version 0.12.7
+    io.rlaopt.julia.version @JULIA_VERSION@
+    io.rlaopt.cuclarabel.commit @CUCLARABEL_COMMIT@
 
 %test
     export HOME=/tmp
     export CUPY_CACHE_DIR=/tmp/cupy-cache
     /opt/rlaopt-experiments/.venv/bin/python -c \
-        'import cupy, cuml, rlaopt, torch; print("container imports passed")'
+        'import cupy, cuml, juliacall, rlaopt, torch; print("container imports passed")'
+    JULIA_DEPOT_PATH=/opt/julia-depot julia \
+        --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
+        'using Clarabel; println("CuClarabel import passed")'

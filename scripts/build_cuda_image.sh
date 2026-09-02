@@ -9,6 +9,16 @@ if [[ ! "$CUDA_BASE_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
   exit 2
 fi
 
+if [[ ! "$JULIA_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+  echo "containers/cuda.env does not contain a valid Julia SHA-256" >&2
+  exit 2
+fi
+
+if [[ ! "$CUCLARABEL_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "containers/cuda.env does not contain an immutable CuClarabel commit" >&2
+  exit 2
+fi
+
 OUTPUT="${1:-$REPOSITORY/$RLAOPT_CUDA_IMAGE}"
 BUILD_DIRECTORY="$(mktemp -d "${TMPDIR:-/tmp}/rlaopt-apptainer-build.XXXXXX")"
 trap 'rm -rf "$BUILD_DIRECTORY"' EXIT
@@ -18,6 +28,9 @@ sed \
   -e "s|@CUDA_IMAGE_REFERENCE@|$CUDA_IMAGE_REFERENCE|g" \
   -e "s|@CUDA_BASE_IMAGE_DIGEST@|$CUDA_BASE_IMAGE_DIGEST|g" \
   -e "s|@CUDA_IMAGE_VERSION@|$CUDA_IMAGE_VERSION|g" \
+  -e "s|@JULIA_VERSION@|$JULIA_VERSION|g" \
+  -e "s|@JULIA_SHA256@|$JULIA_SHA256|g" \
+  -e "s|@CUCLARABEL_COMMIT@|$CUCLARABEL_COMMIT|g" \
   "$REPOSITORY/containers/cuda.def.in" > "$BUILD_DIRECTORY/cuda.def"
 
 mkdir -p "$(dirname "$OUTPUT")"

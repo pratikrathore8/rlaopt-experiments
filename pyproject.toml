@@ -23,7 +23,11 @@ rlaopt-bench = "rlaopt_experiments.cli:main"
 
 [dependency-groups]
 dev = ["pytest==9.0.2", "ruff==0.15.6"]
-gpu = ["cuml-cu13==26.8.0"]
+gpu = [
+    "cuml-cu13==26.8.0",
+    "cupy-cuda13x==14.2.0",
+    "juliacall==0.9.31",
+]
 
 [tool.uv]
 required-version = "==0.12.7"
