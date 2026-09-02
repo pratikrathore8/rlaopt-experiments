@@ -35,6 +35,13 @@ def test_load_synthetic_erm_smoke_config() -> None:
     assert config.multinomial.shapes == (ErmShape(1024, 64), ErmShape(4096, 256))
     assert config.elastic_net.regularization_fractions == (0.1, 0.01)
     assert "sklearn_coordinate_descent" in config.elastic_net.vanilla_solvers.cpu
+    assert config.elastic_net.vanilla_execution.max_iterations == 10_000
+    assert (
+        config.elastic_net.vanilla_execution.native_tolerances.for_solver(
+            "cuda", "cuml_coordinate_descent"
+        )
+        == 1e-6
+    )
     assert "cuclarabel_cudss" in config.elastic_net.bounded_solvers.cuda
 
 
@@ -124,4 +131,5 @@ def test_shapes_must_be_nonempty() -> None:
             regularization_fractions=config.elastic_net.regularization_fractions,
             vanilla_solvers=config.elastic_net.vanilla_solvers,
             bounded_solvers=config.elastic_net.bounded_solvers,
+            vanilla_execution=config.elastic_net.vanilla_execution,
         )

@@ -5,18 +5,21 @@ from __future__ import annotations
 from dataclasses import asdict
 from typing import Any
 
-from rlaopt_experiments.problems.synthetic_erm import MultinomialSpec
+from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, MultinomialSpec
 from rlaopt_experiments.seeds import derive_seed
 from rlaopt_experiments.suites.synthetic_erm.config import SyntheticErmConfig
+
+
+def _require_backend(backend: str) -> None:
+    if backend not in {"cpu", "cuda"}:
+        raise ValueError("backend must be cpu or cuda")
 
 
 def build_multinomial_manifest(
     config: SyntheticErmConfig,
     backend: str,
 ) -> list[dict[str, Any]]:
-    """Expand the configured multinomial grid into self-contained jobs."""
-    if backend not in {"cpu", "cuda"}:
-        raise ValueError("backend must be 'cpu' or 'cuda'")
+    _require_backend(backend)
     solvers = getattr(config.multinomial.solvers, backend)
     jobs: list[dict[str, Any]] = []
     for shape in config.multinomial.shapes:
@@ -45,3 +48,50 @@ def build_multinomial_manifest(
                     }
                 )
     return jobs
+
+
+def build_vanilla_elastic_net_manifest(
+    config: SyntheticErmConfig,
+    backend: str,
+) -> list[dict[str, Any]]:
+    """Expand the configured unbounded elastic-net grid into self-contained jobs."""
+    _require_backend(backend)
+    solvers = getattr(config.elastic_net.vanilla_solvers, backend)
+    jobs: list[dict[str, Any]] = []
+    for shape in config.elastic_net.shapes:
+        for seed in config.seeds:
+            for fraction in config.elastic_net.regularization_fractions:
+                problem_spec = ElasticNetSpec(
+                    n=shape.n,
+                    p=shape.p,
+                    feature_seed=derive_seed(seed, "elastic_net_features"),
+                    target_seed=derive_seed(seed, "elastic_net_targets"),
+                    teacher_density=config.elastic_net.teacher_density,
+                    noise_ratio=config.elastic_net.noise_ratio,
+                    teacher_intercept=config.elastic_net.teacher_intercept,
+                    regularization_fraction=fraction,
+                )
+                for solver in solvers:
+                    jobs.append(
+                        {
+                            "suite": config.suite,
+                            "problem_type": "vanilla_elastic_net",
+                            "problem_id": problem_spec.problem_id(bounded=False),
+                            "problem_spec": asdict(problem_spec),
+                            "seed": seed,
+                            "solver_seed": derive_seed(seed, "vanilla_elastic_net_solver"),
+                            "solver": solver,
+                            "backend": backend,
+                        }
+                    )
+    return jobs
+
+
+def build_synthetic_erm_manifest(
+    config: SyntheticErmConfig,
+    backend: str,
+) -> list[dict[str, Any]]:
+    """Return all currently executable synthetic-ERM jobs."""
+    return build_multinomial_manifest(config, backend) + build_vanilla_elastic_net_manifest(
+        config, backend
+    )

@@ -8,10 +8,13 @@ from typing import Any
 import pytest
 
 from rlaopt_experiments.manifests import build_manifest
-from rlaopt_experiments.problems.synthetic_erm import MultinomialSpec
+from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, MultinomialSpec
 from rlaopt_experiments.records import read_record
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
-from rlaopt_experiments.suites.synthetic_erm.execution import run_multinomial_job
+from rlaopt_experiments.suites.synthetic_erm.execution import (
+    run_multinomial_job,
+    run_vanilla_elastic_net_job,
+)
 
 
 CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_smoke.toml"
@@ -61,6 +64,7 @@ class FakeWorker:
                 "stationarity": 1e-8,
                 "feasibility": 0.0,
                 "objective": 0.5,
+                "relative_duality_gap": 1e-9,
                 "external_success": self.external_success,
             },
             "solver_metadata": {
@@ -231,6 +235,72 @@ def test_multinomial_job_rejects_tampered_problem_id(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="problem_id"):
         run_multinomial_job(
             job,
+            config,
+            native_tolerance=1e-6,
+            max_iterations=100,
+            batch_size=64,
+            output_dir=tmp_path,
+        )
+
+
+def test_vanilla_elastic_net_job_runs_and_writes_canonical_metrics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = replace(load_synthetic_erm_config(CONFIG), warmups=1, repetitions=2)
+    job = next(
+        item
+        for item in build_manifest(CONFIG, "cpu")
+        if item["problem_type"] == "vanilla_elastic_net"
+        and item["solver"] == "sklearn_coordinate_descent"
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.suites.synthetic_erm.execution.ProblemWorker",
+        FakeWorker,
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.runner.wandb_run",
+        lambda *_args, **_kwargs: nullcontext(None),
+    )
+
+    records = run_vanilla_elastic_net_job(
+        job,
+        config,
+        native_tolerance=1e-7,
+        max_iterations=500,
+        batch_size=256,
+        output_dir=tmp_path,
+    )
+
+    worker = FakeWorker.instances[0]
+    assert worker.closed
+    assert worker.specification["problem_type"] == "vanilla_elastic_net"
+    assert [command["max_iters"] for command in worker.commands] == [10, 500, 500]
+    assert len(records) == 2
+    assert records[0].problem["problem_type"] == "vanilla_elastic_net"
+    assert records[0].problem["regularization_fraction"] in {0.1, 0.01}
+    assert records[0].metrics["relative_duality_gap"] == 1e-9
+    assert records[0].metadata["relative_duality_gap_tolerance"] == 1e-6
+    assert records[0].metadata["feasibility_tolerance"] == 1e-8
+    assert not records[0].metadata["native_tolerances_calibrated"]
+
+
+def test_vanilla_elastic_net_job_rejects_tampered_fraction(tmp_path: Path) -> None:
+    config = load_synthetic_erm_config(CONFIG)
+    job = next(
+        item
+        for item in build_manifest(CONFIG, "cpu")
+        if item["problem_type"] == "vanilla_elastic_net"
+    )
+    problem_spec = job["problem_spec"] | {"regularization_fraction": 0.5}
+    tampered = job | {
+        "problem_spec": problem_spec,
+        "problem_id": ElasticNetSpec(**problem_spec).problem_id(bounded=False),
+    }
+
+    with pytest.raises(ValueError, match="regularization fraction"):
+        run_vanilla_elastic_net_job(
+            tampered,
             config,
             native_tolerance=1e-6,
             max_iterations=100,

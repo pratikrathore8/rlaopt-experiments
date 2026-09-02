@@ -202,6 +202,10 @@ class ElasticNetSpec:
             f"-noise{self.noise_ratio:g}-b{self.teacher_intercept:g}"
         )
 
+    def problem_id(self, *, bounded: bool) -> str:
+        variant = "bounded" if bounded else "unbounded"
+        return f"{self.data_id}-{variant}-rf{self.regularization_fraction:g}"
+
 
 @dataclass
 class ElasticNetProblem:
@@ -219,8 +223,7 @@ class ElasticNetProblem:
 
     @property
     def problem_id(self) -> str:
-        variant = "bounded" if self.bounded else "unbounded"
-        return f"{self.spec.data_id}-{variant}-rf{self.spec.regularization_fraction:g}"
+        return self.spec.problem_id(bounded=self.bounded)
 
     def objective(self, weights: torch.Tensor, intercept: torch.Tensor | float) -> torch.Tensor:
         self._validate_weights(weights)

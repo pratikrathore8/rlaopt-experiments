@@ -8,7 +8,10 @@ from typing import Any
 
 from rlaopt_experiments.records import TrialRecord
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
-from rlaopt_experiments.suites.synthetic_erm.execution import run_multinomial_job
+from rlaopt_experiments.suites.synthetic_erm.execution import (
+    run_multinomial_job,
+    run_vanilla_elastic_net_job,
+)
 
 
 def read_manifest_job(path: Path, index: int) -> dict[str, Any]:
@@ -37,14 +40,20 @@ def run_manifest_job(
     suite = job.get("suite")
     if suite == "synthetic_erm":
         config = load_synthetic_erm_config(config_path)
-        if job.get("problem_type") != "multinomial":
-            raise ValueError(f"unsupported synthetic ERM problem type: {job.get('problem_type')}")
-        controls = config.multinomial.execution
+        problem_type = job.get("problem_type")
+        if problem_type == "multinomial":
+            controls = config.multinomial.execution
+            runner = run_multinomial_job
+        elif problem_type == "vanilla_elastic_net":
+            controls = config.elastic_net.vanilla_execution
+            runner = run_vanilla_elastic_net_job
+        else:
+            raise ValueError(f"unsupported synthetic ERM problem type: {problem_type}")
         native_tolerance = controls.native_tolerances.for_solver(
             job.get("backend"),
             job.get("solver"),
         )
-        return run_multinomial_job(
+        return runner(
             job,
             config,
             native_tolerance=native_tolerance,

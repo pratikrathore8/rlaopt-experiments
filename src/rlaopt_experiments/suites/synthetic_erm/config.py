@@ -93,7 +93,7 @@ class BackendTolerances:
 
 
 @dataclass(frozen=True)
-class MultinomialExecution:
+class SolverExecution:
     max_iterations: int
     batch_size: int
     native_tolerances_calibrated: bool
@@ -101,9 +101,9 @@ class MultinomialExecution:
 
     def __post_init__(self) -> None:
         if self.max_iterations < 1:
-            raise ValueError("multinomial max_iterations must be positive")
+            raise ValueError("max_iterations must be positive")
         if self.batch_size < 1:
-            raise ValueError("multinomial batch_size must be positive")
+            raise ValueError("batch_size must be positive")
 
 
 @dataclass(frozen=True)
@@ -114,7 +114,7 @@ class MultinomialExperiment:
     box_lower: float
     box_upper: float
     solvers: BackendSolvers
-    execution: MultinomialExecution
+    execution: SolverExecution
 
     def __post_init__(self) -> None:
         _unique_nonempty(self.shapes, "multinomial shapes")
@@ -147,6 +147,7 @@ class ElasticNetExperiment:
     regularization_fractions: tuple[float, ...]
     vanilla_solvers: BackendSolvers
     bounded_solvers: BackendSolvers
+    vanilla_execution: SolverExecution
 
     def __post_init__(self) -> None:
         _unique_nonempty(self.shapes, "elastic-net shapes")
@@ -159,6 +160,15 @@ class ElasticNetExperiment:
         _unique_nonempty(self.regularization_fractions, "regularization_fractions")
         for fraction in self.regularization_fractions:
             _positive(fraction, "regularization fraction")
+        for backend in ("cpu", "cuda"):
+            configured = set(getattr(self.vanilla_solvers, backend))
+            tolerance_names = {
+                name for name, _ in getattr(self.vanilla_execution.native_tolerances, backend)
+            }
+            if tolerance_names != configured:
+                raise ValueError(
+                    f"{backend} native tolerances must exactly match vanilla elastic-net solvers"
+                )
 
 
 @dataclass(frozen=True)
@@ -196,6 +206,29 @@ def _backend_solvers(data: dict[str, Any]) -> BackendSolvers:
 
 def _shapes(data: list[dict[str, Any]]) -> tuple[ErmShape, ...]:
     return tuple(ErmShape(**shape) for shape in data)
+
+
+def _solver_execution(data: dict[str, Any], name: str) -> SolverExecution:
+    execution_data = dict(data)
+    _require_keys(
+        execution_data,
+        {
+            "max_iterations",
+            "batch_size",
+            "native_tolerances_calibrated",
+            "native_tolerances",
+        },
+        name,
+    )
+    tolerance_data = dict(execution_data.pop("native_tolerances"))
+    _require_keys(tolerance_data, {"cpu", "cuda"}, f"{name} native tolerances")
+    return SolverExecution(
+        native_tolerances=BackendTolerances(
+            cpu=tuple(sorted(tolerance_data["cpu"].items())),
+            cuda=tuple(sorted(tolerance_data["cuda"].items())),
+        ),
+        **execution_data,
+    )
 
 
 def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
@@ -236,26 +269,7 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
         },
         "multinomial",
     )
-    execution_data = dict(multinomial_data.pop("execution"))
-    _require_keys(
-        execution_data,
-        {
-            "max_iterations",
-            "batch_size",
-            "native_tolerances_calibrated",
-            "native_tolerances",
-        },
-        "multinomial execution",
-    )
-    tolerance_data = dict(execution_data.pop("native_tolerances"))
-    _require_keys(tolerance_data, {"cpu", "cuda"}, "multinomial native tolerances")
-    execution = MultinomialExecution(
-        native_tolerances=BackendTolerances(
-            cpu=tuple(sorted(tolerance_data["cpu"].items())),
-            cuda=tuple(sorted(tolerance_data["cuda"].items())),
-        ),
-        **execution_data,
-    )
+    execution = _solver_execution(multinomial_data.pop("execution"), "multinomial execution")
     multinomial = MultinomialExperiment(
         shapes=_shapes(multinomial_data.pop("shapes")),
         solvers=_backend_solvers(multinomial_data.pop("solvers")),
@@ -274,11 +288,16 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
             "regularization_fractions",
             "vanilla_solvers",
             "bounded_solvers",
+            "vanilla_execution",
         },
         "elastic_net",
     )
+    vanilla_execution = _solver_execution(
+        elastic_net_data.pop("vanilla_execution"), "vanilla elastic-net execution"
+    )
     elastic_net = ElasticNetExperiment(
         shapes=_shapes(elastic_net_data.pop("shapes")),
+        vanilla_execution=vanilla_execution,
         regularization_fractions=tuple(elastic_net_data.pop("regularization_fractions")),
         vanilla_solvers=_backend_solvers(elastic_net_data.pop("vanilla_solvers")),
         bounded_solvers=_backend_solvers(elastic_net_data.pop("bounded_solvers")),

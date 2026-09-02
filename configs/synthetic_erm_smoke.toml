@@ -57,6 +57,21 @@ shapes = [
 cpu = ["rlaopt_sapphire", "sklearn_coordinate_descent", "jaxopt_proximal_gradient"]
 cuda = ["rlaopt_sapphire", "cuml_coordinate_descent", "jaxopt_proximal_gradient"]
 
+[elastic_net.vanilla_execution]
+max_iterations = 10000
+batch_size = 256
+native_tolerances_calibrated = false
+
+[elastic_net.vanilla_execution.native_tolerances.cpu]
+rlaopt_sapphire = 1.0e-6
+sklearn_coordinate_descent = 1.0e-6
+jaxopt_proximal_gradient = 1.0e-6
+
+[elastic_net.vanilla_execution.native_tolerances.cuda]
+rlaopt_sapphire = 1.0e-6
+cuml_coordinate_descent = 1.0e-6
+jaxopt_proximal_gradient = 1.0e-6
+
 [elastic_net.bounded_solvers]
 cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
 cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]

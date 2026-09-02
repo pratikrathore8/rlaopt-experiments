@@ -74,6 +74,7 @@ def _environment_metadata() -> dict[str, Any]:
         "jaxopt_version": version("jaxopt"),
         "numpy_version": version("numpy"),
         "scipy_version": version("scipy"),
+        "scikit_learn_version": version("scikit-learn"),
         "wandb_version": version("wandb"),
     }
 

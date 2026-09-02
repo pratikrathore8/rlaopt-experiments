@@ -8,9 +8,7 @@ from typing import Any
 
 from rlaopt_experiments.config import load_experiment, load_solvers
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
-from rlaopt_experiments.suites.synthetic_erm.manifest import (
-    build_multinomial_manifest,
-)
+from rlaopt_experiments.suites.synthetic_erm.manifest import build_synthetic_erm_manifest
 
 
 def _configured_suite(path: Path) -> str:
@@ -28,7 +26,7 @@ def build_manifest(path: Path, backend: str) -> list[dict[str, Any]]:
     """Build the selected suite's manifest from one strict configuration."""
     suite = _configured_suite(path)
     if suite == "synthetic_erm":
-        return build_multinomial_manifest(load_synthetic_erm_config(path), backend)
+        return build_synthetic_erm_manifest(load_synthetic_erm_config(path), backend)
     if suite == "synthetic_ridge":
         config = load_experiment(path)
         solvers = load_solvers(path, backend)
