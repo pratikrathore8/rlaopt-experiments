@@ -10,3 +10,6 @@ CUDSS = "=0.6.5"
 Clarabel = "=0.11.0"
 PythonCall = "=0.9.31"
 julia = "=1.10.12"
+
+[extras]
+CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"

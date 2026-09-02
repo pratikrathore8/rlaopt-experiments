@@ -8,6 +8,7 @@ From: @CUDA_IMAGE_REFERENCE@
     containers/scs-3.2.11-gpu-build.patch /opt/rlaopt-experiments/containers/scs-3.2.11-gpu-build.patch
     src /opt/rlaopt-experiments/src
     julia/cuclarabel/Project.toml /opt/rlaopt-experiments/julia/cuclarabel/Project.toml
+    julia/cuclarabel/LocalPreferences.toml /opt/rlaopt-experiments/julia/cuclarabel/LocalPreferences.toml
     julia/cuclarabel/Manifest.toml /opt/rlaopt-experiments/julia/cuclarabel/Manifest.toml
 
 %post
@@ -49,6 +50,9 @@ From: @CUDA_IMAGE_REFERENCE@
     rm /tmp/julia.tar.gz
     ln -s /opt/julia/bin/julia /usr/local/bin/julia
     export JULIA_DEPOT_PATH=/opt/julia-depot
+    # Package images built for the native build-node CPU can segfault when this
+    # SIF runs on a different CPU family elsewhere in the cluster.
+    export JULIA_CPU_TARGET=generic
     export JULIA_PKG_PRECOMPILE_AUTO=0
     export JULIA_CONDAPKG_BACKEND=Null
     export JULIA_PYTHONCALL_EXE=/opt/rlaopt-experiments/.venv/bin/python
@@ -64,6 +68,7 @@ From: @CUDA_IMAGE_REFERENCE@
     export PYTHON_JULIACALL_EXE=/usr/local/bin/julia
     export PYTHON_JULIACALL_PROJECT=/opt/rlaopt-experiments/julia/cuclarabel
     export PYTHON_JULIACALL_THREADS=1
+    export JULIA_CPU_TARGET=generic
     export JULIA_DEPOT_PATH="${TMPDIR:-/tmp}/rlaopt-julia-depot-${SLURM_JOB_ID:-local}:/opt/julia-depot"
     export JULIA_PKG_OFFLINE=true
     export JULIA_CONDAPKG_BACKEND=Null
