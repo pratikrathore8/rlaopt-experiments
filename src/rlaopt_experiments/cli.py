@@ -6,7 +6,8 @@ import argparse
 import json
 from pathlib import Path
 
-from rlaopt_experiments.config import load_experiment, load_solvers, load_tolerances
+from rlaopt_experiments.config import load_experiment, load_tolerances
+from rlaopt_experiments.manifests import build_manifest
 from rlaopt_experiments.runner import run_job
 
 
@@ -42,29 +43,15 @@ def _parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = _parser().parse_args()
-    config = load_experiment(args.config) if hasattr(args, "config") else None
     if args.command == "manifest":
-        solvers = load_solvers(args.config, args.backend)
-        jobs = [
-            {
-                "suite": config.suite,
-                "n": shape.n,
-                "p": shape.p,
-                "family": shape.family,
-                "alpha": alpha,
-                "seed": seed,
-                "solver": solver,
-                "backend": args.backend,
-            }
-            for shape in config.shapes
-            for alpha in config.alphas
-            for seed in config.seeds
-            for solver in solvers
-        ]
+        jobs = build_manifest(args.config, args.backend)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text("\n".join(json.dumps(job, sort_keys=True) for job in jobs) + "\n")
         print(f"wrote {len(jobs)} jobs to {args.output}")
-    elif args.command == "run-job":
+        return
+
+    config = load_experiment(args.config) if hasattr(args, "config") else None
+    if args.command == "run-job":
         tolerance = load_tolerances(args.tolerances, args.backend)[args.solver]
         run_job(
             n=args.n,
