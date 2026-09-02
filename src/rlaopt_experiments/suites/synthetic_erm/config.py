@@ -70,6 +70,43 @@ class AccuracyThresholds:
 
 
 @dataclass(frozen=True)
+class BackendTolerances:
+    cpu: tuple[tuple[str, float], ...]
+    cuda: tuple[tuple[str, float], ...]
+
+    def __post_init__(self) -> None:
+        for backend, values in (("cpu", self.cpu), ("cuda", self.cuda)):
+            names = tuple(name for name, _ in values)
+            _unique_nonempty(names, f"{backend} native-tolerance solvers")
+            for name, tolerance in values:
+                if not isinstance(name, str) or not name.strip():
+                    raise ValueError("native-tolerance solver names must be nonempty")
+                _positive(tolerance, f"native tolerance for {backend}/{name}")
+
+    def for_solver(self, backend: str, solver: str) -> float:
+        if backend not in {"cpu", "cuda"}:
+            raise ValueError("backend must be cpu or cuda")
+        try:
+            return dict(getattr(self, backend))[solver]
+        except KeyError as error:
+            raise ValueError(f"no native tolerance for {backend}/{solver}") from error
+
+
+@dataclass(frozen=True)
+class MultinomialExecution:
+    max_iterations: int
+    batch_size: int
+    native_tolerances_calibrated: bool
+    native_tolerances: BackendTolerances
+
+    def __post_init__(self) -> None:
+        if self.max_iterations < 1:
+            raise ValueError("multinomial max_iterations must be positive")
+        if self.batch_size < 1:
+            raise ValueError("multinomial batch_size must be positive")
+
+
+@dataclass(frozen=True)
 class MultinomialExperiment:
     shapes: tuple[ErmShape, ...]
     n_classes: int
@@ -77,12 +114,22 @@ class MultinomialExperiment:
     box_lower: float
     box_upper: float
     solvers: BackendSolvers
+    execution: MultinomialExecution
 
     def __post_init__(self) -> None:
         _unique_nonempty(self.shapes, "multinomial shapes")
         if self.n_classes < 2:
             raise ValueError("n_classes must be at least two")
         _positive(self.teacher_scale, "teacher_scale")
+        for backend in ("cpu", "cuda"):
+            configured = set(getattr(self.solvers, backend))
+            tolerance_names = {
+                name for name, _ in getattr(self.execution.native_tolerances, backend)
+            }
+            if tolerance_names != configured:
+                raise ValueError(
+                    f"{backend} native tolerances must exactly match multinomial solvers"
+                )
         if not (
             math.isfinite(self.box_lower)
             and math.isfinite(self.box_upper)
@@ -178,12 +225,41 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
     multinomial_data = dict(root["multinomial"])
     _require_keys(
         multinomial_data,
-        {"shapes", "n_classes", "teacher_scale", "box_lower", "box_upper", "solvers"},
+        {
+            "shapes",
+            "n_classes",
+            "teacher_scale",
+            "box_lower",
+            "box_upper",
+            "solvers",
+            "execution",
+        },
         "multinomial",
+    )
+    execution_data = dict(multinomial_data.pop("execution"))
+    _require_keys(
+        execution_data,
+        {
+            "max_iterations",
+            "batch_size",
+            "native_tolerances_calibrated",
+            "native_tolerances",
+        },
+        "multinomial execution",
+    )
+    tolerance_data = dict(execution_data.pop("native_tolerances"))
+    _require_keys(tolerance_data, {"cpu", "cuda"}, "multinomial native tolerances")
+    execution = MultinomialExecution(
+        native_tolerances=BackendTolerances(
+            cpu=tuple(sorted(tolerance_data["cpu"].items())),
+            cuda=tuple(sorted(tolerance_data["cuda"].items())),
+        ),
+        **execution_data,
     )
     multinomial = MultinomialExperiment(
         shapes=_shapes(multinomial_data.pop("shapes")),
         solvers=_backend_solvers(multinomial_data.pop("solvers")),
+        execution=execution,
         **multinomial_data,
     )
 

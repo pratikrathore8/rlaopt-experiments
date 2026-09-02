@@ -26,6 +26,12 @@ def test_load_synthetic_erm_smoke_config() -> None:
     assert config.seeds == (0, 1, 2)
     assert config.repetitions == 1
     assert not config.accuracy.calibrated
+    assert config.multinomial.execution.max_iterations == 10_000
+    assert config.multinomial.execution.batch_size == 256
+    assert not config.multinomial.execution.native_tolerances_calibrated
+    assert (
+        config.multinomial.execution.native_tolerances.for_solver("cpu", "rlaopt_sapphire") == 1e-6
+    )
     assert config.multinomial.shapes == (ErmShape(1024, 64), ErmShape(4096, 256))
     assert config.elastic_net.regularization_fractions == (0.1, 0.01)
     assert "sklearn_coordinate_descent" in config.elastic_net.vanilla_solvers.cpu

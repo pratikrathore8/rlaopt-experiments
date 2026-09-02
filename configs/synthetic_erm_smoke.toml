@@ -27,6 +27,21 @@ shapes = [
 cpu = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
 cuda = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
 
+[multinomial.execution]
+max_iterations = 10000
+batch_size = 256
+native_tolerances_calibrated = false
+
+[multinomial.execution.native_tolerances.cpu]
+rlaopt_sapphire = 1.0e-6
+projected_gradient = 1.0e-6
+jaxopt_lbfgsb = 1.0e-6
+
+[multinomial.execution.native_tolerances.cuda]
+rlaopt_sapphire = 1.0e-6
+projected_gradient = 1.0e-6
+jaxopt_lbfgsb = 1.0e-6
+
 [elastic_net]
 teacher_density = 0.1
 noise_ratio = 0.1

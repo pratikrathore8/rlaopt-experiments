@@ -127,6 +127,9 @@ def run_multinomial_job(
             "stationarity_tolerance": config.accuracy.stationarity,
             "feasibility_tolerance": config.accuracy.feasibility,
             "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+            "native_tolerances_calibrated": (
+                config.multinomial.execution.native_tolerances_calibrated
+            ),
         }
         annotated = outcome | {"solver_metadata": metadata}
         return record_outcome(

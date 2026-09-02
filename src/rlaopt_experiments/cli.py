@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from rlaopt_experiments.config import load_experiment, load_tolerances
+from rlaopt_experiments.execution import read_manifest_job, run_manifest_job
 from rlaopt_experiments.manifests import build_manifest
 from rlaopt_experiments.runner import run_job
 
@@ -18,6 +19,13 @@ def _parser() -> argparse.ArgumentParser:
     manifest.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     manifest.add_argument("--backend", choices=("cpu", "cuda"), required=True)
     manifest.add_argument("--output", type=Path, required=True)
+    manifest_run = subparsers.add_parser("run-manifest-job")
+    manifest_run.add_argument("--manifest", type=Path, required=True)
+    manifest_run.add_argument("--index", type=int, required=True)
+    manifest_run.add_argument(
+        "--config", type=Path, default=Path("configs/synthetic_erm_smoke.toml")
+    )
+    manifest_run.add_argument("--output", type=Path, default=Path("artifacts"))
     run = subparsers.add_parser("run-job")
     for name, kind in (("n", int), ("p", int), ("alpha", float), ("seed", int)):
         run.add_argument(f"--{name}", type=kind, required=True)
@@ -48,6 +56,11 @@ def main() -> None:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text("\n".join(json.dumps(job, sort_keys=True) for job in jobs) + "\n")
         print(f"wrote {len(jobs)} jobs to {args.output}")
+        return
+
+    if args.command == "run-manifest-job":
+        job = read_manifest_job(args.manifest, args.index)
+        run_manifest_job(job, args.config, args.output)
         return
 
     config = load_experiment(args.config) if hasattr(args, "config") else None

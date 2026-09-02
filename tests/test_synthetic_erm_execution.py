@@ -122,6 +122,7 @@ def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
     assert records[0].metadata["stationarity_tolerance"] == 1e-6
     assert records[0].metadata["feasibility_tolerance"] == 1e-8
     assert not records[0].metadata["accuracy_thresholds_calibrated"]
+    assert not records[0].metadata["native_tolerances_calibrated"]
     assert "JIT compilation" in records[0].metadata["timing_scope"]
     paths = sorted((tmp_path / "records").glob("*.json"))
     assert len(paths) == 2

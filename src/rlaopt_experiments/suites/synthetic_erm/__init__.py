@@ -2,9 +2,11 @@
 
 from rlaopt_experiments.suites.synthetic_erm.config import (
     AccuracyThresholds,
+    BackendTolerances,
     BackendSolvers,
     ElasticNetExperiment,
     ErmShape,
+    MultinomialExecution,
     MultinomialExperiment,
     SyntheticErmConfig,
     load_synthetic_erm_config,
@@ -18,9 +20,11 @@ from rlaopt_experiments.suites.synthetic_erm.multinomial_solvers import (
 
 __all__ = [
     "AccuracyThresholds",
+    "BackendTolerances",
     "BackendSolvers",
     "ElasticNetExperiment",
     "ErmShape",
+    "MultinomialExecution",
     "MultinomialExperiment",
     "MultinomialSolverResult",
     "SyntheticErmConfig",
