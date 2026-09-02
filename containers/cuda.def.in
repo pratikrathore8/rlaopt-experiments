@@ -5,6 +5,7 @@ From: @CUDA_IMAGE_REFERENCE@
     pyproject.toml /opt/rlaopt-experiments/pyproject.toml
     uv.lock /opt/rlaopt-experiments/uv.lock
     README.md /opt/rlaopt-experiments/README.md
+    containers/scs-3.2.11-gpu-build.patch /opt/rlaopt-experiments/containers/scs-3.2.11-gpu-build.patch
     src /opt/rlaopt-experiments/src
     julia/cuclarabel/Project.toml /opt/rlaopt-experiments/julia/cuclarabel/Project.toml
     julia/cuclarabel/Manifest.toml /opt/rlaopt-experiments/julia/cuclarabel/Manifest.toml
@@ -14,7 +15,7 @@ From: @CUDA_IMAGE_REFERENCE@
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y --no-install-recommends \
-        build-essential ca-certificates curl git libopenblas-dev pkg-config \
+        build-essential ca-certificates curl git libopenblas-dev patch pkg-config \
         python3.12 python3.12-dev python3.12-venv
     rm -rf /var/lib/apt/lists/*
     export UV_UNMANAGED_INSTALL=/usr/local/bin
@@ -28,14 +29,18 @@ From: @CUDA_IMAGE_REFERENCE@
         "https://files.pythonhosted.org/packages/9e/59/5cb7f9612a5a3ff6efd4ab2d899902a536cc5974a7edb589084c5577291c/scs-@SCS_VERSION@.tar.gz" \
         -o /tmp/scs.tar.gz
     echo "@SCS_SDIST_SHA256@  /tmp/scs.tar.gz" | sha256sum --check --strict
+    mkdir /tmp/scs-source
+    tar -xzf /tmp/scs.tar.gz --strip-components=1 -C /tmp/scs-source
+    patch --directory=/tmp/scs-source --strip=1 \
+        < /opt/rlaopt-experiments/containers/scs-3.2.11-gpu-build.patch
     UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
         uv pip install --python /opt/rlaopt-experiments/.venv/bin/python \
         --reinstall --no-deps \
         --config-setting=setup-args=-Duse_gpu=true \
         --config-setting=setup-args=-Dint32=true \
         --config-setting=setup-args=-Dgpu_atrans=true \
-        /tmp/scs.tar.gz
-    rm /tmp/scs.tar.gz
+        /tmp/scs-source
+    rm -rf /tmp/scs.tar.gz /tmp/scs-source
     curl -fL "https://julialang-s3.julialang.org/bin/linux/x64/1.10/julia-@JULIA_VERSION@-linux-x86_64.tar.gz" \
         -o /tmp/julia.tar.gz
     echo "@JULIA_SHA256@  /tmp/julia.tar.gz" | sha256sum --check --strict
@@ -77,8 +82,9 @@ From: @CUDA_IMAGE_REFERENCE@
 %test
     export HOME=/tmp
     export CUPY_CACHE_DIR=/tmp/cupy-cache
+    mkdir -p /tmp/rlaopt-julia-test-depot
+    export JULIA_DEPOT_PATH=/tmp/rlaopt-julia-test-depot:/opt/julia-depot
     /opt/rlaopt-experiments/.venv/bin/python -c \
         'import cupy, cuml, juliacall, rlaopt, torch; from scs import _scs_gpu; assert _scs_gpu.sizeof_float() == 8; assert _scs_gpu.sizeof_int() == 4; print("container imports passed")'
-    JULIA_DEPOT_PATH=/opt/julia-depot julia \
-        --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
+    julia --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
         'using Clarabel; println("CuClarabel import passed")'

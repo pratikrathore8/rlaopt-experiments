@@ -1,0 +1,94 @@
+From 335311fe87c33751817bd1f7d30f5ca5a0ee0618 Mon Sep 17 00:00:00 2001
+From: rlaopt-experiments <benchmark@local>
+Date: Wed, 2 Sep 2026 14:00:00 -0700
+Subject: [PATCH] Backport official SCS Python GPU build fixes
+
+This combines the meson.build portions of upstream commits
+335311fe87c33751817bd1f7d30f5ca5a0ee0618 and
+3564b3b051ebbf516ff4d21bb6482db65abc4665. The first moves the GPU
+extension below its source definitions; the second supplies explicit
+cuBLAS/cuSPARSE linkage and unfolds the GPU source globs.
+---
+ meson.build | 60 ++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 36 insertions(+), 24 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 181bee3..f797566 100644
+--- a/meson.build
++++ b/meson.build
+@@ -121,30 +121,6 @@ if is_gpu_build and not cuda_dep.found()
+   error('GPU build requested but CUDA toolkit was not found.')
+ endif
+ 
+-if get_option('use_gpu')
+-  gpu_c_args = common_c_args + ['-DPY_GPU=1', '-DINDIRECT=1']
+-  _deps += cuda_dep
+-  if get_option('gpu_atrans')
+-    gpu_c_args += '-DGPU_TRANSPOSE_MAT=1'
+-  endif
+-  ext_modules += py.extension_module(
+-    '_scs_gpu',
+-    common_sources,
+-    # In Meson, sources with a `.cu` extension are compiled with nvcc by default.
+-    # To compile `.c` files with nvcc, they must be explicitly targeted.
+-    # It is strongly recommended to rename CUDA-C files to `.cu`.
+-    fs.glob('scs_source/linsys/gpu/*.c'),
+-    fs.glob('scs_source/linsys/gpu/indirect/*.c'),
+-    c_args: gpu_c_args,
+-    dependencies: _deps,
+-    include_directories: [
+-      common_includes, 'scs_source/linsys/gpu/', 'scs_source/linsys/gpu/indirect'
+-    ],
+-    install: true,
+-    install_dir: scs_dir,
+-  )
+-endif
+-
+ # Sources
+ scs_core_sources = files(
+   'scs_source/src/aa.c',
+@@ -215,6 +191,42 @@ py.extension_module(
+   install: true,
+ )
+ 
++if get_option('use_gpu')
++  gpu_c_args = common_c_args + ['-DPY_GPU=1', '-DINDIRECT=1']
++  _deps += cuda_dep
++  cublas_dep = cc.find_library('cublas', required: false)
++  if not cublas_dep.found()
++    cublas_dep = dependency('cublas', required: true)
++  endif
++  _deps += cublas_dep
++  cusparse_dep = cc.find_library('cusparse', required: false)
++  if not cusparse_dep.found()
++    cusparse_dep = dependency('cusparse', required: true)
++  endif
++  _deps += cusparse_dep
++  if get_option('gpu_atrans')
++    gpu_c_args += '-DGPU_TRANSPOSE_MAT=1'
++  endif
++  py.extension_module(
++    '_scs_gpu',
++    'scs/scspy.c',
++    common_linsys_sources,
++    scs_core_sources,
++    # In Meson, sources with a `.cu` extension are compiled with nvcc by default.
++    # To compile `.c` files with nvcc, they must be explicitly targeted.
++    # It is strongly recommended to rename CUDA-C files to `.cu`.
++    'scs_source/linsys/gpu/gpu.c',
++    'scs_source/linsys/gpu/indirect/private.c',
++    c_args: gpu_c_args,
++    dependencies: _deps,
++    include_directories: [
++      common_includes, 'scs_source/linsys/gpu/', 'scs_source/linsys/gpu/indirect'
++    ],
++    install: true,
++    install_dir: scs_dir,
++  )
++endif
++
+ if get_option('link_mkl')
+   py.extension_module(
+     '_scs_mkl',
+-- 
+2.43.0
