@@ -1,0 +1,47 @@
+[experiment]
+suite = "synthetic_erm"
+seeds = [0, 1, 2]
+warmups = 1
+repetitions = 1
+timeout_seconds = 900
+startup_timeout_seconds = 900
+
+# Development-only values. These must be calibrated and frozen before production.
+[accuracy]
+stationarity = 1.0e-6
+feasibility = 1.0e-8
+relative_duality_gap = 1.0e-6
+calibrated = false
+
+[multinomial]
+n_classes = 5
+teacher_scale = 1.0
+box_lower = -1.0
+box_upper = 1.0
+shapes = [
+  { n = 1024, p = 64 },
+  { n = 4096, p = 256 },
+]
+
+[multinomial.solvers]
+cpu = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
+cuda = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
+
+[elastic_net]
+teacher_density = 0.1
+noise_ratio = 0.1
+teacher_intercept = 0.5
+regularization_fractions = [0.1, 0.01]
+shapes = [
+  { n = 1024, p = 64 },
+  { n = 4096, p = 256 },
+]
+
+# Both variants consume the same generated X and y for each shape, seed, and fraction.
+[elastic_net.vanilla_solvers]
+cpu = ["rlaopt_sapphire", "sklearn_coordinate_descent", "jaxopt_proximal_gradient"]
+cuda = ["rlaopt_sapphire", "cuml_coordinate_descent", "jaxopt_proximal_gradient"]
+
+[elastic_net.bounded_solvers]
+cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
+cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]

@@ -144,6 +144,8 @@ CuClarabel's current CuPy bridge wraps device pointers without taking ownership 
 
 Final dataset sizes, the synthetic grid, calibrated thresholds, resource limits, and exact solver versions will be added and frozen before production. The study will include instances demonstrably too large for the considered interior-point baselines; such claims will be supported by explicit memory estimates or observed structured resource failures rather than assumed from dimensions alone.
 
+The initial development grid is intentionally small and is defined in `configs/synthetic_erm_smoke.toml`. It uses $(n,p)\in\{(1024,64),(4096,256)\}$, five classes for multinomial regression, three data seeds, one measured repetition per seed, and regularization fractions $\gamma\in\{0.1,0.01\}$. The vanilla and bounded elastic-net variants share one configuration block, which prevents their shapes or data-generating parameters from drifting apart. The configured accuracy thresholds are explicitly marked `calibrated = false`; production orchestration must not treat them as frozen thresholds until solver-specific tolerance calibration is complete.
+
 The remaining sections describe the implemented synthetic ridge suite.
 
 ## Synthetic ridge suite: mathematical model
