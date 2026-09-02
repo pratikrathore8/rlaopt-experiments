@@ -2,7 +2,7 @@
 
 This repository contains reproducible benchmark suites comparing rlaopt with other optimization and numerical linear algebra methods. It is intended to grow beyond least squares and ridge regression: each problem family should define its own mathematical model, competitors, accuracy contract, configuration, runner, and analysis while sharing the repository's environment, result-tracking, and orchestration conventions.
 
-The first implemented suite is controlled synthetic ridge regression. Its fixed-budget design is documented below.
+The first implemented suite is controlled synthetic ridge regression. A synthetic empirical-risk-minimization (ERM) suite for developing the later real-data benchmarks is now under development; its problem-generation and accuracy contracts are documented below before its solver adapters and experiment grid are implemented.
 
 ## Benchmark suite organization
 
@@ -17,7 +17,128 @@ Every suite must document:
 - resource limits, failure handling, and the exact hardware scope; and
 - suite-specific limitations and confirmatory versus exploratory analyses.
 
-The sections that follow describe only the synthetic ridge suite.
+## Synthetic ERM suite (under development)
+
+This suite develops the three problem classes intended for the later real-data study on deterministic synthetic data first. All generated arrays and all solver computations use float64. Features are generated on CPU from seeded Gaussian streams, then each column is centered and scaled to unit population root-mean-square. Problem generation and host-to-device transfer are measured separately from solver time and are not included in the primary solve-time comparison. Every competitor receives the same materialized data and mathematical formulation.
+
+### Problem definitions and scaling
+
+Here, a *teacher* is the hidden ground-truth parameter used only to generate a synthetic response: it generates class probabilities in multinomial regression and the noiseless signal in elastic-net regression. No solver receives the teacher. Because labels and noise are sampled and the fitted problems are regularized, the teacher is generally not the minimizer of the realized empirical objective and is not used as an accuracy oracle.
+
+The box-constrained multinomial logistic-regression problem has no intercept and solves
+
+$$
+\min_{B\in[\ell,u]^{p\times K}}
+\frac{1}{n}\sum_{i=1}^{n}
+\left[
+\log\left(\sum_{k=1}^{K}\exp(x_i^{\mathsf T}B_{:k})\right)
+-x_i^{\mathsf T}B_{:y_i}
+\right].
+$$
+
+Labels are sampled from a softmax teacher. The seeded Gaussian teacher is centered across classes to remove the softmax shift ambiguity, scaled by $1/\sqrt{p}$, and, if necessary, rescaled to remain within 80% of the explicitly configured coefficient box. This matches the no-intercept bounded formulation used in Chapter 4 of the thesis.
+
+The vanilla and bounded elastic-net variants share exactly the same generated $X$, response $y$, teacher, and unregularized fitted intercept $b$. They solve
+
+$$
+\min_{w,b}
+\frac{1}{2n}\lVert Xw+b\mathbf{1}-y\rVert_2^2
++\lambda_1\lVert w\rVert_1
++\frac{\lambda_2}{2}\lVert w\rVert_2^2,
+$$
+
+with either $w\in\mathbb{R}^p$ for vanilla elastic net or $w\in[0,1]^p$ for bounded elastic net. A sparse nonnegative teacher generates the signal. Independent centered Gaussian noise is scaled to an explicitly configured population-RMS noise-to-signal ratio. The completed response is divided by its centered population RMS but is not centered: its variance is one, while its nonzero mean preserves the configured teacher intercept and makes fitted-intercept stationarity nontrivial. Regularization follows the thesis convention
+
+$$
+\lambda_{\max}
+=\frac{1}{n}\left\lVert X_c^{\mathsf T}y_c\right\rVert_\infty,
+\qquad
+\lambda_1=\lambda_2=\gamma\lambda_{\max},
+$$
+
+where $X_c$ and $y_c$ are centered to account for the fitted intercept and the fraction $\gamma>0$ is explicit in the experiment configuration.
+
+### Solver-independent accuracy contract
+
+Native solver status and native stopping tolerances are never treated as cross-method accuracy evidence. After timing, the testbed recomputes every primary metric from the returned primal solution in float64 using the canonical problem above. The problem objects implement the formulation-dependent objective, gradients, KKT residuals, constraint violations, and dual certificate; the suite diagnostics layer only records those values and applies frozen pass thresholds. Solver-specific tolerances will be calibrated and frozen on a separate calibration grid. Production stationarity, dual-gap, and feasibility thresholds will be explicit in configuration and result records. Constraint satisfaction is not tested against exact zero: a constrained solution passes when its measured maximum violation is at most the frozen feasibility tolerance. Objective value, iteration history, native residuals, and native dual variables are retained as secondary diagnostics, not substituted for the primary criterion.
+
+For box-constrained multinomial logistic regression, let
+
+$$
+G=\frac{1}{n}X^{\mathsf T}(P-Y),
+\qquad
+P=\mathrm{softmax}(XB).
+$$
+
+The primary metric is a primal KKT stationarity residual: $G_{jk}=0$ in the interior, $G_{jk}\ge 0$ at the lower bound, and $G_{jk}\le 0$ at the upper bound. Coordinates within the frozen feasibility tolerance of a bound are evaluated using that bound's one-sided condition; all others are evaluated as interior coordinates. The maximum violation of these coordinate conditions is reported together with, and must pass alongside, the separate maximum box violation
+
+$$
+\max_{j,k}\left\{(\ell-B_{jk})_+,(B_{jk}-u)_+\right\}.
+$$
+
+No dual variables or solver-independent step size are required.
+
+For vanilla elastic net, the primary metric is a relative primal-dual gap. Given a returned $(w,b)$ with residual $r=Xw+b\mathbf{1}-y$, the testbed constructs its own dual-feasible point
+
+$$
+\nu=\frac{r-\overline r\mathbf{1}}{n},
+\qquad \mathbf{1}^{\mathsf T}\nu=0.
+$$
+
+For the positive $\lambda_2$ used here, define
+
+$$
+P(w,b)=\frac{1}{2n}\lVert r\rVert_2^2
++\lambda_1\lVert w\rVert_1
++\frac{\lambda_2}{2}\lVert w\rVert_2^2
+$$
+
+and
+
+$$
+D(\nu)=-y^{\mathsf T}\nu-\frac{n}{2}\lVert\nu\rVert_2^2
+-\frac{1}{2\lambda_2}
+\left\lVert S_{\lambda_1}(-X^{\mathsf T}\nu)\right\rVert_2^2,
+$$
+
+where $S$ is elementwise soft thresholding. The reported relative gap is
+
+$$
+\frac{P-D}{\max\{1,|P|,|D|\}}.
+$$
+
+Thus competitors do not need to expose dual variables; the benchmark constructs the certificate uniformly. A primal KKT residual is retained as a secondary diagnostic.
+
+For bounded elastic net, on the feasible region the smooth-plus-linear coordinate gradient is
+
+$$
+g=\frac{1}{n}X^{\mathsf T}(Xw+b\mathbf{1}-y)
++\lambda_2w+\lambda_1\mathbf{1},
+$$
+
+and intercept stationarity requires $\mathbf{1}^{\mathsf T}(Xw+b\mathbf{1}-y)/n=0$. The primary metric combines the corresponding one-sided box KKT conditions—$g_j=0$ in the interior, $g_j\ge0$ at zero, and $g_j\le0$ at one—with intercept stationarity. As above, coordinates within the frozen feasibility tolerance of a bound use its one-sided condition. Stationarity must pass alongside the separately reported maximum constraint violation
+
+$$
+\max_j\left\{(-w_j)_+,(w_j-1)_+\right\}.
+$$
+
+No dual variables are required. Native dual information from rlaopt ADMM, SCS, or Clarabel is saved only as a secondary diagnostic because their internal conic and splitting formulations need not use comparable dual coordinates.
+
+| problem | primary accuracy metric | separate feasibility check | dual information required from solver |
+|---|---|---|---|
+| box-constrained multinomial logistic regression | external primal KKT stationarity | coefficient-box violation at frozen tolerance | no |
+| vanilla elastic net | external relative primal-dual gap | none | no; testbed constructs $\nu$ |
+| bounded elastic net | external primal KKT stationarity, including intercept | $[0,1]$ violation at frozen tolerance | no |
+
+### Timing and competitor-interface policy
+
+SAPPHIRE will be compared with projected gradient and JAXopt L-BFGS-B for bounded multinomial logistic regression. SAPPHIRE will be compared with scikit-learn, cuML, and JAXopt proximal gradient for vanilla elastic net. The bounded elastic-net comparison will use rlaopt ADMM, SCS, and Clarabel. CPU and GPU results will be reported separately, and unsupported backend/problem combinations will be labeled rather than emulated.
+
+Every competitor, including SCS and Clarabel, is called through its direct solver interface. Benchmark-side construction of the common problem arrays and any format conversion needed to pass them to an interface occurs before the timed region and is recorded separately. Primary solver time begins immediately before the native setup/solve call and therefore includes all symbolic analysis, scaling, factorization, preconditioner construction, and other numerical setup performed by that solver. Repeated timings reuse the same immutable problem arrays but create a fresh solver instance unless a separately labeled warm-start experiment explicitly permits state reuse. Small-instance equivalence checks compare every direct interface against the canonical objective and KKT diagnostics implemented by this repository.
+
+Final dataset sizes, the synthetic grid, calibrated thresholds, resource limits, and exact solver versions will be added and frozen before production. The study will include instances demonstrably too large for the considered interior-point baselines; such claims will be supported by explicit memory estimates or observed structured resource failures rather than assumed from dimensions alone.
+
+The remaining sections describe the implemented synthetic ridge suite.
 
 ## Synthetic ridge suite: mathematical model
 
