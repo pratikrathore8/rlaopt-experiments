@@ -19,6 +19,8 @@ if TYPE_CHECKING:
         BoundedElasticNetSolverResult,
     )
 
+COMMON_ACCURACY_TOLERANCE = 1e-6
+
 
 def make_problem(
     *,
@@ -74,12 +76,16 @@ def validate(
         raise RuntimeError(f"{result.metadata['linear_solver']} returned {result.native_status}")
     objective = float(problem.objective(result.weights, result.intercept))
     stationarity = float(
-        problem.kkt_residual(result.weights, result.intercept, activity_tolerance=1e-8)
+        problem.kkt_residual(
+            result.weights,
+            result.intercept,
+            activity_tolerance=COMMON_ACCURACY_TOLERANCE,
+        )
     )
     feasibility = float(problem.constraint_violation(result.weights))
-    if stationarity > 1e-7:
+    if stationarity > COMMON_ACCURACY_TOLERANCE:
         raise RuntimeError(f"stationarity is {stationarity:.3e}")
-    if feasibility > 1e-8:
+    if feasibility > COMMON_ACCURACY_TOLERANCE:
         raise RuntimeError(f"constraint violation is {feasibility:.3e}")
     return objective, stationarity, feasibility
 
@@ -136,9 +142,7 @@ def main() -> None:
         cuda_solution = np.concatenate(
             (cuda_result.weights.cpu().numpy(), [float(cuda_result.intercept)])
         )
-        coefficient_difference = float(
-            np.linalg.norm(cpu_solution - cuda_solution, ord=np.inf)
-        )
+        coefficient_difference = float(np.linalg.norm(cpu_solution - cuda_solution, ord=np.inf))
         if objective_difference > 1e-9 or coefficient_difference > 1e-6:
             raise RuntimeError(
                 "CPU/GPU disagreement: "

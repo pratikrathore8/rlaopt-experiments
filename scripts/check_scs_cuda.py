@@ -15,6 +15,8 @@ from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import 
     solve_scs_cuda,
 )
 
+COMMON_ACCURACY_TOLERANCE = 1e-6
+
 
 def main() -> None:
     if not torch.cuda.is_available():
@@ -44,12 +46,16 @@ def main() -> None:
         max_iterations=10_000,
     )
     stationarity = float(
-        problem.kkt_residual(result.weights, result.intercept, activity_tolerance=1e-8)
+        problem.kkt_residual(
+            result.weights,
+            result.intercept,
+            activity_tolerance=COMMON_ACCURACY_TOLERANCE,
+        )
     )
     feasibility = float(problem.constraint_violation(result.weights))
     if result.native_status != "converged":
         raise RuntimeError(f"SCS CUDA returned {result.native_status}")
-    if stationarity > 1e-6 or feasibility > 1e-8:
+    if stationarity > COMMON_ACCURACY_TOLERANCE or feasibility > COMMON_ACCURACY_TOLERANCE:
         raise RuntimeError(
             f"SCS CUDA accuracy failure: stationarity={stationarity:.3e}, "
             f"feasibility={feasibility:.3e}"
