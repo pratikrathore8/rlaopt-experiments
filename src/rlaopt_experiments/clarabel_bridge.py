@@ -44,7 +44,10 @@ function rlaopt_clarabel_solve_gpu(
         max_iter = max_iterations,
     )
     cones = [Clarabel.ZeroConeT(equality_dim), Clarabel.NonnegativeConeT(inequality_dim)]
-    solver = Clarabel.Solver(P, q, A, b, cones, settings)
+    # CuClarabel's convenience constructor requires q::Vector even though
+    # setup! correctly accepts GPU AbstractVector inputs.
+    solver = Clarabel.Solver{Float64}()
+    Clarabel.setup!(solver, P, q, A, b, cones, settings)
     Clarabel.solve!(solver)
     CUDA.synchronize()
     return solver
@@ -137,9 +140,7 @@ class ClarabelRuntime:
 
         return PreparedClarabelData(
             quadratic=sparse_matrix(quadratic),
-            linear=self.main.Vector[self.main.Float64](
-                np.asarray(linear, dtype=np.float64)
-            ),
+            linear=self.main.Vector[self.main.Float64](np.asarray(linear, dtype=np.float64)),
             constraints=sparse_matrix(constraints),
             rhs=self.main.Vector[self.main.Float64](np.asarray(rhs, dtype=np.float64)),
             owners=(),
@@ -155,9 +156,7 @@ class ClarabelRuntime:
         import cupy as cp
         from cupyx.scipy.sparse import csr_matrix
 
-        extension = self.main.Base.get_extension(
-            self.main.Clarabel, self.main.Symbol("PythonExt")
-        )
+        extension = self.main.Base.get_extension(self.main.Clarabel, self.main.Symbol("PythonExt"))
 
         # CuClarabel increments CSR indices and row pointers in place. Every
         # call therefore owns fresh buffers that must remain live through solve
@@ -168,9 +167,7 @@ class ClarabelRuntime:
         b_owner = cp.asarray(rhs, dtype=cp.float64)
 
         def vector(array: Any) -> Any:
-            return extension.cupy_to_cuvector(
-                self.main.Float64, int(array.data.ptr), array.size
-            )
+            return extension.cupy_to_cuvector(self.main.Float64, int(array.data.ptr), array.size)
 
         def sparse_matrix(matrix: Any) -> Any:
             return extension.cupy_to_cucsrmat(
@@ -202,7 +199,7 @@ def initialize_clarabel_runtime(backend: str) -> ClarabelRuntime:
     from juliacall import Main as jl
 
     if backend == "cuda":
-        jl.seval("using Clarabel, PythonCall, SparseArrays, CUDA, CUDA.CUSPARSE")
+        jl.seval("using Clarabel, PythonCall, SparseArrays, CUDA, CUDA.CUSPARSE, CUDSS")
     else:
         jl.seval("using Clarabel, PythonCall, SparseArrays")
     jl.seval(_JULIA_HELPERS)

@@ -1,3 +1,5 @@
 [CUDA_Runtime_jll]
-local = "true"
+# Use the CUDA 13 artifact runtime so CUDSS_jll can select its matching artifact.
+# The local CUDA toolkit does not include the separately distributed cuDSS library.
+local = "false"
 version = "13.0"

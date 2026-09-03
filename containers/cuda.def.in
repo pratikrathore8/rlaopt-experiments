@@ -5,6 +5,7 @@ From: @CUDA_IMAGE_REFERENCE@
     pyproject.toml /opt/rlaopt-experiments/pyproject.toml
     uv.lock /opt/rlaopt-experiments/uv.lock
     README.md /opt/rlaopt-experiments/README.md
+    containers/python-shared.c /opt/rlaopt-experiments/containers/python-shared.c
     containers/scs-3.2.11-gpu-build.patch /opt/rlaopt-experiments/containers/scs-3.2.11-gpu-build.patch
     src /opt/rlaopt-experiments/src
     julia/cuclarabel/Project.toml /opt/rlaopt-experiments/julia/cuclarabel/Project.toml
@@ -18,12 +19,16 @@ From: @CUDA_IMAGE_REFERENCE@
     apt-get install -y --no-install-recommends \
         build-essential ca-certificates curl git libopenblas-dev patch pkg-config \
         python3.12 python3.12-dev python3.12-venv
+    gcc /opt/rlaopt-experiments/containers/python-shared.c \
+        $(python3.12-config --embed --cflags --ldflags) \
+        -Wl,-rpath,/usr/lib/x86_64-linux-gnu \
+        -o /usr/bin/python3.12-shared
     rm -rf /var/lib/apt/lists/*
     export UV_UNMANAGED_INSTALL=/usr/local/bin
     export UV_LINK_MODE=copy
     curl -LsSf https://astral.sh/uv/0.12.7/install.sh | sh
     cd /opt/rlaopt-experiments
-    uv venv --python /usr/bin/python3.12 .venv
+    uv venv --python /usr/bin/python3.12-shared .venv
     UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
         uv sync --frozen --no-dev --group gpu
     curl -fL \
@@ -91,5 +96,6 @@ From: @CUDA_IMAGE_REFERENCE@
     export JULIA_DEPOT_PATH=/tmp/rlaopt-julia-test-depot:/opt/julia-depot
     /opt/rlaopt-experiments/.venv/bin/python -c \
         'import cupy, cuml, juliacall, rlaopt, torch; from scs import _scs_gpu; assert _scs_gpu.sizeof_float() == 8; assert _scs_gpu.sizeof_int() == 4; print("container imports passed")'
+    ldd /opt/rlaopt-experiments/.venv/bin/python | grep -q libpython3.12
     julia --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
         'using Clarabel; println("CuClarabel import passed")'
