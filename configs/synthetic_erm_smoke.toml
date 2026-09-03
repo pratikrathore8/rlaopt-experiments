@@ -33,7 +33,7 @@ batch_size = 256
 
 [multinomial.execution.native_tolerances_calibrated]
 cpu = true
-cuda = false
+cuda = true
 
 [multinomial.execution.native_tolerances.cpu]
 rlaopt_sapphire = 1.0e-7
@@ -41,7 +41,7 @@ projected_gradient = 1.0e-6
 jaxopt_lbfgsb = 1.0e-6
 
 [multinomial.execution.native_tolerances.cuda]
-rlaopt_sapphire = 1.0e-6
+rlaopt_sapphire = 1.0e-7
 projected_gradient = 1.0e-6
 jaxopt_lbfgsb = 1.0e-6
 
@@ -66,7 +66,7 @@ batch_size = 256
 
 [elastic_net.vanilla_execution.native_tolerances_calibrated]
 cpu = true
-cuda = false
+cuda = true
 
 [elastic_net.vanilla_execution.native_tolerances.cpu]
 rlaopt_sapphire = 1.0e-5
@@ -74,9 +74,9 @@ sklearn_coordinate_descent = 1.0e-4
 jaxopt_proximal_gradient = 1.0e-5
 
 [elastic_net.vanilla_execution.native_tolerances.cuda]
-rlaopt_sapphire = 1.0e-6
-cuml_coordinate_descent = 1.0e-6
-jaxopt_proximal_gradient = 1.0e-6
+rlaopt_sapphire = 1.0e-5
+cuml_coordinate_descent = 1.0e-4
+jaxopt_proximal_gradient = 1.0e-5
 
 [elastic_net.bounded_solvers]
 cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
@@ -88,7 +88,7 @@ batch_size = 256
 
 [elastic_net.bounded_execution.native_tolerances_calibrated]
 cpu = true
-cuda = false
+cuda = true
 
 [elastic_net.bounded_execution.native_tolerances.cpu]
 rlaopt_admm = 1.0e-7
@@ -96,6 +96,6 @@ scs = 1.0e-7
 clarabel_qdldl = 1.0e-10
 
 [elastic_net.bounded_execution.native_tolerances.cuda]
-rlaopt_admm = 1.0e-6
-scs_cuda = 1.0e-6
-cuclarabel_cudss = 1.0e-6
+rlaopt_admm = 1.0e-7
+scs_cuda = 1.0e-7
+cuclarabel_cudss = 1.0e-10

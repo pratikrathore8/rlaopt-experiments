@@ -32,7 +32,12 @@ def test_load_synthetic_erm_smoke_config() -> None:
     assert config.multinomial.execution.batch_size == 256
     assert config.multinomial.execution.native_tolerances_calibrated is not None
     assert config.multinomial.execution.native_tolerances_calibrated.cpu
-    assert not config.multinomial.execution.native_tolerances_calibrated.cuda
+    assert config.multinomial.execution.native_tolerances_calibrated.cuda
+    assert dict(config.multinomial.execution.native_tolerances.cuda) == {
+        "jaxopt_lbfgsb": 1e-6,
+        "projected_gradient": 1e-6,
+        "rlaopt_sapphire": 1e-7,
+    }
     assert (
         config.multinomial.execution.native_tolerances.for_solver("cpu", "rlaopt_sapphire") == 1e-7
     )
@@ -41,7 +46,12 @@ def test_load_synthetic_erm_smoke_config() -> None:
     assert "sklearn_coordinate_descent" in config.elastic_net.vanilla_solvers.cpu
     assert config.elastic_net.vanilla_execution.native_tolerances_calibrated is not None
     assert config.elastic_net.vanilla_execution.native_tolerances_calibrated.cpu
-    assert not config.elastic_net.vanilla_execution.native_tolerances_calibrated.cuda
+    assert config.elastic_net.vanilla_execution.native_tolerances_calibrated.cuda
+    assert dict(config.elastic_net.vanilla_execution.native_tolerances.cuda) == {
+        "cuml_coordinate_descent": 1e-4,
+        "jaxopt_proximal_gradient": 1e-5,
+        "rlaopt_sapphire": 1e-5,
+    }
     assert (
         config.elastic_net.vanilla_execution.native_tolerances.for_solver(
             "cpu", "sklearn_coordinate_descent"
@@ -49,23 +59,16 @@ def test_load_synthetic_erm_smoke_config() -> None:
         == 1e-4
     )
     assert config.elastic_net.vanilla_execution.max_iterations == 10_000
-    assert (
-        config.elastic_net.vanilla_execution.native_tolerances.for_solver(
-            "cuda", "cuml_coordinate_descent"
-        )
-        == 1e-6
-    )
     assert "cuclarabel_cudss" in config.elastic_net.bounded_solvers.cuda
     assert config.elastic_net.bounded_execution.max_iterations == 10_000
-    assert (
-        config.elastic_net.bounded_execution.native_tolerances.for_solver(
-            "cuda", "cuclarabel_cudss"
-        )
-        == 1e-6
-    )
     assert config.elastic_net.bounded_execution.native_tolerances_calibrated is not None
     assert config.elastic_net.bounded_execution.native_tolerances_calibrated.cpu
-    assert not config.elastic_net.bounded_execution.native_tolerances_calibrated.cuda
+    assert config.elastic_net.bounded_execution.native_tolerances_calibrated.cuda
+    assert dict(config.elastic_net.bounded_execution.native_tolerances.cuda) == {
+        "cuclarabel_cudss": 1e-10,
+        "rlaopt_admm": 1e-7,
+        "scs_cuda": 1e-7,
+    }
 
 
 def test_load_synthetic_erm_calibration_config_without_frozen_tolerances() -> None:
