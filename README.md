@@ -154,6 +154,44 @@ The initial development grid is intentionally small and is defined in `configs/s
 
 The held-out scaling pilot is defined in `configs/synthetic_erm_pilot.toml`. Guided by the real-data dimensions in [Figure 4.5 of the thesis](https://web.stanford.edu/~udell/doc/rathore26_thesis.pdf), it scales samples through $(2^{14},2^{11})$, $(2^{16},2^{11})$, and $(2^{18},2^{11})$, adds the feature-scaling point $(2^{16},2^{13})$, and adds $(2^{13},2^{14})$ for the two elastic-net variants as an underdetermined high-feature stress case. The thesis datasets can be sparse, whereas this testbed materializes dense float64 matrices, so the pilot matches their computational regimes without copying their largest dimensions literally. Its largest design matrix occupies 4 GiB before solver working memory. One held-out seed, one measured repetition, one warmup, and only the less-regularized $\gamma=0.01$ endpoint keep the pilot diagnostic rather than production-sized. It contains 12 multinomial, 15 vanilla-elastic-net, and 15 bounded-elastic-net jobs per backend: 42 per backend and 84 total.
 
+Generate the pilot manifests through the pinned image from a clean repository root:
+
+```bash
+source containers/cuda.env
+for backend in cpu cuda; do
+  apptainer exec --bind "$PWD:$PWD" --pwd "$PWD" "$RLAOPT_CUDA_IMAGE" \
+    /opt/rlaopt-experiments/.venv/bin/rlaopt-bench manifest \
+    --config configs/synthetic_erm_pilot.toml \
+    --backend "$backend" \
+    --output "artifacts/synthetic-erm-pilot/manifests/$backend.jsonl"
+done
+```
+
+Submit the 84 benchmark configurations as six Slurm tasks, below the soal limits of 20 submitted and 12 running jobs. The two CPU chunks are pinned to different nodes and the four CUDA chunks occupy at most the four H200 NVLs:
+
+```bash
+BACKEND=cpu MANIFEST=artifacts/synthetic-erm-pilot/manifests/cpu.jsonl \
+CONFIG=configs/synthetic_erm_pilot.toml OUTPUT_DIR=artifacts/synthetic-erm-pilot \
+CHUNK_COUNT=2 \
+  sbatch --array=0 --nodelist=soal-8 --job-name=erm-pilot-cpu-8 \
+  --output=erm-pilot-cpu-8-%A_%a.out slurm/run_chunk_array.sh
+
+BACKEND=cpu MANIFEST=artifacts/synthetic-erm-pilot/manifests/cpu.jsonl \
+CONFIG=configs/synthetic_erm_pilot.toml OUTPUT_DIR=artifacts/synthetic-erm-pilot \
+CHUNK_COUNT=2 \
+  sbatch --array=1 --nodelist=soal-9 --job-name=erm-pilot-cpu-9 \
+  --output=erm-pilot-cpu-9-%A_%a.out slurm/run_chunk_array.sh
+
+BACKEND=cuda MANIFEST=artifacts/synthetic-erm-pilot/manifests/cuda.jsonl \
+CONFIG=configs/synthetic_erm_pilot.toml OUTPUT_DIR=artifacts/synthetic-erm-pilot \
+CHUNK_COUNT=4 BENCHMARK_CPU_THREADS=16 \
+  sbatch --array=0-3%4 --nodelist=soal-12 --gres=gpu:h200nvl:1 \
+  --cpus-per-task=16 --job-name=erm-pilot-cuda \
+  --output=erm-pilot-cuda-%A_%a.out slurm/run_chunk_array.sh
+```
+
+Each chunk processes its round-robin subset sequentially and continues after an individual launcher failure, while each benchmark retains the configured 15-minute startup and solve limits. Use a fresh output directory for every campaign.
+
 The `manifest` command expands every synthetic-ERM grid into one self-contained JSON record per problem, solver, and backend. Feature, target, and solver randomness use independently derived deterministic streams from the recorded master seed; the complete problem specification and resulting problem ID are stored in every job. Across regularization fractions and the two elastic-net variants, jobs reuse the same feature and target seeds, so only the regularization and boundedness change. Per backend, the smoke manifest contains 18 multinomial jobs, 36 vanilla elastic-net jobs, and 36 bounded elastic-net jobs, for 90 jobs total. The corresponding `run-manifest-job` command reads one zero-based manifest index without loading the full file and obtains all execution controls from the same strict suite configuration.
 
 Independent CPU and CUDA calibration selected the same native tolerances for corresponding methods: $10^{-7}$ for multinomial SAPPHIRE, $10^{-6}$ for projected gradient and JAXopt L-BFGS-B, $10^{-5}$ for vanilla-elastic-net SAPPHIRE and JAXopt proximal gradient, $10^{-4}$ for coordinate descent in scikit-learn and cuML, $10^{-7}$ for bounded-elastic-net ADMM and SCS, and $10^{-10}$ for Clarabel with QDLDL or cuDSS. Both backend-specific calibration states are frozen. The configuration uses a batch size of 256 for the rlaopt methods and permits at most 10,000 solver iterations subject to the 15-minute hard timeout. Each problem family and elastic-net variant has its own strict execution-control block whose native-tolerance keys must exactly match its CPU and CUDA solver lists.

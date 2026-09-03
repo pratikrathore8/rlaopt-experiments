@@ -55,14 +55,34 @@ export RLAOPT_CUDA_IMAGE_SHA256
 export APPTAINERENV_RLAOPT_CUDA_IMAGE_SHA256="$RLAOPT_CUDA_IMAGE_SHA256"
 echo "RLAOPT_CUDA_IMAGE_SHA256=$RLAOPT_CUDA_IMAGE_SHA256"
 
-read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
+read -r SUITE JOB_BACKEND < <(apptainer exec "$DERIVED_IMAGE" \
   /opt/rlaopt-experiments/.venv/bin/python -c \
-  'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
+  'import json,sys; j=json.loads(sys.argv[1]); print(j.get("suite"), j.get("backend"))' "$LINE")
+if [[ "$JOB_BACKEND" != "$BACKEND" ]]; then
+  echo "Manifest backend $JOB_BACKEND does not match requested backend $BACKEND" >&2
+  exit 2
+fi
 
 APPTAINER_ARGS=(--bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY")
 if [[ "$BACKEND" == "cuda" ]]; then
   APPTAINER_ARGS=(--nv "${APPTAINER_ARGS[@]}")
 fi
+
+if [[ "$SUITE" == "synthetic_erm" ]]; then
+  timeout --signal=TERM 179m apptainer exec "${APPTAINER_ARGS[@]}" \
+    "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-manifest-job \
+    --manifest "$MANIFEST" --index "$MANIFEST_INDEX" \
+    --config "$CONFIG" --output "$OUTPUT_DIR"
+  exit
+fi
+if [[ "$SUITE" != "synthetic_ridge" ]]; then
+  echo "Unsupported manifest suite: $SUITE" >&2
+  exit 2
+fi
+
+read -r N P ALPHA SEED SOLVER < <(apptainer exec "$DERIVED_IMAGE" \
+  /opt/rlaopt-experiments/.venv/bin/python -c \
+  'import json,sys; j=json.loads(sys.argv[1]); print(j["n"],j["p"],j["alpha"],j["seed"],j["solver"])' "$LINE")
 timeout --signal=TERM 179m apptainer exec "${APPTAINER_ARGS[@]}" \
   "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-job \
   --config "$CONFIG" --output "$OUTPUT_DIR" \
