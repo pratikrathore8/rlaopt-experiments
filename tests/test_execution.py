@@ -69,11 +69,11 @@ def test_run_manifest_job_uses_strict_configured_controls(
 
     assert run_manifest_job(job, CONFIG, tmp_path) == []
     assert captured["job"] == job
-    assert captured["native_tolerance"] == 1e-6
+    assert captured["native_tolerance"] == 1e-7
     assert captured["max_iterations"] == 10_000
     assert captured["batch_size"] == 256
     assert captured["output_dir"] == tmp_path
-    assert not captured["config"].multinomial.execution.native_tolerances_calibrated
+    assert captured["config"].multinomial.execution.tolerances_calibrated_for("cpu")
 
 
 def test_run_manifest_job_dispatches_vanilla_elastic_net_controls(
@@ -102,11 +102,11 @@ def test_run_manifest_job_dispatches_vanilla_elastic_net_controls(
 
     assert run_manifest_job(job, CONFIG, tmp_path) == []
     assert captured["job"] == job
-    assert captured["native_tolerance"] == 1e-6
+    assert captured["native_tolerance"] == 1e-5
     assert captured["max_iterations"] == 10_000
     assert captured["batch_size"] == 256
     assert captured["output_dir"] == tmp_path
-    assert not captured["config"].elastic_net.vanilla_execution.native_tolerances_calibrated
+    assert captured["config"].elastic_net.vanilla_execution.tolerances_calibrated_for("cpu")
 
 
 def test_run_manifest_job_dispatches_bounded_elastic_net_controls(
@@ -135,8 +135,8 @@ def test_run_manifest_job_dispatches_bounded_elastic_net_controls(
 
     assert run_manifest_job(job, CONFIG, tmp_path) == []
     assert captured["job"] == job
-    assert captured["native_tolerance"] == 1e-6
+    assert captured["native_tolerance"] == 1e-7
     assert captured["max_iterations"] == 10_000
     assert captured["batch_size"] == 256
     assert captured["output_dir"] == tmp_path
-    assert not captured["config"].elastic_net.bounded_execution.native_tolerances_calibrated
+    assert captured["config"].elastic_net.bounded_execution.tolerances_calibrated_for("cpu")

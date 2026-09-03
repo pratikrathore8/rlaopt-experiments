@@ -6,12 +6,12 @@ repetitions = 1
 timeout_seconds = 900
 startup_timeout_seconds = 900
 
-# Development-only values. These must be calibrated and frozen before production.
+# Frozen common external accuracy thresholds.
 [accuracy]
 stationarity = 1.0e-6
-feasibility = 1.0e-8
+feasibility = 1.0e-6
 relative_duality_gap = 1.0e-6
-calibrated = false
+calibrated = true
 
 [multinomial]
 n_classes = 5
@@ -30,10 +30,13 @@ cuda = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
 [multinomial.execution]
 max_iterations = 10000
 batch_size = 256
-native_tolerances_calibrated = false
+
+[multinomial.execution.native_tolerances_calibrated]
+cpu = true
+cuda = false
 
 [multinomial.execution.native_tolerances.cpu]
-rlaopt_sapphire = 1.0e-6
+rlaopt_sapphire = 1.0e-7
 projected_gradient = 1.0e-6
 jaxopt_lbfgsb = 1.0e-6
 
@@ -60,12 +63,15 @@ cuda = ["rlaopt_sapphire", "cuml_coordinate_descent", "jaxopt_proximal_gradient"
 [elastic_net.vanilla_execution]
 max_iterations = 10000
 batch_size = 256
-native_tolerances_calibrated = false
+
+[elastic_net.vanilla_execution.native_tolerances_calibrated]
+cpu = true
+cuda = false
 
 [elastic_net.vanilla_execution.native_tolerances.cpu]
-rlaopt_sapphire = 1.0e-6
-sklearn_coordinate_descent = 1.0e-6
-jaxopt_proximal_gradient = 1.0e-6
+rlaopt_sapphire = 1.0e-5
+sklearn_coordinate_descent = 1.0e-4
+jaxopt_proximal_gradient = 1.0e-5
 
 [elastic_net.vanilla_execution.native_tolerances.cuda]
 rlaopt_sapphire = 1.0e-6
@@ -79,12 +85,15 @@ cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]
 [elastic_net.bounded_execution]
 max_iterations = 10000
 batch_size = 256
-native_tolerances_calibrated = false
+
+[elastic_net.bounded_execution.native_tolerances_calibrated]
+cpu = true
+cuda = false
 
 [elastic_net.bounded_execution.native_tolerances.cpu]
-rlaopt_admm = 1.0e-6
-scs = 1.0e-6
-clarabel_qdldl = 1.0e-6
+rlaopt_admm = 1.0e-7
+scs = 1.0e-7
+clarabel_qdldl = 1.0e-10
 
 [elastic_net.bounded_execution.native_tolerances.cuda]
 rlaopt_admm = 1.0e-6

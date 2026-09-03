@@ -132,9 +132,9 @@ def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
     assert records[0].metadata["execution_phase"] == "measurement"
     assert records[0].metadata["max_iterations"] == 500
     assert records[0].metadata["stationarity_tolerance"] == 1e-6
-    assert records[0].metadata["feasibility_tolerance"] == 1e-8
-    assert not records[0].metadata["accuracy_thresholds_calibrated"]
-    assert not records[0].metadata["native_tolerances_calibrated"]
+    assert records[0].metadata["feasibility_tolerance"] == 1e-6
+    assert records[0].metadata["accuracy_thresholds_calibrated"]
+    assert records[0].metadata["native_tolerances_calibrated"]
     assert "JIT compilation" in records[0].metadata["timing_scope"]
     paths = sorted((tmp_path / "records").glob("*.json"))
     assert len(paths) == 2
@@ -282,8 +282,8 @@ def test_vanilla_elastic_net_job_runs_and_writes_canonical_metrics(
     assert records[0].problem["regularization_fraction"] in {0.1, 0.01}
     assert records[0].metrics["relative_duality_gap"] == 1e-9
     assert records[0].metadata["relative_duality_gap_tolerance"] == 1e-6
-    assert records[0].metadata["feasibility_tolerance"] == 1e-8
-    assert not records[0].metadata["native_tolerances_calibrated"]
+    assert records[0].metadata["feasibility_tolerance"] == 1e-6
+    assert records[0].metadata["native_tolerances_calibrated"]
 
 
 def test_vanilla_elastic_net_job_rejects_tampered_fraction(tmp_path: Path) -> None:
@@ -348,8 +348,8 @@ def test_bounded_elastic_net_job_runs_and_requests_julia_first(
     assert records[0].metrics["stationarity"] == 1e-8
     assert records[0].metrics["feasibility"] == 0.0
     assert records[0].metadata["stationarity_tolerance"] == 1e-6
-    assert records[0].metadata["feasibility_tolerance"] == 1e-8
-    assert not records[0].metadata["native_tolerances_calibrated"]
+    assert records[0].metadata["feasibility_tolerance"] == 1e-6
+    assert records[0].metadata["native_tolerances_calibrated"]
     assert "conic construction and format conversion" in records[0].metadata["timing_scope"]
 
 

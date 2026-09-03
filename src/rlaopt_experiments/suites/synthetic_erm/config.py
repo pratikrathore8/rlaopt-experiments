@@ -93,11 +93,22 @@ class BackendTolerances:
 
 
 @dataclass(frozen=True)
+class BackendCalibrationState:
+    cpu: bool
+    cuda: bool
+
+    def for_backend(self, backend: str) -> bool:
+        if backend not in {"cpu", "cuda"}:
+            raise ValueError("backend must be cpu or cuda")
+        return getattr(self, backend)
+
+
+@dataclass(frozen=True)
 class SolverExecution:
     max_iterations: int
     batch_size: int
     # Calibration configurations explicitly carry no frozen native tolerances.
-    native_tolerances_calibrated: bool | None
+    native_tolerances_calibrated: BackendCalibrationState | None
     native_tolerances: BackendTolerances | None
 
     def __post_init__(self) -> None:
@@ -111,6 +122,11 @@ class SolverExecution:
             raise ValueError(
                 "native tolerance state and mappings must either both be present or both be absent"
             )
+
+    def tolerances_calibrated_for(self, backend: str) -> bool:
+        if self.native_tolerances_calibrated is None:
+            raise ValueError("calibration configuration has no frozen native tolerances")
+        return self.native_tolerances_calibrated.for_backend(backend)
 
 
 @dataclass(frozen=True)
@@ -230,6 +246,13 @@ def _backend_solvers(data: dict[str, Any]) -> BackendSolvers:
     return BackendSolvers(cpu=tuple(data["cpu"]), cuda=tuple(data["cuda"]))
 
 
+def _backend_calibration_state(data: dict[str, Any]) -> BackendCalibrationState:
+    _require_keys(data, {"cpu", "cuda"}, "native-tolerance calibration state")
+    if not all(isinstance(data[backend], bool) for backend in ("cpu", "cuda")):
+        raise ValueError("native-tolerance calibration states must be Boolean")
+    return BackendCalibrationState(cpu=data["cpu"], cuda=data["cuda"])
+
+
 def _shapes(data: list[dict[str, Any]]) -> tuple[ErmShape, ...]:
     return tuple(ErmShape(**shape) for shape in data)
 
@@ -247,8 +270,10 @@ def _solver_execution(data: dict[str, Any], name: str) -> SolverExecution:
         name,
     )
     tolerance_data = dict(execution_data.pop("native_tolerances"))
+    calibration_state_data = dict(execution_data.pop("native_tolerances_calibrated"))
     _require_keys(tolerance_data, {"cpu", "cuda"}, f"{name} native tolerances")
     return SolverExecution(
+        native_tolerances_calibrated=_backend_calibration_state(calibration_state_data),
         native_tolerances=BackendTolerances(
             cpu=tuple(sorted(tolerance_data["cpu"].items())),
             cuda=tuple(sorted(tolerance_data["cuda"].items())),

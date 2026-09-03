@@ -27,16 +27,27 @@ def test_load_synthetic_erm_smoke_config() -> None:
     assert config.suite == "synthetic_erm"
     assert config.seeds == (0, 1, 2)
     assert config.repetitions == 1
-    assert not config.accuracy.calibrated
+    assert config.accuracy.calibrated
     assert config.multinomial.execution.max_iterations == 10_000
     assert config.multinomial.execution.batch_size == 256
-    assert not config.multinomial.execution.native_tolerances_calibrated
+    assert config.multinomial.execution.native_tolerances_calibrated is not None
+    assert config.multinomial.execution.native_tolerances_calibrated.cpu
+    assert not config.multinomial.execution.native_tolerances_calibrated.cuda
     assert (
-        config.multinomial.execution.native_tolerances.for_solver("cpu", "rlaopt_sapphire") == 1e-6
+        config.multinomial.execution.native_tolerances.for_solver("cpu", "rlaopt_sapphire") == 1e-7
     )
     assert config.multinomial.shapes == (ErmShape(1024, 64), ErmShape(4096, 256))
     assert config.elastic_net.regularization_fractions == (0.1, 0.01)
     assert "sklearn_coordinate_descent" in config.elastic_net.vanilla_solvers.cpu
+    assert config.elastic_net.vanilla_execution.native_tolerances_calibrated is not None
+    assert config.elastic_net.vanilla_execution.native_tolerances_calibrated.cpu
+    assert not config.elastic_net.vanilla_execution.native_tolerances_calibrated.cuda
+    assert (
+        config.elastic_net.vanilla_execution.native_tolerances.for_solver(
+            "cpu", "sklearn_coordinate_descent"
+        )
+        == 1e-4
+    )
     assert config.elastic_net.vanilla_execution.max_iterations == 10_000
     assert (
         config.elastic_net.vanilla_execution.native_tolerances.for_solver(
@@ -52,7 +63,9 @@ def test_load_synthetic_erm_smoke_config() -> None:
         )
         == 1e-6
     )
-    assert not config.elastic_net.bounded_execution.native_tolerances_calibrated
+    assert config.elastic_net.bounded_execution.native_tolerances_calibrated is not None
+    assert config.elastic_net.bounded_execution.native_tolerances_calibrated.cpu
+    assert not config.elastic_net.bounded_execution.native_tolerances_calibrated.cuda
 
 
 def test_load_synthetic_erm_calibration_config_without_frozen_tolerances() -> None:
@@ -75,7 +88,7 @@ def test_calibration_config_rejects_frozen_native_tolerances(tmp_path: Path) -> 
     contents = CALIBRATION_CONFIG.read_text().replace(
         "[multinomial.execution]\nmax_iterations = 10000\nbatch_size = 256",
         "[multinomial.execution]\nmax_iterations = 10000\nbatch_size = 256\n"
-        "native_tolerances_calibrated = false",
+        "[multinomial.execution.native_tolerances_calibrated]\ncpu = false\ncuda = false",
     )
     path = tmp_path / "invalid-calibration.toml"
     path.write_text(contents)

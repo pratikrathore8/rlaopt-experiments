@@ -195,7 +195,7 @@ def run_multinomial_job(
                 "feasibility_tolerance": config.accuracy.feasibility,
                 "accuracy_thresholds_calibrated": config.accuracy.calibrated,
                 "native_tolerances_calibrated": (
-                    bool(config.multinomial.execution.native_tolerances_calibrated)
+                    config.multinomial.execution.tolerances_calibrated_for(backend)
                 ),
             }
             | (record_metadata or {})
@@ -343,7 +343,7 @@ def run_vanilla_elastic_net_job(
                 "feasibility_tolerance": config.accuracy.feasibility,
                 "accuracy_thresholds_calibrated": config.accuracy.calibrated,
                 "native_tolerances_calibrated": (
-                    bool(config.elastic_net.vanilla_execution.native_tolerances_calibrated)
+                    config.elastic_net.vanilla_execution.tolerances_calibrated_for(backend)
                 ),
             }
             | (record_metadata or {})
@@ -446,7 +446,7 @@ def run_bounded_elastic_net_job(
                 "feasibility_tolerance": config.accuracy.feasibility,
                 "accuracy_thresholds_calibrated": config.accuracy.calibrated,
                 "native_tolerances_calibrated": (
-                    bool(config.elastic_net.bounded_execution.native_tolerances_calibrated)
+                    config.elastic_net.bounded_execution.tolerances_calibrated_for(backend)
                 ),
             }
             | (record_metadata or {})
