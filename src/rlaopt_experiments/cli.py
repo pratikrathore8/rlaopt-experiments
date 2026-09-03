@@ -33,7 +33,13 @@ def _parser() -> argparse.ArgumentParser:
     calibration.add_argument("--solver", required=True)
     calibration.add_argument("--backend", choices=("cpu", "cuda"), required=True)
     calibration.add_argument(
-        "--candidates", type=float, nargs="+", default=[1e-4, 1e-5, 1e-6, 1e-7, 1e-8]
+        "--problem-type",
+        choices=("multinomial", "vanilla_elastic_net", "bounded_elastic_net"),
+    )
+    calibration.add_argument(
+        "--candidates",
+        type=float,
+        nargs="+",
     )
     calibration.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     calibration.add_argument("--output", type=Path, default=Path("artifacts/calibration"))
@@ -62,6 +68,54 @@ def main() -> None:
         run_manifest_job(job, args.config, args.output)
         return
 
+    if args.command == "calibrate":
+        from rlaopt_experiments.manifests import configured_suite
+
+        suite = configured_suite(args.config)
+        if suite == "synthetic_erm":
+            if args.problem_type is None:
+                raise ValueError("--problem-type is required when calibrating synthetic_erm")
+            if args.candidates is not None:
+                raise ValueError(
+                    "synthetic_erm calibration candidates must be defined in its TOML file"
+                )
+            from rlaopt_experiments.suites.synthetic_erm.calibration import (
+                calibrate_synthetic_erm,
+            )
+            from rlaopt_experiments.suites.synthetic_erm.config import (
+                load_synthetic_erm_calibration_config,
+            )
+
+            calibration_config = load_synthetic_erm_calibration_config(args.config)
+            selected = calibrate_synthetic_erm(
+                problem_type=args.problem_type,
+                solver=args.solver,
+                backend=args.backend,
+                candidates=list(calibration_config.candidates),
+                config=calibration_config.experiment,
+                output_dir=(args.output / args.backend / args.problem_type / args.solver),
+            )
+        elif suite == "synthetic_ridge":
+            if args.problem_type is not None:
+                raise ValueError("--problem-type is only valid when calibrating synthetic_erm")
+            from rlaopt_experiments.calibration import calibrate
+            from rlaopt_experiments.config import load_experiment
+
+            selected = calibrate(
+                solver=args.solver,
+                backend=args.backend,
+                candidates=args.candidates or [1e-4, 1e-5, 1e-6, 1e-7, 1e-8],
+                config=load_experiment(args.config),
+                output_dir=args.output / args.backend / args.solver,
+            )
+        else:
+            raise ValueError(f"calibration is not implemented for suite: {suite}")
+        print(
+            f"selected native tolerance for "
+            f"{args.backend}/{args.problem_type or 'ridge'}/{args.solver}: {selected:g}"
+        )
+        return
+
     from rlaopt_experiments.config import load_experiment
 
     config = load_experiment(args.config) if hasattr(args, "config") else None
@@ -88,17 +142,6 @@ def main() -> None:
             output_dir=args.output,
             suite=config.suite,
         )
-    elif args.command == "calibrate":
-        from rlaopt_experiments.calibration import calibrate
-
-        selected = calibrate(
-            solver=args.solver,
-            backend=args.backend,
-            candidates=args.candidates,
-            config=config,
-            output_dir=args.output / args.backend / args.solver,
-        )
-        print(f"selected native tolerance for {args.backend}/{args.solver}: {selected:g}")
     else:
         from rlaopt_experiments.plotting import make_figures
 

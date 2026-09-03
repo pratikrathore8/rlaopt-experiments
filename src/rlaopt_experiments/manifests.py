@@ -11,7 +11,7 @@ from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_co
 from rlaopt_experiments.suites.synthetic_erm.manifest import build_synthetic_erm_manifest
 
 
-def _configured_suite(path: Path) -> str:
+def configured_suite(path: Path) -> str:
     root = tomllib.loads(path.read_text())
     try:
         suite = root["experiment"]["suite"]
@@ -24,7 +24,7 @@ def _configured_suite(path: Path) -> str:
 
 def build_manifest(path: Path, backend: str) -> list[dict[str, Any]]:
     """Build the selected suite's manifest from one strict configuration."""
-    suite = _configured_suite(path)
+    suite = configured_suite(path)
     if suite == "synthetic_erm":
         return build_synthetic_erm_manifest(load_synthetic_erm_config(path), backend)
     if suite == "synthetic_ridge":

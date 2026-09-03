@@ -8,7 +8,9 @@ from rlaopt_experiments.suites.synthetic_erm.config import (
     ErmShape,
     SolverExecution,
     MultinomialExperiment,
+    SyntheticErmCalibrationConfig,
     SyntheticErmConfig,
+    load_synthetic_erm_calibration_config,
     load_synthetic_erm_config,
 )
 from rlaopt_experiments.suites.synthetic_erm.multinomial_solvers import (
@@ -27,7 +29,9 @@ __all__ = [
     "SolverExecution",
     "MultinomialExperiment",
     "MultinomialSolverResult",
+    "SyntheticErmCalibrationConfig",
     "SyntheticErmConfig",
+    "load_synthetic_erm_calibration_config",
     "load_synthetic_erm_config",
     "solve_jaxopt_lbfgsb",
     "solve_jaxopt_projected_gradient",

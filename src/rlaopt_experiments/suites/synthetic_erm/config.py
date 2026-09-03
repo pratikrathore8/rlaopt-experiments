@@ -96,14 +96,21 @@ class BackendTolerances:
 class SolverExecution:
     max_iterations: int
     batch_size: int
-    native_tolerances_calibrated: bool
-    native_tolerances: BackendTolerances
+    # Calibration configurations explicitly carry no frozen native tolerances.
+    native_tolerances_calibrated: bool | None
+    native_tolerances: BackendTolerances | None
 
     def __post_init__(self) -> None:
         if self.max_iterations < 1:
             raise ValueError("max_iterations must be positive")
         if self.batch_size < 1:
             raise ValueError("batch_size must be positive")
+        has_state = self.native_tolerances_calibrated is not None
+        has_tolerances = self.native_tolerances is not None
+        if has_state != has_tolerances:
+            raise ValueError(
+                "native tolerance state and mappings must either both be present or both be absent"
+            )
 
 
 @dataclass(frozen=True)
@@ -121,15 +128,16 @@ class MultinomialExperiment:
         if self.n_classes < 2:
             raise ValueError("n_classes must be at least two")
         _positive(self.teacher_scale, "teacher_scale")
-        for backend in ("cpu", "cuda"):
-            configured = set(getattr(self.solvers, backend))
-            tolerance_names = {
-                name for name, _ in getattr(self.execution.native_tolerances, backend)
-            }
-            if tolerance_names != configured:
-                raise ValueError(
-                    f"{backend} native tolerances must exactly match multinomial solvers"
-                )
+        if self.execution.native_tolerances is not None:
+            for backend in ("cpu", "cuda"):
+                configured = set(getattr(self.solvers, backend))
+                tolerance_names = {
+                    name for name, _ in getattr(self.execution.native_tolerances, backend)
+                }
+                if tolerance_names != configured:
+                    raise ValueError(
+                        f"{backend} native tolerances must exactly match multinomial solvers"
+                    )
         if not (
             math.isfinite(self.box_lower)
             and math.isfinite(self.box_upper)
@@ -166,15 +174,16 @@ class ElasticNetExperiment:
                 ("vanilla", self.vanilla_solvers, self.vanilla_execution),
                 ("bounded", self.bounded_solvers, self.bounded_execution),
             ):
-                configured = set(getattr(solvers, backend))
-                tolerance_names = {
-                    name for name, _ in getattr(execution.native_tolerances, backend)
-                }
-                if tolerance_names != configured:
-                    raise ValueError(
-                        f"{backend} native tolerances must exactly match "
-                        f"{variant} elastic-net solvers"
-                    )
+                if execution.native_tolerances is not None:
+                    configured = set(getattr(solvers, backend))
+                    tolerance_names = {
+                        name for name, _ in getattr(execution.native_tolerances, backend)
+                    }
+                    if tolerance_names != configured:
+                        raise ValueError(
+                            f"{backend} native tolerances must exactly match "
+                            f"{variant} elastic-net solvers"
+                        )
 
 
 @dataclass(frozen=True)
@@ -203,6 +212,17 @@ class SyntheticErmConfig:
             raise ValueError("timeout_seconds must be positive")
         if self.startup_timeout_seconds < 1:
             raise ValueError("startup_timeout_seconds must be positive")
+
+
+@dataclass(frozen=True)
+class SyntheticErmCalibrationConfig:
+    experiment: SyntheticErmConfig
+    candidates: tuple[float, ...]
+
+    def __post_init__(self) -> None:
+        _unique_nonempty(self.candidates, "calibration candidates")
+        for candidate in self.candidates:
+            _positive(candidate, "calibration candidate")
 
 
 def _backend_solvers(data: dict[str, Any]) -> BackendSolvers:
@@ -237,9 +257,19 @@ def _solver_execution(data: dict[str, Any], name: str) -> SolverExecution:
     )
 
 
-def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
-    """Load a synthetic-ERM TOML file, rejecting missing or unknown fields."""
-    root = tomllib.loads(path.read_text())
+def _calibration_execution(data: dict[str, Any], name: str) -> SolverExecution:
+    _require_keys(data, {"max_iterations", "batch_size"}, name)
+    return SolverExecution(
+        max_iterations=data["max_iterations"],
+        batch_size=data["batch_size"],
+        native_tolerances_calibrated=None,
+        native_tolerances=None,
+    )
+
+
+def _parse_synthetic_erm_config(
+    root: dict[str, Any], *, calibration: bool = False
+) -> SyntheticErmConfig:
     _require_keys(root, {"experiment", "accuracy", "multinomial", "elastic_net"}, "root")
     experiment = dict(root["experiment"])
     _require_keys(
@@ -275,7 +305,12 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
         },
         "multinomial",
     )
-    execution = _solver_execution(multinomial_data.pop("execution"), "multinomial execution")
+    execution_data = multinomial_data.pop("execution")
+    execution = (
+        _calibration_execution(execution_data, "multinomial execution")
+        if calibration
+        else _solver_execution(execution_data, "multinomial execution")
+    )
     multinomial = MultinomialExperiment(
         shapes=_shapes(multinomial_data.pop("shapes")),
         solvers=_backend_solvers(multinomial_data.pop("solvers")),
@@ -299,12 +334,11 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
         },
         "elastic_net",
     )
-    vanilla_execution = _solver_execution(
-        elastic_net_data.pop("vanilla_execution"), "vanilla elastic-net execution"
-    )
-    bounded_execution = _solver_execution(
-        elastic_net_data.pop("bounded_execution"), "bounded elastic-net execution"
-    )
+    vanilla_execution_data = elastic_net_data.pop("vanilla_execution")
+    bounded_execution_data = elastic_net_data.pop("bounded_execution")
+    execution_parser = _calibration_execution if calibration else _solver_execution
+    vanilla_execution = execution_parser(vanilla_execution_data, "vanilla elastic-net execution")
+    bounded_execution = execution_parser(bounded_execution_data, "bounded elastic-net execution")
     elastic_net = ElasticNetExperiment(
         shapes=_shapes(elastic_net_data.pop("shapes")),
         vanilla_execution=vanilla_execution,
@@ -320,4 +354,27 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
         elastic_net=elastic_net,
         seeds=tuple(experiment.pop("seeds")),
         **experiment,
+    )
+
+
+def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
+    """Load a synthetic-ERM TOML file, rejecting missing or unknown fields."""
+    return _parse_synthetic_erm_config(tomllib.loads(path.read_text()))
+
+
+def load_synthetic_erm_calibration_config(
+    path: Path,
+) -> SyntheticErmCalibrationConfig:
+    """Load a complete synthetic-ERM calibration protocol."""
+    root = tomllib.loads(path.read_text())
+    _require_keys(
+        root,
+        {"experiment", "accuracy", "multinomial", "elastic_net", "calibration"},
+        "root",
+    )
+    calibration = dict(root.pop("calibration"))
+    _require_keys(calibration, {"candidates"}, "calibration")
+    return SyntheticErmCalibrationConfig(
+        experiment=_parse_synthetic_erm_config(root, calibration=True),
+        candidates=tuple(calibration["candidates"]),
     )

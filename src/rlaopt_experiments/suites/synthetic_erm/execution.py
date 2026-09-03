@@ -136,6 +136,8 @@ def run_multinomial_job(
     max_iterations: int,
     batch_size: int,
     output_dir: Path,
+    record_run_key: str = "multinomial",
+    record_metadata: dict[str, Any] | None = None,
 ) -> list[TrialRecord]:
     """Execute one multinomial manifest job through an isolated worker."""
     _validate_controls(native_tolerance, max_iterations, batch_size)
@@ -182,23 +184,27 @@ def run_multinomial_job(
         phase: str,
         iteration_limit: int | None,
     ) -> TrialRecord:
-        metadata = outcome.get("solver_metadata", {}) | {
-            "execution_phase": phase,
-            "native_tolerance": native_tolerance,
-            "max_iterations": iteration_limit,
-            "solver_seed": job["solver_seed"],
-            "stationarity_tolerance": config.accuracy.stationarity,
-            "feasibility_tolerance": config.accuracy.feasibility,
-            "accuracy_thresholds_calibrated": config.accuracy.calibrated,
-            "native_tolerances_calibrated": (
-                config.multinomial.execution.native_tolerances_calibrated
-            ),
-        }
+        metadata = (
+            outcome.get("solver_metadata", {})
+            | {
+                "execution_phase": phase,
+                "native_tolerance": native_tolerance,
+                "max_iterations": iteration_limit,
+                "solver_seed": job["solver_seed"],
+                "stationarity_tolerance": config.accuracy.stationarity,
+                "feasibility_tolerance": config.accuracy.feasibility,
+                "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+                "native_tolerances_calibrated": (
+                    bool(config.multinomial.execution.native_tolerances_calibrated)
+                ),
+            }
+            | (record_metadata or {})
+        )
         annotated = outcome | {"solver_metadata": metadata}
         return record_outcome(
             suite=config.suite,
             problem_id=spec.problem_id,
-            run_key="multinomial",
+            run_key=record_run_key,
             problem=problem_fields,
             solver=solver,
             backend=backend,
@@ -278,6 +284,8 @@ def run_vanilla_elastic_net_job(
     max_iterations: int,
     batch_size: int,
     output_dir: Path,
+    record_run_key: str = "vanilla_elastic_net",
+    record_metadata: dict[str, Any] | None = None,
 ) -> list[TrialRecord]:
     """Execute one vanilla elastic-net manifest job through an isolated worker."""
     _validate_controls(native_tolerance, max_iterations, batch_size)
@@ -324,22 +332,26 @@ def run_vanilla_elastic_net_job(
         phase: str,
         iteration_limit: int | None,
     ) -> TrialRecord:
-        metadata = outcome.get("solver_metadata", {}) | {
-            "execution_phase": phase,
-            "native_tolerance": native_tolerance,
-            "max_iterations": iteration_limit,
-            "solver_seed": job["solver_seed"],
-            "relative_duality_gap_tolerance": config.accuracy.relative_duality_gap,
-            "feasibility_tolerance": config.accuracy.feasibility,
-            "accuracy_thresholds_calibrated": config.accuracy.calibrated,
-            "native_tolerances_calibrated": (
-                config.elastic_net.vanilla_execution.native_tolerances_calibrated
-            ),
-        }
+        metadata = (
+            outcome.get("solver_metadata", {})
+            | {
+                "execution_phase": phase,
+                "native_tolerance": native_tolerance,
+                "max_iterations": iteration_limit,
+                "solver_seed": job["solver_seed"],
+                "relative_duality_gap_tolerance": config.accuracy.relative_duality_gap,
+                "feasibility_tolerance": config.accuracy.feasibility,
+                "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+                "native_tolerances_calibrated": (
+                    bool(config.elastic_net.vanilla_execution.native_tolerances_calibrated)
+                ),
+            }
+            | (record_metadata or {})
+        )
         return record_outcome(
             suite=config.suite,
             problem_id=spec.problem_id(bounded=False),
-            run_key="vanilla_elastic_net",
+            run_key=record_run_key,
             problem=problem_fields,
             solver=solver,
             backend=backend,
@@ -373,6 +385,8 @@ def run_bounded_elastic_net_job(
     max_iterations: int,
     batch_size: int,
     output_dir: Path,
+    record_run_key: str = "bounded_elastic_net",
+    record_metadata: dict[str, Any] | None = None,
 ) -> list[TrialRecord]:
     """Execute one bounded elastic-net manifest job through an isolated worker."""
     _validate_controls(native_tolerance, max_iterations, batch_size)
@@ -421,22 +435,26 @@ def run_bounded_elastic_net_job(
         phase: str,
         iteration_limit: int | None,
     ) -> TrialRecord:
-        metadata = outcome.get("solver_metadata", {}) | {
-            "execution_phase": phase,
-            "native_tolerance": native_tolerance,
-            "max_iterations": iteration_limit,
-            "solver_seed": job["solver_seed"],
-            "stationarity_tolerance": config.accuracy.stationarity,
-            "feasibility_tolerance": config.accuracy.feasibility,
-            "accuracy_thresholds_calibrated": config.accuracy.calibrated,
-            "native_tolerances_calibrated": (
-                config.elastic_net.bounded_execution.native_tolerances_calibrated
-            ),
-        }
+        metadata = (
+            outcome.get("solver_metadata", {})
+            | {
+                "execution_phase": phase,
+                "native_tolerance": native_tolerance,
+                "max_iterations": iteration_limit,
+                "solver_seed": job["solver_seed"],
+                "stationarity_tolerance": config.accuracy.stationarity,
+                "feasibility_tolerance": config.accuracy.feasibility,
+                "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+                "native_tolerances_calibrated": (
+                    bool(config.elastic_net.bounded_execution.native_tolerances_calibrated)
+                ),
+            }
+            | (record_metadata or {})
+        )
         return record_outcome(
             suite=config.suite,
             problem_id=spec.problem_id(bounded=True),
-            run_key="bounded_elastic_net",
+            run_key=record_run_key,
             problem=problem_fields,
             solver=solver,
             backend=backend,

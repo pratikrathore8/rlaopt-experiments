@@ -53,6 +53,8 @@ def run_manifest_job(
             runner = run_bounded_elastic_net_job
         else:
             raise ValueError(f"unsupported synthetic ERM problem type: {problem_type}")
+        if controls.native_tolerances is None:
+            raise ValueError("manifest execution requires frozen native tolerances")
         native_tolerance = controls.native_tolerances.for_solver(
             job.get("backend"),
             job.get("solver"),
@@ -64,5 +66,7 @@ def run_manifest_job(
             max_iterations=controls.max_iterations,
             batch_size=controls.batch_size,
             output_dir=output_dir,
+            record_run_key=problem_type,
+            record_metadata={},
         )
     raise ValueError(f"manifest execution is not implemented for suite: {suite}")

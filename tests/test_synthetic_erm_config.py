@@ -11,11 +11,13 @@ from rlaopt_experiments.suites.synthetic_erm.config import (
     ElasticNetExperiment,
     ErmShape,
     SyntheticErmConfig,
+    load_synthetic_erm_calibration_config,
     load_synthetic_erm_config,
 )
 
 
 CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_smoke.toml"
+CALIBRATION_CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_calibration.toml"
 
 
 def test_load_synthetic_erm_smoke_config() -> None:
@@ -51,6 +53,35 @@ def test_load_synthetic_erm_smoke_config() -> None:
         == 1e-6
     )
     assert not config.elastic_net.bounded_execution.native_tolerances_calibrated
+
+
+def test_load_synthetic_erm_calibration_config_without_frozen_tolerances() -> None:
+    calibration = load_synthetic_erm_calibration_config(CALIBRATION_CONFIG)
+
+    assert calibration.candidates == (1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
+    assert calibration.experiment.accuracy.stationarity == 1e-6
+    assert calibration.experiment.accuracy.feasibility == 1e-6
+    assert calibration.experiment.accuracy.relative_duality_gap == 1e-6
+    for execution in (
+        calibration.experiment.multinomial.execution,
+        calibration.experiment.elastic_net.vanilla_execution,
+        calibration.experiment.elastic_net.bounded_execution,
+    ):
+        assert execution.native_tolerances is None
+        assert execution.native_tolerances_calibrated is None
+
+
+def test_calibration_config_rejects_frozen_native_tolerances(tmp_path: Path) -> None:
+    contents = CALIBRATION_CONFIG.read_text().replace(
+        "[multinomial.execution]\nmax_iterations = 10000\nbatch_size = 256",
+        "[multinomial.execution]\nmax_iterations = 10000\nbatch_size = 256\n"
+        "native_tolerances_calibrated = false",
+    )
+    path = tmp_path / "invalid-calibration.toml"
+    path.write_text(contents)
+
+    with pytest.raises(ValueError, match="unknown fields.*native_tolerances_calibrated"):
+        load_synthetic_erm_calibration_config(path)
 
 
 def test_elastic_net_variants_share_one_data_grid() -> None:
