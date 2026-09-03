@@ -15,6 +15,7 @@ from rlaopt_experiments.suites.synthetic_erm.manifest import (
 
 
 CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_smoke.toml"
+PILOT_CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_pilot.toml"
 
 
 def test_synthetic_erm_manifest_is_complete_deterministic_and_self_contained() -> None:
@@ -40,6 +41,45 @@ def test_synthetic_erm_manifest_is_complete_deterministic_and_self_contained() -
     assert all(job["suite"] == "synthetic_erm" for job in first)
     assert all(job["problem_spec"]["feature_seed"] >= 0 for job in first)
     assert all(job["problem_spec"]["target_seed"] >= 0 for job in first)
+
+
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_synthetic_erm_pilot_manifest_has_exact_compact_grid(backend: str) -> None:
+    config = load_synthetic_erm_config(PILOT_CONFIG)
+    smoke_config = load_synthetic_erm_config(CONFIG)
+    jobs = build_manifest(PILOT_CONFIG, backend)
+    multinomial_jobs = [job for job in jobs if job["problem_type"] == "multinomial"]
+    vanilla_jobs = [job for job in jobs if job["problem_type"] == "vanilla_elastic_net"]
+    bounded_jobs = [job for job in jobs if job["problem_type"] == "bounded_elastic_net"]
+
+    assert config.seeds == (200,)
+    assert config.repetitions == 1
+    assert config.warmups == 1
+    assert config.accuracy == smoke_config.accuracy
+    assert config.multinomial.execution == smoke_config.multinomial.execution
+    assert config.elastic_net.vanilla_execution == smoke_config.elastic_net.vanilla_execution
+    assert config.elastic_net.bounded_execution == smoke_config.elastic_net.bounded_execution
+    assert config.elastic_net.regularization_fractions == (0.01,)
+    assert {(shape.n, shape.p) for shape in config.multinomial.shapes} == {
+        (16384, 2048),
+        (65536, 2048),
+        (262144, 2048),
+        (65536, 8192),
+    }
+    assert {(shape.n, shape.p) for shape in config.elastic_net.shapes} == {
+        (16384, 2048),
+        (65536, 2048),
+        (262144, 2048),
+        (65536, 8192),
+        (8192, 16384),
+    }
+    assert len(jobs) == 42
+    assert len(multinomial_jobs) == 12
+    assert len(vanilla_jobs) == 15
+    assert len(bounded_jobs) == 15
+    assert len({job["problem_id"] for job in jobs}) == 14
+    assert {job["seed"] for job in jobs} == {200}
+    assert {job["backend"] for job in jobs} == {backend}
 
 
 def test_vanilla_manifest_preserves_data_across_regularization_fractions() -> None:
