@@ -11,7 +11,20 @@ from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, Multinomia
 from rlaopt_experiments.records import TrialRecord
 from rlaopt_experiments.runner import record_outcome
 from rlaopt_experiments.seeds import derive_seed
-from rlaopt_experiments.suites.synthetic_erm.config import SyntheticErmConfig
+from rlaopt_experiments.suites.synthetic_erm.config import (
+    SolverExecution,
+    SyntheticErmConfig,
+)
+
+
+def _native_tolerances_calibrated(
+    execution: SolverExecution,
+    backend: str,
+) -> bool:
+    """Return false for calibration configs, which have no frozen tolerances."""
+    if execution.native_tolerances_calibrated is None:
+        return False
+    return execution.tolerances_calibrated_for(backend)
 
 
 def _validate_controls(
@@ -195,7 +208,7 @@ def run_multinomial_job(
                 "feasibility_tolerance": config.accuracy.feasibility,
                 "accuracy_thresholds_calibrated": config.accuracy.calibrated,
                 "native_tolerances_calibrated": (
-                    config.multinomial.execution.tolerances_calibrated_for(backend)
+                    _native_tolerances_calibrated(config.multinomial.execution, backend)
                 ),
             }
             | (record_metadata or {})
@@ -343,7 +356,7 @@ def run_vanilla_elastic_net_job(
                 "feasibility_tolerance": config.accuracy.feasibility,
                 "accuracy_thresholds_calibrated": config.accuracy.calibrated,
                 "native_tolerances_calibrated": (
-                    config.elastic_net.vanilla_execution.tolerances_calibrated_for(backend)
+                    _native_tolerances_calibrated(config.elastic_net.vanilla_execution, backend)
                 ),
             }
             | (record_metadata or {})
@@ -446,7 +459,7 @@ def run_bounded_elastic_net_job(
                 "feasibility_tolerance": config.accuracy.feasibility,
                 "accuracy_thresholds_calibrated": config.accuracy.calibrated,
                 "native_tolerances_calibrated": (
-                    config.elastic_net.bounded_execution.tolerances_calibrated_for(backend)
+                    _native_tolerances_calibrated(config.elastic_net.bounded_execution, backend)
                 ),
             }
             | (record_metadata or {})

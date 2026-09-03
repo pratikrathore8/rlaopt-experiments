@@ -10,15 +10,22 @@ import pytest
 from rlaopt_experiments.manifests import build_manifest
 from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, MultinomialSpec
 from rlaopt_experiments.records import read_record
-from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
+from rlaopt_experiments.suites.synthetic_erm.config import (
+    load_synthetic_erm_calibration_config,
+    load_synthetic_erm_config,
+)
 from rlaopt_experiments.suites.synthetic_erm.execution import (
     run_bounded_elastic_net_job,
     run_multinomial_job,
     run_vanilla_elastic_net_job,
 )
+from rlaopt_experiments.suites.synthetic_erm.manifest import (
+    build_synthetic_erm_manifest,
+)
 
 
 CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_smoke.toml"
+CALIBRATION_CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_calibration.toml"
 
 
 class FakeWorker:
@@ -85,6 +92,53 @@ class FakeWorker:
 def reset_fake_workers() -> None:
     FakeWorker.instances.clear()
     FakeWorker.external_success = True
+
+
+@pytest.mark.parametrize(
+    ("problem_type", "solver", "runner"),
+    [
+        ("multinomial", "jaxopt_lbfgsb", run_multinomial_job),
+        (
+            "vanilla_elastic_net",
+            "sklearn_coordinate_descent",
+            run_vanilla_elastic_net_job,
+        ),
+        ("bounded_elastic_net", "clarabel_qdldl", run_bounded_elastic_net_job),
+    ],
+)
+def test_calibration_execution_records_unfrozen_native_tolerances(
+    problem_type: str,
+    solver: str,
+    runner: Any,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = load_synthetic_erm_calibration_config(CALIBRATION_CONFIG).experiment
+    job = next(
+        item
+        for item in build_synthetic_erm_manifest(config, "cpu")
+        if item["problem_type"] == problem_type and item["solver"] == solver
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.suites.synthetic_erm.execution.ProblemWorker",
+        FakeWorker,
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.runner.wandb_run",
+        lambda *_args, **_kwargs: nullcontext(None),
+    )
+
+    records = runner(
+        job,
+        config,
+        native_tolerance=1e-6,
+        max_iterations=100,
+        batch_size=64,
+        output_dir=tmp_path / problem_type,
+    )
+
+    assert len(records) == 1
+    assert records[0].metadata["native_tolerances_calibrated"] is False
 
 
 def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
