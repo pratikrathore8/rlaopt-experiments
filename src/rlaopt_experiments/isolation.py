@@ -17,6 +17,15 @@ def _worker(
 ) -> None:
     """Generate one problem, retain it, and execute commands from the parent."""
     try:
+        runtime_name = specification.get("pre_torch_runtime")
+        if runtime_name not in {None, "clarabel"}:
+            raise ValueError(f"unknown pre-PyTorch runtime: {runtime_name}")
+        clarabel_runtime = None
+        if runtime_name == "clarabel":
+            from rlaopt_experiments.clarabel_bridge import initialize_clarabel_runtime
+
+            clarabel_runtime = initialize_clarabel_runtime(backend)
+
         import torch
 
         from rlaopt_experiments.suites import get_suite
@@ -34,6 +43,7 @@ def _worker(
                 "kind": "ready",
                 "worker_metadata": {
                     "torch_version": torch.__version__,
+                    "pre_torch_runtime": runtime_name,
                     **suite.problem_metadata(problem),
                     "torch_num_threads": torch.get_num_threads(),
                     "cuda_version": torch.version.cuda,
@@ -60,6 +70,8 @@ def _worker(
                 torch.cuda.reset_peak_memory_stats()
             started = time.perf_counter()
             try:
+                if clarabel_runtime is not None:
+                    command = command | {"clarabel_runtime": clarabel_runtime}
                 result = suite.execute(problem, command, backend)
                 connection.send(
                     {

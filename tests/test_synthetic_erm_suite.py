@@ -4,6 +4,9 @@ import pytest
 import torch
 
 from rlaopt_experiments.suites import get_suite
+from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import (
+    BoundedElasticNetSolverResult,
+)
 
 
 def _multinomial_specification(n: int = 64, p: int = 8) -> dict:
@@ -36,6 +39,11 @@ def _vanilla_elastic_net_specification() -> dict:
             "regularization_fraction": 0.1,
         },
     }
+
+
+def _bounded_elastic_net_specification() -> dict:
+    specification = _vanilla_elastic_net_specification()
+    return specification | {"problem_type": "bounded_elastic_net"}
 
 
 def test_multinomial_suite_executes_and_adjudicates_jaxopt_lbfgsb() -> None:
@@ -94,6 +102,49 @@ def test_vanilla_elastic_net_suite_executes_and_uses_external_gap() -> None:
     assert outcome["accuracy"]["feasibility"] == 0.0
     assert outcome["accuracy"]["stationarity"] <= 1e-6
     assert outcome["diagnostics"]["bounded"] is False
+
+
+def test_bounded_elastic_net_suite_executes_and_uses_external_kkt(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    suite = get_suite("synthetic_erm")
+    problem = suite.generate(
+        _bounded_elastic_net_specification(),
+        device=torch.device("cpu"),
+    )
+    result = BoundedElasticNetSolverResult(
+        weights=torch.zeros(problem.spec.p, dtype=torch.float64),
+        intercept=problem.y.mean(),
+        runtime_seconds=0.25,
+        iterations=4,
+        native_status="converged",
+        native_error=None,
+        metadata={"linear_solver": "fake"},
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.suites.synthetic_erm.suite.solve_scs",
+        lambda *_args, **_kwargs: result,
+    )
+
+    outcome = suite.execute(
+        problem,
+        {
+            "solver": "scs",
+            "native_tolerance": 1e-6,
+            "max_iters": 100,
+            "stationarity_tolerance": 1e6,
+            "feasibility_tolerance": 1e-8,
+        },
+        backend="cpu",
+    )
+
+    assert outcome["native_success"]
+    assert outcome["runtime_eligible"]
+    assert outcome["accuracy"]["external_success"]
+    assert outcome["accuracy"]["feasibility"] == 0.0
+    assert outcome["accuracy"]["stationarity"] <= 1e6
+    assert outcome["diagnostics"]["bounded"] is True
+    assert outcome["solver_metadata"]["native_error"] is None
 
 
 def test_multinomial_suite_rejects_unknown_solver() -> None:

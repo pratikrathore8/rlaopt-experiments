@@ -12,6 +12,7 @@ from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, Multinomia
 from rlaopt_experiments.records import read_record
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
 from rlaopt_experiments.suites.synthetic_erm.execution import (
+    run_bounded_elastic_net_job,
     run_multinomial_job,
     run_vanilla_elastic_net_job,
 )
@@ -300,6 +301,69 @@ def test_vanilla_elastic_net_job_rejects_tampered_fraction(tmp_path: Path) -> No
 
     with pytest.raises(ValueError, match="regularization fraction"):
         run_vanilla_elastic_net_job(
+            tampered,
+            config,
+            native_tolerance=1e-6,
+            max_iterations=100,
+            batch_size=64,
+            output_dir=tmp_path,
+        )
+
+
+def test_bounded_elastic_net_job_runs_and_requests_julia_first(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = replace(load_synthetic_erm_config(CONFIG), warmups=1, repetitions=2)
+    job = next(
+        item
+        for item in build_manifest(CONFIG, "cpu")
+        if item["problem_type"] == "bounded_elastic_net" and item["solver"] == "clarabel_qdldl"
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.suites.synthetic_erm.execution.ProblemWorker",
+        FakeWorker,
+    )
+    monkeypatch.setattr(
+        "rlaopt_experiments.runner.wandb_run",
+        lambda *_args, **_kwargs: nullcontext(None),
+    )
+
+    records = run_bounded_elastic_net_job(
+        job,
+        config,
+        native_tolerance=1e-7,
+        max_iterations=500,
+        batch_size=256,
+        output_dir=tmp_path,
+    )
+
+    worker = FakeWorker.instances[0]
+    assert worker.closed
+    assert worker.specification["problem_type"] == "bounded_elastic_net"
+    assert worker.specification["pre_torch_runtime"] == "clarabel"
+    assert [command["max_iters"] for command in worker.commands] == [10, 500, 500]
+    assert len(records) == 2
+    assert records[0].problem["problem_type"] == "bounded_elastic_net"
+    assert records[0].metrics["stationarity"] == 1e-8
+    assert records[0].metrics["feasibility"] == 0.0
+    assert records[0].metadata["stationarity_tolerance"] == 1e-6
+    assert records[0].metadata["feasibility_tolerance"] == 1e-8
+    assert not records[0].metadata["native_tolerances_calibrated"]
+    assert "conic construction and format conversion" in records[0].metadata["timing_scope"]
+
+
+def test_bounded_elastic_net_job_rejects_vanilla_problem_id(tmp_path: Path) -> None:
+    config = load_synthetic_erm_config(CONFIG)
+    job = next(
+        item
+        for item in build_manifest(CONFIG, "cpu")
+        if item["problem_type"] == "bounded_elastic_net"
+    )
+    tampered = job | {"problem_id": ElasticNetSpec(**job["problem_spec"]).problem_id(bounded=False)}
+
+    with pytest.raises(ValueError, match="problem_id"):
+        run_bounded_elastic_net_job(
             tampered,
             config,
             native_tolerance=1e-6,

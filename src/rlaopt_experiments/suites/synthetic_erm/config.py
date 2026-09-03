@@ -148,6 +148,7 @@ class ElasticNetExperiment:
     vanilla_solvers: BackendSolvers
     bounded_solvers: BackendSolvers
     vanilla_execution: SolverExecution
+    bounded_execution: SolverExecution
 
     def __post_init__(self) -> None:
         _unique_nonempty(self.shapes, "elastic-net shapes")
@@ -161,14 +162,19 @@ class ElasticNetExperiment:
         for fraction in self.regularization_fractions:
             _positive(fraction, "regularization fraction")
         for backend in ("cpu", "cuda"):
-            configured = set(getattr(self.vanilla_solvers, backend))
-            tolerance_names = {
-                name for name, _ in getattr(self.vanilla_execution.native_tolerances, backend)
-            }
-            if tolerance_names != configured:
-                raise ValueError(
-                    f"{backend} native tolerances must exactly match vanilla elastic-net solvers"
-                )
+            for variant, solvers, execution in (
+                ("vanilla", self.vanilla_solvers, self.vanilla_execution),
+                ("bounded", self.bounded_solvers, self.bounded_execution),
+            ):
+                configured = set(getattr(solvers, backend))
+                tolerance_names = {
+                    name for name, _ in getattr(execution.native_tolerances, backend)
+                }
+                if tolerance_names != configured:
+                    raise ValueError(
+                        f"{backend} native tolerances must exactly match "
+                        f"{variant} elastic-net solvers"
+                    )
 
 
 @dataclass(frozen=True)
@@ -289,15 +295,20 @@ def load_synthetic_erm_config(path: Path) -> SyntheticErmConfig:
             "vanilla_solvers",
             "bounded_solvers",
             "vanilla_execution",
+            "bounded_execution",
         },
         "elastic_net",
     )
     vanilla_execution = _solver_execution(
         elastic_net_data.pop("vanilla_execution"), "vanilla elastic-net execution"
     )
+    bounded_execution = _solver_execution(
+        elastic_net_data.pop("bounded_execution"), "bounded elastic-net execution"
+    )
     elastic_net = ElasticNetExperiment(
         shapes=_shapes(elastic_net_data.pop("shapes")),
         vanilla_execution=vanilla_execution,
+        bounded_execution=bounded_execution,
         regularization_fractions=tuple(elastic_net_data.pop("regularization_fractions")),
         vanilla_solvers=_backend_solvers(elastic_net_data.pop("vanilla_solvers")),
         bounded_solvers=_backend_solvers(elastic_net_data.pop("bounded_solvers")),

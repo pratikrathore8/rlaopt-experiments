@@ -87,11 +87,50 @@ def build_vanilla_elastic_net_manifest(
     return jobs
 
 
+def build_bounded_elastic_net_manifest(
+    config: SyntheticErmConfig,
+    backend: str,
+) -> list[dict[str, Any]]:
+    """Expand the configured bounded elastic-net grid into self-contained jobs."""
+    _require_backend(backend)
+    solvers = getattr(config.elastic_net.bounded_solvers, backend)
+    jobs: list[dict[str, Any]] = []
+    for shape in config.elastic_net.shapes:
+        for seed in config.seeds:
+            for fraction in config.elastic_net.regularization_fractions:
+                problem_spec = ElasticNetSpec(
+                    n=shape.n,
+                    p=shape.p,
+                    feature_seed=derive_seed(seed, "elastic_net_features"),
+                    target_seed=derive_seed(seed, "elastic_net_targets"),
+                    teacher_density=config.elastic_net.teacher_density,
+                    noise_ratio=config.elastic_net.noise_ratio,
+                    teacher_intercept=config.elastic_net.teacher_intercept,
+                    regularization_fraction=fraction,
+                )
+                for solver in solvers:
+                    jobs.append(
+                        {
+                            "suite": config.suite,
+                            "problem_type": "bounded_elastic_net",
+                            "problem_id": problem_spec.problem_id(bounded=True),
+                            "problem_spec": asdict(problem_spec),
+                            "seed": seed,
+                            "solver_seed": derive_seed(seed, "bounded_elastic_net_solver"),
+                            "solver": solver,
+                            "backend": backend,
+                        }
+                    )
+    return jobs
+
+
 def build_synthetic_erm_manifest(
     config: SyntheticErmConfig,
     backend: str,
 ) -> list[dict[str, Any]]:
-    """Return all currently executable synthetic-ERM jobs."""
-    return build_multinomial_manifest(config, backend) + build_vanilla_elastic_net_manifest(
-        config, backend
+    """Return every executable synthetic-ERM job."""
+    return (
+        build_multinomial_manifest(config, backend)
+        + build_vanilla_elastic_net_manifest(config, backend)
+        + build_bounded_elastic_net_manifest(config, backend)
     )

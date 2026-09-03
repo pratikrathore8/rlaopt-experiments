@@ -9,6 +9,7 @@ from typing import Any
 from rlaopt_experiments.records import TrialRecord
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
 from rlaopt_experiments.suites.synthetic_erm.execution import (
+    run_bounded_elastic_net_job,
     run_multinomial_job,
     run_vanilla_elastic_net_job,
 )
@@ -47,6 +48,9 @@ def run_manifest_job(
         elif problem_type == "vanilla_elastic_net":
             controls = config.elastic_net.vanilla_execution
             runner = run_vanilla_elastic_net_job
+        elif problem_type == "bounded_elastic_net":
+            controls = config.elastic_net.bounded_execution
+            runner = run_bounded_elastic_net_job
         else:
             raise ValueError(f"unsupported synthetic ERM problem type: {problem_type}")
         native_tolerance = controls.native_tolerances.for_solver(

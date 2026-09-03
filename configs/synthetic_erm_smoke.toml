@@ -75,3 +75,18 @@ jaxopt_proximal_gradient = 1.0e-6
 [elastic_net.bounded_solvers]
 cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
 cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]
+
+[elastic_net.bounded_execution]
+max_iterations = 10000
+batch_size = 256
+native_tolerances_calibrated = false
+
+[elastic_net.bounded_execution.native_tolerances.cpu]
+rlaopt_admm = 1.0e-6
+scs = 1.0e-6
+clarabel_qdldl = 1.0e-6
+
+[elastic_net.bounded_execution.native_tolerances.cuda]
+rlaopt_admm = 1.0e-6
+scs_cuda = 1.0e-6
+cuclarabel_cudss = 1.0e-6

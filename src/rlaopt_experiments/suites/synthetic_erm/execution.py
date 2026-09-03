@@ -224,18 +224,23 @@ def run_multinomial_job(
     )
 
 
-def _validate_vanilla_elastic_net_job(
+def _validate_elastic_net_job(
     job: dict[str, Any],
     config: SyntheticErmConfig,
+    *,
+    bounded: bool,
 ) -> ElasticNetSpec:
+    problem_type = "bounded_elastic_net" if bounded else "vanilla_elastic_net"
+    variant = "bounded" if bounded else "vanilla"
     if job.get("suite") != config.suite:
         raise ValueError("manifest job suite does not match the configuration")
-    if job.get("problem_type") != "vanilla_elastic_net":
-        raise ValueError("execution requires a vanilla elastic-net manifest job")
+    if job.get("problem_type") != problem_type:
+        raise ValueError(f"execution requires a {variant} elastic-net manifest job")
     backend = job.get("backend")
     if backend not in {"cpu", "cuda"}:
         raise ValueError("manifest job backend must be cpu or cuda")
-    if job.get("solver") not in getattr(config.elastic_net.vanilla_solvers, backend):
+    solvers = config.elastic_net.bounded_solvers if bounded else config.elastic_net.vanilla_solvers
+    if job.get("solver") not in getattr(solvers, backend):
         raise ValueError("manifest solver is not configured for its backend")
     spec = ElasticNetSpec(**job["problem_spec"])
     seed = job.get("seed")
@@ -257,9 +262,10 @@ def _validate_vanilla_elastic_net_job(
     )
     if spec != expected_spec:
         raise ValueError("manifest problem_spec does not match the configuration")
-    if job.get("problem_id") != spec.problem_id(bounded=False):
+    if job.get("problem_id") != spec.problem_id(bounded=bounded):
         raise ValueError("manifest problem_id does not match problem_spec")
-    if job.get("solver_seed") != derive_seed(seed, "vanilla_elastic_net_solver"):
+    solver_seed_name = "bounded_elastic_net_solver" if bounded else "vanilla_elastic_net_solver"
+    if job.get("solver_seed") != derive_seed(seed, solver_seed_name):
         raise ValueError("manifest solver_seed does not match its master seed")
     return spec
 
@@ -275,7 +281,7 @@ def run_vanilla_elastic_net_job(
 ) -> list[TrialRecord]:
     """Execute one vanilla elastic-net manifest job through an isolated worker."""
     _validate_controls(native_tolerance, max_iterations, batch_size)
-    spec = _validate_vanilla_elastic_net_job(job, config)
+    spec = _validate_elastic_net_job(job, config, bounded=False)
     backend = job["backend"]
     solver = job["solver"]
     specification = {
@@ -346,6 +352,104 @@ def run_vanilla_elastic_net_job(
             timing_scope=(
                 "device-resident solver invocation; excludes problem generation, "
                 "worker startup, format conversion, and JIT compilation"
+            ),
+        )
+
+    return _run_repetitions(
+        worker=worker,
+        ready=ready,
+        config=config,
+        command=command,
+        max_iterations=max_iterations,
+        persist=persist,
+    )
+
+
+def run_bounded_elastic_net_job(
+    job: dict[str, Any],
+    config: SyntheticErmConfig,
+    *,
+    native_tolerance: float,
+    max_iterations: int,
+    batch_size: int,
+    output_dir: Path,
+) -> list[TrialRecord]:
+    """Execute one bounded elastic-net manifest job through an isolated worker."""
+    _validate_controls(native_tolerance, max_iterations, batch_size)
+    spec = _validate_elastic_net_job(job, config, bounded=True)
+    backend = job["backend"]
+    solver = job["solver"]
+    clarabel_solvers = {"clarabel_qdldl", "cuclarabel_cudss"}
+    specification = {
+        "problem_type": "bounded_elastic_net",
+        "problem_spec": job["problem_spec"],
+        "pre_torch_runtime": "clarabel" if solver in clarabel_solvers else None,
+    }
+    command = {
+        "solver": solver,
+        "native_tolerance": native_tolerance,
+        "max_iters": max_iterations,
+        "batch_size": batch_size,
+        "solver_seed": job["solver_seed"],
+        "stationarity_tolerance": config.accuracy.stationarity,
+        "feasibility_tolerance": config.accuracy.feasibility,
+    }
+    problem_fields = {
+        "problem_type": "bounded_elastic_net",
+        "n": spec.n,
+        "p": spec.p,
+        "teacher_density": spec.teacher_density,
+        "noise_ratio": spec.noise_ratio,
+        "teacher_intercept": spec.teacher_intercept,
+        "regularization_fraction": spec.regularization_fraction,
+        "feature_seed": spec.feature_seed,
+        "target_seed": spec.target_seed,
+    }
+
+    worker = ProblemWorker(specification, backend, config.suite)
+    try:
+        ready = worker.wait_until_ready(config.startup_timeout_seconds)
+    except BaseException:
+        worker.close()
+        raise
+
+    def persist(
+        outcome: dict[str, Any],
+        repetition: int,
+        runtimes: list[float],
+        *,
+        phase: str,
+        iteration_limit: int | None,
+    ) -> TrialRecord:
+        metadata = outcome.get("solver_metadata", {}) | {
+            "execution_phase": phase,
+            "native_tolerance": native_tolerance,
+            "max_iterations": iteration_limit,
+            "solver_seed": job["solver_seed"],
+            "stationarity_tolerance": config.accuracy.stationarity,
+            "feasibility_tolerance": config.accuracy.feasibility,
+            "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+            "native_tolerances_calibrated": (
+                config.elastic_net.bounded_execution.native_tolerances_calibrated
+            ),
+        }
+        return record_outcome(
+            suite=config.suite,
+            problem_id=spec.problem_id(bounded=True),
+            run_key="bounded_elastic_net",
+            problem=problem_fields,
+            solver=solver,
+            backend=backend,
+            seed=job["seed"],
+            repetition=repetition,
+            outcome=outcome | {"solver_metadata": metadata},
+            runtimes=runtimes,
+            output_dir=output_dir,
+            worker_metadata=ready.get("worker_metadata", {}),
+            timing_scope=(
+                "native solver invocation; excludes problem generation, worker startup, "
+                "benchmark-side conic construction and format conversion, and JIT compilation; "
+                "includes solver-internal setup and transfers"
             ),
         )
 

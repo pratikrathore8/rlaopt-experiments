@@ -6,11 +6,6 @@ import argparse
 import json
 from pathlib import Path
 
-from rlaopt_experiments.config import load_experiment, load_tolerances
-from rlaopt_experiments.execution import read_manifest_job, run_manifest_job
-from rlaopt_experiments.manifests import build_manifest
-from rlaopt_experiments.runner import run_job
-
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="rlaopt-bench")
@@ -52,6 +47,8 @@ def _parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = _parser().parse_args()
     if args.command == "manifest":
+        from rlaopt_experiments.manifests import build_manifest
+
         jobs = build_manifest(args.config, args.backend)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text("\n".join(json.dumps(job, sort_keys=True) for job in jobs) + "\n")
@@ -59,12 +56,19 @@ def main() -> None:
         return
 
     if args.command == "run-manifest-job":
+        from rlaopt_experiments.execution import read_manifest_job, run_manifest_job
+
         job = read_manifest_job(args.manifest, args.index)
         run_manifest_job(job, args.config, args.output)
         return
 
+    from rlaopt_experiments.config import load_experiment
+
     config = load_experiment(args.config) if hasattr(args, "config") else None
     if args.command == "run-job":
+        from rlaopt_experiments.config import load_tolerances
+        from rlaopt_experiments.runner import run_job
+
         tolerance = load_tolerances(args.tolerances, args.backend)[args.solver]
         run_job(
             n=args.n,

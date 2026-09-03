@@ -43,6 +43,14 @@ def test_load_synthetic_erm_smoke_config() -> None:
         == 1e-6
     )
     assert "cuclarabel_cudss" in config.elastic_net.bounded_solvers.cuda
+    assert config.elastic_net.bounded_execution.max_iterations == 10_000
+    assert (
+        config.elastic_net.bounded_execution.native_tolerances.for_solver(
+            "cuda", "cuclarabel_cudss"
+        )
+        == 1e-6
+    )
+    assert not config.elastic_net.bounded_execution.native_tolerances_calibrated
 
 
 def test_elastic_net_variants_share_one_data_grid() -> None:
@@ -132,4 +140,5 @@ def test_shapes_must_be_nonempty() -> None:
             vanilla_solvers=config.elastic_net.vanilla_solvers,
             bounded_solvers=config.elastic_net.bounded_solvers,
             vanilla_execution=config.elastic_net.vanilla_execution,
+            bounded_execution=config.elastic_net.bounded_execution,
         )
