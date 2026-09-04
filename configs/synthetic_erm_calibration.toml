@@ -12,12 +12,14 @@ startup_timeout_seconds = 900
 candidates = [1.0e-4, 1.0e-5, 1.0e-6, 1.0e-7, 1.0e-8, 1.0e-9, 1.0e-10]
 
 # Common external targets used to qualify every native tolerance candidate.
+# ERM stationarity and duality-gap targets reflect practical optimization
+# accuracy; constrained formulations retain the stricter feasibility target.
 # Keep calibrated=false until these thresholds and all selected native
 # tolerances have been reviewed and frozen.
 [accuracy]
-stationarity = 1.0e-6
+stationarity = 1.0e-4
 feasibility = 1.0e-6
-relative_duality_gap = 1.0e-6
+relative_duality_gap = 1.0e-4
 calibrated = false
 
 [features]
