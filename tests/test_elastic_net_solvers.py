@@ -11,6 +11,7 @@ from rlaopt_experiments.problems.synthetic_erm import (
 )
 from rlaopt_experiments.suites.synthetic_erm.elastic_net_solvers import (
     _build_rlaopt_objective,
+    _jax_problem,
     solve_cuml_coordinate_descent,
     solve_jaxopt_proximal_gradient,
     solve_rlaopt_sapphire,
@@ -34,6 +35,20 @@ def problem():
         bounded=False,
         device="cpu",
     )
+
+
+def test_jaxopt_elastic_net_data_are_not_compilation_constants(problem) -> None:
+    import jax
+
+    objective, initial, features, targets, _ = _jax_problem(problem)
+    traced = jax.make_jaxpr(objective)(
+        initial,
+        features,
+        targets,
+        problem.lambda_l2,
+    )
+
+    assert not traced.consts
 
 
 def test_sklearn_and_jaxopt_match_the_canonical_problem(problem) -> None:
@@ -72,6 +87,9 @@ def test_sklearn_and_jaxopt_match_the_canonical_problem(problem) -> None:
     assert sklearn_result.metadata["alpha"] == pytest.approx(problem.lambda_l1 + problem.lambda_l2)
     assert sklearn_result.metadata["l1_ratio"] == pytest.approx(0.5)
     assert jaxopt_result.metadata["acceleration"] is True
+    assert jaxopt_result.metadata["data_arguments"] == "dynamic"
+    assert jaxopt_result.metadata["first_jit_compilation_included"] is True
+    assert jaxopt_result.metadata["jit_enabled"] is True
     assert jaxopt_result.metadata["line_search"] == "backtracking"
 
 

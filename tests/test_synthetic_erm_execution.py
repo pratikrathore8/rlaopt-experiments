@@ -189,7 +189,7 @@ def test_multinomial_job_runs_warmup_repetitions_and_writes_records(
     assert records[0].metadata["feasibility_tolerance"] == 1e-6
     assert records[0].metadata["accuracy_thresholds_calibrated"]
     assert records[0].metadata["native_tolerances_calibrated"]
-    assert "JIT compilation" in records[0].metadata["timing_scope"]
+    assert "includes solver-side JIT compilation" in records[0].metadata["timing_scope"]
     paths = sorted((tmp_path / "records").glob("*.json"))
     assert len(paths) == 2
     assert read_record(paths[0])["problem_type"] == "multinomial"
@@ -405,6 +405,7 @@ def test_bounded_elastic_net_job_runs_and_requests_julia_first(
     assert records[0].metadata["feasibility_tolerance"] == 1e-6
     assert records[0].metadata["native_tolerances_calibrated"]
     assert "conic construction and format conversion" in records[0].metadata["timing_scope"]
+    assert "includes solver-side JIT compilation" in records[0].metadata["timing_scope"]
 
 
 def test_bounded_elastic_net_job_rejects_vanilla_problem_id(tmp_path: Path) -> None:

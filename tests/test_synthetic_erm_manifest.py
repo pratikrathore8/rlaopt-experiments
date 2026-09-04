@@ -54,7 +54,7 @@ def test_synthetic_erm_pilot_manifest_has_exact_compact_grid(backend: str) -> No
 
     assert config.seeds == (200,)
     assert config.repetitions == 1
-    assert config.warmups == 1
+    assert config.warmups == 0
     assert config.accuracy == smoke_config.accuracy
     assert config.multinomial.execution == smoke_config.multinomial.execution
     assert config.elastic_net.vanilla_execution == smoke_config.elastic_net.vanilla_execution

@@ -229,7 +229,8 @@ def run_multinomial_job(
             worker_metadata=ready.get("worker_metadata", {}),
             timing_scope=(
                 "device-resident solver invocation; excludes problem generation, "
-                "worker startup, format conversion, and JIT compilation"
+                "worker startup, and format conversion; includes solver-side "
+                "JIT compilation when required"
             ),
         )
 
@@ -376,7 +377,8 @@ def run_vanilla_elastic_net_job(
             worker_metadata=ready.get("worker_metadata", {}),
             timing_scope=(
                 "device-resident solver invocation; excludes problem generation, "
-                "worker startup, format conversion, and JIT compilation"
+                "worker startup, and format conversion; includes solver-side "
+                "JIT compilation when required"
             ),
         )
 
@@ -479,8 +481,8 @@ def run_bounded_elastic_net_job(
             worker_metadata=ready.get("worker_metadata", {}),
             timing_scope=(
                 "native solver invocation; excludes problem generation, worker startup, "
-                "benchmark-side conic construction and format conversion, and JIT compilation; "
-                "includes solver-internal setup and transfers"
+                "and benchmark-side conic construction and format conversion; includes "
+                "solver-side JIT compilation, internal setup, and transfers when required"
             ),
         )
 

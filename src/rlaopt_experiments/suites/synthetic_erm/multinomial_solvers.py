@@ -124,7 +124,7 @@ def solve_rlaopt_sapphire(
     )
 
 
-def _jax_problem(problem: MultinomialProblem) -> tuple[Any, Any, Any]:
+def _jax_problem(problem: MultinomialProblem) -> tuple[Any, Any, Any, Any, Any]:
     """Create device-sharing JAX views and the canonical objective."""
     os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
     import jax
@@ -143,9 +143,9 @@ def _jax_problem(problem: MultinomialProblem) -> tuple[Any, Any, Any]:
     features = jax_dlpack.from_dlpack(problem.X.detach())
     labels = jax_dlpack.from_dlpack(problem.y.detach())
 
-    def objective(coefficients: Any) -> Any:
-        logits = features @ coefficients
-        losses = jax.nn.logsumexp(logits, axis=1) - logits[jnp.arange(labels.shape[0]), labels]
+    def objective(coefficients: Any, data: Any, targets: Any) -> Any:
+        logits = data @ coefficients
+        losses = jax.nn.logsumexp(logits, axis=1) - logits[jnp.arange(targets.shape[0]), targets]
         return jnp.mean(losses)
 
     initial = jnp.zeros(
@@ -156,7 +156,7 @@ def _jax_problem(problem: MultinomialProblem) -> tuple[Any, Any, Any]:
         jnp.full_like(initial, problem.spec.box_lower),
         jnp.full_like(initial, problem.spec.box_upper),
     )
-    return objective, initial, bounds
+    return objective, initial, bounds, features, labels
 
 
 def _torch_from_jax(array: Any, device: torch.device) -> torch.Tensor:
@@ -177,7 +177,7 @@ def solve_jaxopt_projected_gradient(
 ) -> MultinomialSolverResult:
     """Solve with JAXopt default projected-gradient configuration."""
     _validate_inputs(problem, native_tolerance, max_iterations)
-    objective, initial, bounds = _jax_problem(problem)
+    objective, initial, bounds, features, labels = _jax_problem(problem)
     import jaxopt
 
     solver = jaxopt.ProjectedGradient(
@@ -186,10 +186,8 @@ def solve_jaxopt_projected_gradient(
         maxiter=max_iterations,
         tol=native_tolerance,
     )
-    # Compile outside the timed region; the measured run starts from zero again.
-    solver.run(initial, hyperparams_proj=bounds).params.block_until_ready()
     started = time.perf_counter()
-    step = solver.run(initial, hyperparams_proj=bounds)
+    step = solver.run(initial, bounds, features, labels)
     step.params.block_until_ready()
     runtime_seconds = time.perf_counter() - started
     iterations = int(step.state.iter_num)
@@ -203,7 +201,9 @@ def solve_jaxopt_projected_gradient(
         native_error=native_error,
         metadata={
             "acceleration": solver.acceleration,
-            "jit_warmup_excluded": True,
+            "data_arguments": "dynamic",
+            "first_jit_compilation_included": True,
+            "jit_enabled": solver.jit,
             "line_search": "backtracking",
         },
     )
@@ -217,7 +217,7 @@ def solve_jaxopt_lbfgsb(
 ) -> MultinomialSolverResult:
     """Solve with JAXopt L-BFGS-B and its zoom line search."""
     _validate_inputs(problem, native_tolerance, max_iterations)
-    objective, initial, bounds = _jax_problem(problem)
+    objective, initial, bounds, features, labels = _jax_problem(problem)
     import jaxopt
 
     solver = jaxopt.LBFGSB(
@@ -225,9 +225,8 @@ def solve_jaxopt_lbfgsb(
         maxiter=max_iterations,
         tol=native_tolerance,
     )
-    solver.run(initial, bounds=bounds).params.block_until_ready()
     started = time.perf_counter()
-    step = solver.run(initial, bounds=bounds)
+    step = solver.run(initial, bounds, features, labels)
     step.params.block_until_ready()
     runtime_seconds = time.perf_counter() - started
     iterations = int(step.state.iter_num)
@@ -247,7 +246,9 @@ def solve_jaxopt_lbfgsb(
         native_error=native_error,
         metadata={
             "history_size": solver.history_size,
-            "jit_warmup_excluded": True,
+            "data_arguments": "dynamic",
+            "first_jit_compilation_included": True,
+            "jit_enabled": solver.jit,
             "line_search": solver.linesearch,
             "line_search_failed": line_search_failed,
             "num_function_evaluations": int(step.state.num_fun_eval),

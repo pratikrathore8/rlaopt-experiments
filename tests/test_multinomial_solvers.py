@@ -8,6 +8,7 @@ from rlaopt_experiments.problems.synthetic_erm import (
     generate_multinomial_problem,
 )
 from rlaopt_experiments.suites.synthetic_erm.multinomial_solvers import (
+    _jax_problem,
     solve_jaxopt_lbfgsb,
     solve_jaxopt_projected_gradient,
     solve_rlaopt_sapphire,
@@ -31,6 +32,15 @@ def problem():
     )
 
 
+def test_jaxopt_multinomial_data_are_not_compilation_constants(problem) -> None:
+    import jax
+
+    objective, initial, _, features, labels = _jax_problem(problem)
+    traced = jax.make_jaxpr(objective)(initial, features, labels)
+
+    assert not traced.consts
+
+
 @pytest.mark.parametrize(
     "adapter",
     [solve_jaxopt_projected_gradient, solve_jaxopt_lbfgsb],
@@ -43,6 +53,9 @@ def test_jaxopt_multinomial_adapters_match_canonical_problem(problem, adapter) -
     assert result.native_status == "converged"
     assert result.iterations <= 500
     assert result.runtime_seconds > 0
+    assert result.metadata["data_arguments"] == "dynamic"
+    assert result.metadata["first_jit_compilation_included"] is True
+    assert result.metadata["jit_enabled"] is True
     assert problem.constraint_violation(result.coefficients) <= 1e-12
     assert problem.kkt_residual(result.coefficients, activity_tolerance=1e-8) <= 1e-6
     initial = torch.zeros_like(result.coefficients)

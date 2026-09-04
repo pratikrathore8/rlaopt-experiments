@@ -2,7 +2,7 @@
 suite = "synthetic_erm"
 # Held-out from smoke seeds 0-2 and calibration seeds 100-101.
 seeds = [200]
-warmups = 1
+warmups = 0
 repetitions = 1
 timeout_seconds = 900
 startup_timeout_seconds = 900

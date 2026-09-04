@@ -202,7 +202,7 @@ def solve_sklearn_coordinate_descent(
     )
 
 
-def _jax_problem(problem: ElasticNetProblem) -> tuple[Any, Any, Any]:
+def _jax_problem(problem: ElasticNetProblem) -> tuple[Any, Any, Any, Any, Any]:
     os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
     import jax
 
@@ -220,17 +220,20 @@ def _jax_problem(problem: ElasticNetProblem) -> tuple[Any, Any, Any]:
     features = jax_dlpack.from_dlpack(problem.X.detach())
     targets = jax_dlpack.from_dlpack(problem.y.detach())
 
-    def smooth_objective(params: dict[str, Any]) -> Any:
-        residual = features @ params["weights"] + params["intercept"] - targets
-        return 0.5 * jnp.mean(residual**2) + 0.5 * problem.lambda_l2 * jnp.sum(
-            params["weights"] ** 2
-        )
+    def smooth_objective(
+        params: dict[str, Any],
+        data: Any,
+        responses: Any,
+        l2_strength: Any,
+    ) -> Any:
+        residual = data @ params["weights"] + params["intercept"] - responses
+        return 0.5 * jnp.mean(residual**2) + 0.5 * l2_strength * jnp.sum(params["weights"] ** 2)
 
     initial = {
         "weights": jnp.zeros(problem.spec.p, dtype=jnp.float64),
         "intercept": jnp.zeros((), dtype=jnp.float64),
     }
-    return smooth_objective, initial, jax
+    return smooth_objective, initial, features, targets, jax
 
 
 def _torch_from_jax(array: Any, device: torch.device) -> torch.Tensor:
@@ -251,7 +254,7 @@ def solve_jaxopt_proximal_gradient(
 ) -> ElasticNetSolverResult:
     """Solve with JAXopt's default accelerated proximal-gradient method."""
     _validate_inputs(problem, native_tolerance, max_iterations)
-    smooth_objective, initial, jax = _jax_problem(problem)
+    smooth_objective, initial, features, targets, jax = _jax_problem(problem)
     import jaxopt
 
     def prox(params: dict[str, Any], l1_strength: float, scaling: float) -> dict[str, Any]:
@@ -270,11 +273,14 @@ def solve_jaxopt_proximal_gradient(
         maxiter=max_iterations,
         tol=native_tolerance,
     )
-    # Compile outside the timed region; the measured run starts from zero again.
-    warmup = solver.run(initial, hyperparams_prox=problem.lambda_l1)
-    jax.block_until_ready(warmup.params)
     started = time.perf_counter()
-    step = solver.run(initial, hyperparams_prox=problem.lambda_l1)
+    step = solver.run(
+        initial,
+        problem.lambda_l1,
+        features,
+        targets,
+        problem.lambda_l2,
+    )
     jax.block_until_ready(step.params)
     runtime_seconds = time.perf_counter() - started
     iterations = int(step.state.iter_num)
@@ -289,7 +295,9 @@ def solve_jaxopt_proximal_gradient(
         native_error=native_error,
         metadata={
             "acceleration": solver.acceleration,
-            "jit_warmup_excluded": True,
+            "data_arguments": "dynamic",
+            "first_jit_compilation_included": True,
+            "jit_enabled": solver.jit,
             "line_search": "backtracking",
         },
     )
