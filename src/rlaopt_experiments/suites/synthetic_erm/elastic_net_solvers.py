@@ -65,11 +65,14 @@ def _build_rlaopt_objective(problem: ElasticNetProblem, loader: Any) -> tuple[An
 
     weights = Variable(
         (problem.spec.p,),
+        requires_grad=False,
         name="beta",
         dtype=torch.float64,
         device=problem.X.device,
     )
     model = LinearRegression(weights, loader, fit_intercept=True)
+    intercept = model.get_input("intercept")
+    intercept.value.requires_grad_(False)
     # LinearRegression uses MSE rather than 0.5*MSE. Doubling both penalties
     # makes the complete native objective exactly 2 * the canonical objective.
     regularizer = ElasticNet(
@@ -81,7 +84,7 @@ def _build_rlaopt_objective(problem: ElasticNetProblem, loader: Any) -> tuple[An
             2.0 * problem.lambda_l2, dtype=torch.float64, device=problem.X.device
         ),
     )
-    return model + regularizer, weights, model.get_input("intercept")
+    return model + regularizer, weights, intercept
 
 
 def solve_rlaopt_sapphire(
@@ -148,6 +151,7 @@ def solve_rlaopt_sapphire(
             "nystrom_rank": config.precond_config.rank_init,
             "native_solver_time_seconds": native_result.solver_time,
             "torch_default_dtype_workaround": True,
+            "variable_autograd_tracking": False,
         },
     )
 

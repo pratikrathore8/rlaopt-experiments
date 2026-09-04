@@ -42,6 +42,27 @@ def _synchronize(device: torch.device) -> None:
         torch.cuda.synchronize(device)
 
 
+def _build_rlaopt_objective(problem: MultinomialProblem, loader: Any) -> tuple[Any, Any]:
+    """Build the rlaopt objective without retaining higher-order autograd graphs."""
+    from rlaopt.atoms import Box, MultinomialRegression
+    from rlaopt.expression import Variable
+
+    coefficients = Variable(
+        (problem.spec.p, problem.spec.n_classes),
+        requires_grad=False,
+        name="beta",
+        dtype=torch.float64,
+        device=problem.X.device,
+    )
+    model = MultinomialRegression(coefficients, loader, fit_intercept=False)
+    objective = model + Box(
+        coefficients,
+        lower=problem.spec.box_lower,
+        upper=problem.spec.box_upper,
+    )
+    return objective, coefficients
+
+
 def solve_rlaopt_sapphire(
     problem: MultinomialProblem,
     *,
@@ -55,9 +76,7 @@ def solve_rlaopt_sapphire(
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
 
-    from rlaopt.atoms import Box, MultinomialRegression
     from rlaopt.data import DataLoader, Dataset
-    from rlaopt.expression import Variable
     from rlaopt.solvers import (
         GradSolverStoppingCriteria,
         Sapphire,
@@ -80,18 +99,7 @@ def solve_rlaopt_sapphire(
             shuffle=True,
             generator=loader_generator,
         )
-        coefficients = Variable(
-            (problem.spec.p, problem.spec.n_classes),
-            name="beta",
-            dtype=torch.float64,
-            device=device,
-        )
-        model = MultinomialRegression(coefficients, loader, fit_intercept=False)
-        objective = model + Box(
-            coefficients,
-            lower=problem.spec.box_lower,
-            upper=problem.spec.box_upper,
-        )
+        objective, _ = _build_rlaopt_objective(problem, loader)
         config = SapphireConfig()
         solver = Sapphire(objective, config)
         stopping = GradSolverStoppingCriteria(
@@ -117,6 +125,7 @@ def solve_rlaopt_sapphire(
         metadata={
             "base_method": config.base_method,
             "batch_size": effective_batch_size,
+            "variable_autograd_tracking": False,
             "nystrom_rank": config.precond_config.rank_init,
             "native_solver_time_seconds": native_result.solver_time,
             "torch_default_dtype_workaround": True,

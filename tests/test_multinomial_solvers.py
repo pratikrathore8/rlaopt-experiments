@@ -8,6 +8,7 @@ from rlaopt_experiments.problems.synthetic_erm import (
     generate_multinomial_problem,
 )
 from rlaopt_experiments.suites.synthetic_erm.multinomial_solvers import (
+    _build_rlaopt_objective,
     _jax_problem,
     solve_jaxopt_lbfgsb,
     solve_jaxopt_projected_gradient,
@@ -80,9 +81,37 @@ def test_sapphire_adapter_uses_float64_nystrom_path(problem) -> None:
     assert result.metadata["base_method"] == "saga"
     assert result.metadata["nystrom_rank"] == 10
     assert result.metadata["torch_default_dtype_workaround"] is True
+    assert result.metadata["variable_autograd_tracking"] is False
     assert problem.constraint_violation(result.coefficients) == 0
     initial = torch.zeros_like(result.coefficients)
     assert problem.objective(result.coefficients) < problem.objective(initial)
+
+
+def test_sapphire_saga_state_does_not_retain_autograd_graph(problem) -> None:
+    from rlaopt.data import DataLoader, Dataset
+    from rlaopt.solvers import Sapphire, SapphireConfig
+
+    loader = DataLoader(
+        Dataset(problem.X, problem.y, device=problem.X.device, dtype=torch.float64),
+        batch_size=16,
+        shuffle=False,
+    )
+    previous_default_dtype = torch.get_default_dtype()
+    torch.set_default_dtype(torch.float64)
+    try:
+        objective, coefficients = _build_rlaopt_objective(problem, loader)
+        solver = Sapphire(objective, SapphireConfig())
+        variable_values = solver._op_split.variable_values
+        state = solver.init_state(variable_values)
+        _, state = solver.step(variable_values, state)
+    finally:
+        torch.set_default_dtype(previous_default_dtype)
+
+    assert coefficients.value.requires_grad is False
+    assert state.table.requires_grad is False
+    assert state.table.grad_fn is None
+    assert all(value.requires_grad is False for value in state.grad_avg.values())
+    assert all(value.grad_fn is None for value in state.grad_avg.values())
 
 
 def test_multinomial_adapters_reject_nonpositive_controls(problem) -> None:

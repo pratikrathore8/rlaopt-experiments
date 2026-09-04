@@ -114,6 +114,7 @@ def test_sapphire_uses_default_float64_nystrom_path(problem) -> None:
     assert result.metadata["native_objective_scale"] == 2.0
     assert result.metadata["nystrom_rank"] == 10
     assert result.metadata["torch_default_dtype_workaround"] is True
+    assert result.metadata["variable_autograd_tracking"] is False
     initial_weights = torch.zeros_like(result.weights)
     initial_intercept = torch.zeros_like(result.intercept)
     assert problem.objective(result.weights, result.intercept) < problem.objective(
@@ -139,6 +140,34 @@ def test_rlaopt_native_objective_is_exactly_twice_canonical(problem) -> None:
         rtol=1e-14,
         atol=1e-14,
     )
+
+
+def test_sapphire_saga_state_does_not_retain_autograd_graph(problem) -> None:
+    from rlaopt.data import DataLoader, Dataset
+    from rlaopt.solvers import Sapphire, SapphireConfig
+
+    loader = DataLoader(
+        Dataset(problem.X, problem.y, device=problem.X.device, dtype=torch.float64),
+        batch_size=24,
+        shuffle=False,
+    )
+    previous_default_dtype = torch.get_default_dtype()
+    torch.set_default_dtype(torch.float64)
+    try:
+        objective, weights, intercept = _build_rlaopt_objective(problem, loader)
+        solver = Sapphire(objective, SapphireConfig())
+        variable_values = solver._op_split.variable_values
+        state = solver.init_state(variable_values)
+        _, state = solver.step(variable_values, state)
+    finally:
+        torch.set_default_dtype(previous_default_dtype)
+
+    assert weights.value.requires_grad is False
+    assert intercept.value.requires_grad is False
+    assert state.table.requires_grad is False
+    assert state.table.grad_fn is None
+    assert all(value.requires_grad is False for value in state.grad_avg.values())
+    assert all(value.grad_fn is None for value in state.grad_avg.values())
 
 
 def test_vanilla_adapters_reject_bounded_problems(problem) -> None:
