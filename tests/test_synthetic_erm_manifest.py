@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -55,10 +56,22 @@ def test_synthetic_erm_pilot_manifest_has_exact_compact_grid(backend: str) -> No
     assert config.seeds == (200,)
     assert config.repetitions == 1
     assert config.warmups == 0
+    assert config.multinomial.execution.max_iterations == 100_000
+    assert config.elastic_net.vanilla_execution.max_iterations == 100_000
+    assert config.elastic_net.bounded_execution.max_iterations == 100_000
     assert config.accuracy == smoke_config.accuracy
-    assert config.multinomial.execution == smoke_config.multinomial.execution
-    assert config.elastic_net.vanilla_execution == smoke_config.elastic_net.vanilla_execution
-    assert config.elastic_net.bounded_execution == smoke_config.elastic_net.bounded_execution
+    assert config.multinomial.execution == replace(
+        smoke_config.multinomial.execution,
+        max_iterations=100_000,
+    )
+    assert config.elastic_net.vanilla_execution == replace(
+        smoke_config.elastic_net.vanilla_execution,
+        max_iterations=100_000,
+    )
+    assert config.elastic_net.bounded_execution == replace(
+        smoke_config.elastic_net.bounded_execution,
+        max_iterations=100_000,
+    )
     assert config.elastic_net.regularization_fractions == (0.01,)
     assert {(shape.n, shape.p) for shape in config.multinomial.shapes} == {
         (16384, 2048),
