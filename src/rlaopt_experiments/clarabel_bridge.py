@@ -52,6 +52,34 @@ function rlaopt_clarabel_solve_gpu(
     CUDA.synchronize()
     return solver
 end
+
+# CuClarabel's Python extension aliases CuPy-owned device buffers with
+# unsafe_wrap(..., own=false). Copy every wrapped allocation before it enters
+# solver state so Julia, rather than CuPy's memory pool, owns its lifetime.
+function rlaopt_copy_cupy_vector(T::Type, ptr, rows)
+    device_pointer = CUDA.CuPtr{T}(UInt(ptr))
+    aliased = CUDA.unsafe_wrap(CUDA.CuVector{T}, device_pointer, rows)
+    return copy(aliased)
+end
+
+function rlaopt_copy_cupy_csr(
+    T::Type, data_ptr, indices_ptr, indptr_ptr, n_rows, n_cols, nnz
+)
+    n_rows = Int32(n_rows)
+    n_cols = Int32(n_cols)
+    data = copy(CUDA.unsafe_wrap(
+        CUDA.CuVector{T}, CUDA.CuPtr{T}(UInt(data_ptr)), nnz
+    ))
+    indices = copy(CUDA.unsafe_wrap(
+        CUDA.CuVector{Int32}, CUDA.CuPtr{Int32}(UInt(indices_ptr)), nnz
+    ))
+    indptr = copy(CUDA.unsafe_wrap(
+        CUDA.CuVector{Int32}, CUDA.CuPtr{Int32}(UInt(indptr_ptr)), n_rows + 1
+    ))
+    @. indices += 1
+    @. indptr += 1
+    return CUDA.CUSPARSE.CuSparseMatrixCSR(indptr, indices, data, (n_rows, n_cols))
+end
 """
 
 
@@ -156,21 +184,23 @@ class ClarabelRuntime:
         import cupy as cp
         from cupyx.scipy.sparse import csr_matrix
 
-        extension = self.main.Base.get_extension(self.main.Clarabel, self.main.Symbol("PythonExt"))
-
-        # CuClarabel increments CSR indices and row pointers in place. Every
-        # call therefore owns fresh buffers that must remain live through solve
-        # and solution extraction.
+        # Use dedicated CuPy inputs because the bridge first aliases their raw
+        # pointers. The Julia helpers immediately copy those aliases into
+        # Julia-owned device allocations before shifting CSR indices in place.
         p_owner = csr_matrix(quadratic, dtype=cp.float64)
         q_owner = cp.asarray(linear, dtype=cp.float64)
         a_owner = csr_matrix(constraints, dtype=cp.float64)
         b_owner = cp.asarray(rhs, dtype=cp.float64)
 
         def vector(array: Any) -> Any:
-            return extension.cupy_to_cuvector(self.main.Float64, int(array.data.ptr), array.size)
+            return self.main.rlaopt_copy_cupy_vector(
+                self.main.Float64,
+                int(array.data.ptr),
+                array.size,
+            )
 
         def sparse_matrix(matrix: Any) -> Any:
-            return extension.cupy_to_cucsrmat(
+            return self.main.rlaopt_copy_cupy_csr(
                 self.main.Float64,
                 int(matrix.data.data.ptr),
                 int(matrix.indices.data.ptr),

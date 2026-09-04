@@ -39,4 +39,4 @@ nvidia-smi
 apptainer inspect "$DERIVED_IMAGE"
 apptainer exec --nv --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
   "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python \
-  scripts/check_cuclarabel.py --backend both
+  scripts/check_cuclarabel.py --backend both --cuda-stress-repetitions 10

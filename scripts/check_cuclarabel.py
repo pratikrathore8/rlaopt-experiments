@@ -27,6 +27,10 @@ def make_problem(
     device: str,
     n_samples: int = 32,
     n_features: int = 8,
+    teacher_density: float = 0.25,
+    noise_ratio: float = 0.02,
+    teacher_intercept: float = 0.4,
+    regularization_fraction: float = 0.05,
 ) -> ElasticNetProblem:
     """Construct the same deterministic bounded elastic-net problem on either device."""
     from rlaopt_experiments.problems.synthetic_erm import (
@@ -40,10 +44,10 @@ def make_problem(
             p=n_features,
             feature_seed=20260902,
             target_seed=20260903,
-            teacher_density=0.25,
-            noise_ratio=0.02,
-            teacher_intercept=0.4,
-            regularization_fraction=0.05,
+            teacher_density=teacher_density,
+            noise_ratio=noise_ratio,
+            teacher_intercept=teacher_intercept,
+            regularization_fraction=regularization_fraction,
         ),
         bounded=True,
         device=device,
@@ -71,6 +75,8 @@ def solve(
 def validate(
     problem: ElasticNetProblem,
     result: BoundedElasticNetSolverResult,
+    *,
+    require_common_accuracy: bool = True,
 ) -> tuple[float, float, float]:
     if result.native_status != "converged":
         raise RuntimeError(f"{result.metadata['linear_solver']} returned {result.native_status}")
@@ -83,7 +89,9 @@ def validate(
         )
     )
     feasibility = float(problem.constraint_violation(result.weights))
-    if stationarity > COMMON_ACCURACY_TOLERANCE:
+    if not np.isfinite([objective, stationarity, feasibility]).all():
+        raise RuntimeError("solver returned a nonfinite objective or accuracy metric")
+    if require_common_accuracy and stationarity > COMMON_ACCURACY_TOLERANCE:
         raise RuntimeError(f"stationarity is {stationarity:.3e}")
     if feasibility > COMMON_ACCURACY_TOLERANCE:
         raise RuntimeError(f"constraint violation is {feasibility:.3e}")
@@ -113,7 +121,12 @@ def summary(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--backend", choices=("cpu", "cuda", "both"), default="both")
+    parser.add_argument("--cuda-stress-repetitions", type=int, default=0)
     args = parser.parse_args()
+    if args.cuda_stress_repetitions < 0:
+        parser.error("--cuda-stress-repetitions must be nonnegative")
+    if args.cuda_stress_repetitions and args.backend == "cpu":
+        parser.error("CUDA stress repetitions require --backend cuda or both")
 
     backends = ["cpu", "cuda"] if args.backend == "both" else [args.backend]
     # Initialize every requested Julia backend before make_problem imports PyTorch.
@@ -157,6 +170,39 @@ def main() -> None:
                 sort_keys=True,
             )
         )
+
+    if args.cuda_stress_repetitions:
+        # Reproduce the pilot regime in which the unsafe CuPy/Julia ownership
+        # handoff failed intermittently. Repeated solves deliberately reuse
+        # one persistent Julia runtime and CuPy memory pool.
+        stress_problem = make_problem(
+            device="cuda",
+            n_samples=16384,
+            n_features=2048,
+            teacher_density=0.1,
+            noise_ratio=0.1,
+            teacher_intercept=0.5,
+            regularization_fraction=0.01,
+        )
+        for repetition in range(args.cuda_stress_repetitions):
+            result = solve(runtimes["cuda"], stress_problem)
+            # A calibrated native success remains eligible even if its
+            # independently evaluated stationarity is slightly above 1e-6.
+            stress_metrics = validate(
+                stress_problem,
+                result,
+                require_common_accuracy=False,
+            )
+            print(
+                json.dumps(
+                    summary(result, stress_metrics)
+                    | {
+                        "stress_repetition": repetition,
+                        "stress_repetitions": args.cuda_stress_repetitions,
+                    },
+                    sort_keys=True,
+                )
+            )
 
     print("CUCLARABEL_DIRECT_INTERFACE_OK=true")
 
