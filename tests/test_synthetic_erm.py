@@ -19,6 +19,8 @@ def _multinomial_spec() -> MultinomialSpec:
         n_classes=4,
         feature_seed=11,
         target_seed=12,
+        feature_generator="standardized_gaussian",
+        feature_decay_exponent=None,
         teacher_scale=1.5,
         box_lower=-1.0,
         box_upper=1.0,
@@ -31,6 +33,8 @@ def _elastic_net_spec() -> ElasticNetSpec:
         p=16,
         feature_seed=21,
         target_seed=22,
+        feature_generator="standardized_gaussian",
+        feature_decay_exponent=None,
         teacher_density=0.25,
         noise_ratio=0.1,
         teacher_intercept=0.4,
@@ -60,6 +64,34 @@ def test_multinomial_generation_is_deterministic_standardized_and_feasible():
     assert int(first.y.max()) < first.spec.n_classes
     assert float(first.teacher.abs().max()) <= 0.8
     assert sum(first.diagnostics()["class_counts"]) == first.spec.n
+
+
+def test_sorf_features_have_exact_normalized_power_law_spectrum():
+    alpha = 1.0
+    spec = replace(
+        _multinomial_spec(),
+        feature_generator="sorf_power_law",
+        feature_decay_exponent=alpha,
+    )
+    first = generate_multinomial_problem(spec, device="cpu")
+    second = generate_multinomial_problem(spec, device="cpu")
+    rank = min(spec.n, spec.p)
+    expected = torch.arange(1, rank + 1, dtype=torch.float64).pow(-alpha / 2)
+    expected *= math.sqrt(spec.n * spec.p) / torch.linalg.vector_norm(expected)
+
+    torch.testing.assert_close(first.X, second.X, rtol=0, atol=0)
+    torch.testing.assert_close(
+        torch.linalg.svdvals(first.X),
+        expected,
+        rtol=1e-12,
+        atol=1e-12,
+    )
+    assert float(torch.linalg.vector_norm(first.X)) == pytest.approx(
+        math.sqrt(spec.n * spec.p), rel=1e-13
+    )
+    diagnostics = first.diagnostics()
+    assert diagnostics["feature_generator"] == "sorf_power_law"
+    assert diagnostics["feature_decay_exponent"] == alpha
 
 
 def test_multinomial_gradient_matches_autograd():
@@ -258,6 +290,8 @@ def test_synthetic_specs_reject_implicit_or_invalid_scales():
             p=4,
             feature_seed=1,
             target_seed=2,
+            feature_generator="standardized_gaussian",
+            feature_decay_exponent=None,
             teacher_density=0.25,
             noise_ratio=0.1,
             teacher_intercept=0.0,
@@ -270,7 +304,17 @@ def test_synthetic_specs_reject_implicit_or_invalid_scales():
             n_classes=3,
             feature_seed=1,
             target_seed=2,
+            feature_generator="standardized_gaussian",
+            feature_decay_exponent=None,
             teacher_scale=1.0,
             box_lower=0.0,
             box_upper=1.0,
+        )
+    with pytest.raises(ValueError, match="feature generator"):
+        replace(_multinomial_spec(), feature_decay_exponent=1.0)
+    with pytest.raises(ValueError, match="feature generator"):
+        replace(
+            _elastic_net_spec(),
+            feature_generator="sorf_power_law",
+            feature_decay_exponent=None,
         )

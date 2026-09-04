@@ -154,6 +154,23 @@ The initial development grid is intentionally small and is defined in `configs/s
 
 The held-out scaling pilot is defined in `configs/synthetic_erm_pilot.toml`. Guided by the real-data dimensions in [Figure 4.5 of the thesis](https://web.stanford.edu/~udell/doc/rathore26_thesis.pdf), it scales samples through $(2^{14},2^{11})$, $(2^{16},2^{11})$, and $(2^{18},2^{11})$, adds the feature-scaling point $(2^{16},2^{13})$, and adds $(2^{13},2^{14})$ for the two elastic-net variants as an underdetermined high-feature stress case. The thesis datasets can be sparse, whereas this testbed materializes dense float64 matrices, so the pilot matches their computational regimes without copying their largest dimensions literally. Its largest design matrix occupies 4 GiB before solver working memory. One held-out seed, one cold measured repetition, no solver warmup, and only the less-regularized $\gamma=0.01$ endpoint keep the pilot diagnostic rather than production-sized. It contains 12 multinomial, 15 vanilla-elastic-net, and 15 bounded-elastic-net jobs per backend: 42 per backend and 84 total.
 
+The separate conditioning diagnostic in `configs/synthetic_erm_conditioning.toml` changes spectral shape without changing total feature scale. For $r=\min(n,p)$ and covariance-decay exponent $\alpha$, it uses independent SORF factors from [Yu et al. (2016)](https://arxiv.org/abs/1610.09072) and singular values
+
+$$
+s_k = c_\alpha k^{-\alpha/2},
+\qquad
+c_\alpha = \sqrt{\frac{np}{\sum_{j=1}^{r}j^{-\alpha}}},
+\qquad k=1,\ldots,r.
+$$
+
+Consequently, the nonzero eigenvalues of $X^{\mathsf T}X$ decay as $k^{-\alpha}$ and
+
+$$
+\lVert X\rVert_F^2 = \sum_{k=1}^{r}s_k^2 = np.
+$$
+
+The latter exactly matches the total squared magnitude of the column-standardized Gaussian generator, whose columns each have population RMS one. Holding this quantity fixed prevents a change in convergence from being attributed merely to rescaling the loss or regularization. The diagnostic crosses $\alpha\in\{0,1/2,1,2\}$ with one held-out $(2^{12},2^{10})$ problem per family, one seed, one regularization fraction, and every applicable solver. It therefore contains 36 jobs per backend. It is an exploratory sensitivity check; the production study will use real datasets rather than these prescribed spectra.
+
 Generate the pilot manifests through the pinned image from a clean repository root:
 
 ```bash

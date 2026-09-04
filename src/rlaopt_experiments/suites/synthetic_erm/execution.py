@@ -122,12 +122,19 @@ def _validate_multinomial_job(
         raise ValueError("manifest seed is not configured")
     if (spec.n, spec.p) not in {(shape.n, shape.p) for shape in config.multinomial.shapes}:
         raise ValueError("manifest shape is not configured")
+    if (
+        spec.feature_generator != config.features.generator
+        or spec.feature_decay_exponent not in config.features.cases
+    ):
+        raise ValueError("manifest feature model is not configured")
     expected_spec = MultinomialSpec(
         n=spec.n,
         p=spec.p,
         n_classes=config.multinomial.n_classes,
         feature_seed=derive_seed(seed, "multinomial_features"),
         target_seed=derive_seed(seed, "multinomial_targets"),
+        feature_generator=config.features.generator,
+        feature_decay_exponent=spec.feature_decay_exponent,
         teacher_scale=config.multinomial.teacher_scale,
         box_lower=config.multinomial.box_lower,
         box_upper=config.multinomial.box_upper,
@@ -180,6 +187,8 @@ def run_multinomial_job(
         "box_upper": spec.box_upper,
         "feature_seed": spec.feature_seed,
         "target_seed": spec.target_seed,
+        "feature_generator": spec.feature_generator,
+        "feature_decay_exponent": spec.feature_decay_exponent,
     }
 
     worker = ProblemWorker(specification, backend, config.suite)
@@ -268,6 +277,11 @@ def _validate_elastic_net_job(
         raise ValueError("manifest seed is not configured")
     if (spec.n, spec.p) not in {(shape.n, shape.p) for shape in config.elastic_net.shapes}:
         raise ValueError("manifest shape is not configured")
+    if (
+        spec.feature_generator != config.features.generator
+        or spec.feature_decay_exponent not in config.features.cases
+    ):
+        raise ValueError("manifest feature model is not configured")
     if spec.regularization_fraction not in config.elastic_net.regularization_fractions:
         raise ValueError("manifest regularization fraction is not configured")
     expected_spec = ElasticNetSpec(
@@ -275,6 +289,8 @@ def _validate_elastic_net_job(
         p=spec.p,
         feature_seed=derive_seed(seed, "elastic_net_features"),
         target_seed=derive_seed(seed, "elastic_net_targets"),
+        feature_generator=config.features.generator,
+        feature_decay_exponent=spec.feature_decay_exponent,
         teacher_density=config.elastic_net.teacher_density,
         noise_ratio=config.elastic_net.noise_ratio,
         teacher_intercept=config.elastic_net.teacher_intercept,
@@ -329,6 +345,8 @@ def run_vanilla_elastic_net_job(
         "regularization_fraction": spec.regularization_fraction,
         "feature_seed": spec.feature_seed,
         "target_seed": spec.target_seed,
+        "feature_generator": spec.feature_generator,
+        "feature_decay_exponent": spec.feature_decay_exponent,
     }
 
     worker = ProblemWorker(specification, backend, config.suite)
@@ -433,6 +451,8 @@ def run_bounded_elastic_net_job(
         "regularization_fraction": spec.regularization_fraction,
         "feature_seed": spec.feature_seed,
         "target_seed": spec.target_seed,
+        "feature_generator": spec.feature_generator,
+        "feature_decay_exponent": spec.feature_decay_exponent,
     }
 
     worker = ProblemWorker(specification, backend, config.suite)

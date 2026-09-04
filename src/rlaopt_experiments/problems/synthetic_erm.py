@@ -8,8 +8,9 @@ from dataclasses import dataclass
 import torch
 import torch.nn.functional as functional
 
+from rlaopt_experiments.structured_orthogonal import materialize_sorf_matrix
 
-GENERATOR_VERSION = "gaussian-erm1"
+GENERATOR_VERSION = "synthetic-erm2"
 
 
 def _validate_shape(n: int, p: int) -> None:
@@ -28,6 +29,25 @@ def _cpu_generator(seed: int) -> torch.Generator:
     return torch.Generator(device="cpu").manual_seed(seed)
 
 
+def _features_configuration(generator: str, decay_exponent: float | None) -> None:
+    if generator == "standardized_gaussian" and decay_exponent is None:
+        return
+    if (
+        generator == "sorf_power_law"
+        and decay_exponent is not None
+        and math.isfinite(decay_exponent)
+        and decay_exponent >= 0
+    ):
+        return
+    raise ValueError("feature generator and decay exponent are inconsistent")
+
+
+def _feature_id(generator: str, decay_exponent: float | None) -> str:
+    if generator == "standardized_gaussian":
+        return "fg-gaussian"
+    return f"fg-sorf-a{decay_exponent:g}"
+
+
 def _standardized_gaussian(n: int, p: int, seed: int) -> torch.Tensor:
     """Return Gaussian features with exactly zero mean and unit population RMS."""
     features = torch.randn((n, p), dtype=torch.float64, generator=_cpu_generator(seed))
@@ -36,6 +56,36 @@ def _standardized_gaussian(n: int, p: int, seed: int) -> torch.Tensor:
     if bool(torch.any(scales == 0)):
         raise RuntimeError("generated a constant feature column")
     return features / scales
+
+
+def _features(
+    n: int,
+    p: int,
+    seed: int,
+    generator: str,
+    decay_exponent: float | None,
+) -> torch.Tensor:
+    if generator == "standardized_gaussian":
+        if decay_exponent is not None:
+            raise ValueError("Gaussian features cannot specify a decay exponent")
+        return _standardized_gaussian(n, p, seed)
+    if generator != "sorf_power_law":
+        raise ValueError(f"unknown feature generator: {generator}")
+    if decay_exponent is None or not math.isfinite(decay_exponent) or decay_exponent < 0:
+        raise ValueError("SORF power-law features require a finite nonnegative exponent")
+
+    rank = min(n, p)
+    indices = torch.arange(1, rank + 1, dtype=torch.float64)
+    singular_values = indices.pow(-decay_exponent / 2)
+    singular_values *= math.sqrt(n * p) / torch.linalg.vector_norm(singular_values)
+    features, _, _ = materialize_sorf_matrix(
+        n,
+        p,
+        singular_values,
+        seed=seed,
+        device="cpu",
+    )
+    return features
 
 
 @dataclass(frozen=True)
@@ -47,6 +97,8 @@ class MultinomialSpec:
     n_classes: int
     feature_seed: int
     target_seed: int
+    feature_generator: str
+    feature_decay_exponent: float | None
     teacher_scale: float
     box_lower: float
     box_upper: float
@@ -55,6 +107,7 @@ class MultinomialSpec:
         _validate_shape(self.n, self.p)
         if self.n_classes < 2:
             raise ValueError("n_classes must be at least two")
+        _features_configuration(self.feature_generator, self.feature_decay_exponent)
         if self.teacher_scale <= 0:
             raise ValueError("teacher_scale must be positive")
         if not self.box_lower < 0 < self.box_upper:
@@ -64,7 +117,9 @@ class MultinomialSpec:
     def problem_id(self) -> str:
         return (
             f"{GENERATOR_VERSION}-multinomial-n{self.n}-p{self.p}-k{self.n_classes}"
-            f"-x{self.feature_seed}-y{self.target_seed}-s{self.teacher_scale:g}"
+            f"-x{self.feature_seed}-y{self.target_seed}"
+            f"-{_feature_id(self.feature_generator, self.feature_decay_exponent)}"
+            f"-s{self.teacher_scale:g}"
             f"-lo{self.box_lower:g}-hi{self.box_upper:g}"
         )
 
@@ -127,6 +182,9 @@ class MultinomialProblem:
             "teacher_max_abs": float(self.teacher.abs().max()),
             "box_lower": self.spec.box_lower,
             "box_upper": self.spec.box_upper,
+            "feature_generator": self.spec.feature_generator,
+            "feature_decay_exponent": self.spec.feature_decay_exponent,
+            "feature_frobenius_norm": float(torch.linalg.vector_norm(self.X)),
         }
 
     def _validate_coefficients(self, coefficients: torch.Tensor) -> None:
@@ -142,7 +200,13 @@ def generate_multinomial_problem(
 
     The model has no intercept. Only the coefficient matrix is constrained.
     """
-    features = _standardized_gaussian(spec.n, spec.p, spec.feature_seed)
+    features = _features(
+        spec.n,
+        spec.p,
+        spec.feature_seed,
+        spec.feature_generator,
+        spec.feature_decay_exponent,
+    )
     target_rng = _cpu_generator(spec.target_seed)
     teacher = torch.randn(
         (spec.p, spec.n_classes),
@@ -180,6 +244,8 @@ class ElasticNetSpec:
     p: int
     feature_seed: int
     target_seed: int
+    feature_generator: str
+    feature_decay_exponent: float | None
     teacher_density: float
     noise_ratio: float
     teacher_intercept: float
@@ -187,6 +253,7 @@ class ElasticNetSpec:
 
     def __post_init__(self) -> None:
         _validate_shape(self.n, self.p)
+        _features_configuration(self.feature_generator, self.feature_decay_exponent)
         if not 0 < self.teacher_density <= 1:
             raise ValueError("teacher_density must lie in (0, 1]")
         if self.noise_ratio < 0:
@@ -198,7 +265,9 @@ class ElasticNetSpec:
     def data_id(self) -> str:
         return (
             f"{GENERATOR_VERSION}-regression-n{self.n}-p{self.p}"
-            f"-x{self.feature_seed}-y{self.target_seed}-d{self.teacher_density:g}"
+            f"-x{self.feature_seed}-y{self.target_seed}"
+            f"-{_feature_id(self.feature_generator, self.feature_decay_exponent)}"
+            f"-d{self.teacher_density:g}"
             f"-noise{self.noise_ratio:g}-b{self.teacher_intercept:g}"
         )
 
@@ -342,6 +411,9 @@ class ElasticNetProblem:
             "lambda_l2": self.lambda_l2,
             "teacher_nonzeros": int(torch.count_nonzero(self.teacher_weights)),
             "bounded": self.bounded,
+            "feature_generator": self.spec.feature_generator,
+            "feature_decay_exponent": self.spec.feature_decay_exponent,
+            "feature_frobenius_norm": float(torch.linalg.vector_norm(self.X)),
         }
 
     def _validate_weights(self, weights: torch.Tensor) -> None:
@@ -370,7 +442,13 @@ def generate_elastic_net_problem(
     regularization_fraction times lambda_max, where lambda_max is computed after
     centering for the fitted intercept.
     """
-    features = _standardized_gaussian(spec.n, spec.p, spec.feature_seed)
+    features = _features(
+        spec.n,
+        spec.p,
+        spec.feature_seed,
+        spec.feature_generator,
+        spec.feature_decay_exponent,
+    )
     target_rng = _cpu_generator(spec.target_seed)
     support_size = max(1, math.ceil(spec.teacher_density * spec.p))
     support = torch.randperm(spec.p, generator=target_rng)[:support_size]

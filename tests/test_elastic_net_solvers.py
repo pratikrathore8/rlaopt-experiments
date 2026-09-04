@@ -27,6 +27,8 @@ def problem():
             p=12,
             feature_seed=21,
             target_seed=22,
+            feature_generator="standardized_gaussian",
+            feature_decay_exponent=None,
             teacher_density=0.25,
             noise_ratio=0.1,
             teacher_intercept=0.5,

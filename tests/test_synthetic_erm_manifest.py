@@ -17,6 +17,7 @@ from rlaopt_experiments.suites.synthetic_erm.manifest import (
 
 CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_smoke.toml"
 PILOT_CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_pilot.toml"
+CONDITIONING_CONFIG = Path(__file__).parents[1] / "configs" / "synthetic_erm_conditioning.toml"
 
 
 def test_synthetic_erm_manifest_is_complete_deterministic_and_self_contained() -> None:
@@ -93,6 +94,24 @@ def test_synthetic_erm_pilot_manifest_has_exact_compact_grid(backend: str) -> No
     assert len({job["problem_id"] for job in jobs}) == 14
     assert {job["seed"] for job in jobs} == {200}
     assert {job["backend"] for job in jobs} == {backend}
+
+
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_conditioning_manifest_crosses_each_solver_with_each_spectrum(backend: str) -> None:
+    config = load_synthetic_erm_config(CONDITIONING_CONFIG)
+    jobs = build_manifest(CONDITIONING_CONFIG, backend)
+
+    assert config.features.generator == "sorf_power_law"
+    assert config.features.decay_exponents == (0.0, 0.5, 1.0, 2.0)
+    assert len(jobs) == 36
+    assert {job["problem_spec"]["feature_decay_exponent"] for job in jobs} == {
+        0.0,
+        0.5,
+        1.0,
+        2.0,
+    }
+    assert all(job["problem_spec"]["feature_generator"] == "sorf_power_law" for job in jobs)
+    assert len({job["problem_id"] for job in jobs}) == 12
 
 
 def test_vanilla_manifest_preserves_data_across_regularization_fractions() -> None:

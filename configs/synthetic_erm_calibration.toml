@@ -20,6 +20,10 @@ feasibility = 1.0e-6
 relative_duality_gap = 1.0e-6
 calibrated = false
 
+[features]
+generator = "standardized_gaussian"
+decay_exponents = []
+
 [multinomial]
 n_classes = 5
 teacher_scale = 1.0

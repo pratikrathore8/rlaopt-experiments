@@ -80,6 +80,8 @@ def problem():
             p=8,
             feature_seed=31,
             target_seed=32,
+            feature_generator="standardized_gaussian",
+            feature_decay_exponent=None,
             teacher_density=0.25,
             noise_ratio=0.1,
             teacher_intercept=0.5,

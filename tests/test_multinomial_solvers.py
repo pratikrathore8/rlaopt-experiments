@@ -25,6 +25,8 @@ def problem():
             n_classes=3,
             feature_seed=11,
             target_seed=12,
+            feature_generator="standardized_gaussian",
+            feature_decay_exponent=None,
             teacher_scale=1.0,
             box_lower=-1.0,
             box_upper=1.0,

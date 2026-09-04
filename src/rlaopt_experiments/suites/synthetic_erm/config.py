@@ -70,6 +70,29 @@ class AccuracyThresholds:
 
 
 @dataclass(frozen=True)
+class FeatureGeneration:
+    generator: str
+    decay_exponents: tuple[float, ...]
+
+    def __post_init__(self) -> None:
+        if self.generator not in {"standardized_gaussian", "sorf_power_law"}:
+            raise ValueError("feature generator must be standardized_gaussian or sorf_power_law")
+        if self.generator == "standardized_gaussian":
+            if self.decay_exponents:
+                raise ValueError("Gaussian features cannot specify decay exponents")
+            return
+        _unique_nonempty(self.decay_exponents, "feature decay exponents")
+        if any(not math.isfinite(alpha) or alpha < 0 for alpha in self.decay_exponents):
+            raise ValueError("feature decay exponents must be finite and nonnegative")
+
+    @property
+    def cases(self) -> tuple[float | None, ...]:
+        if self.generator == "standardized_gaussian":
+            return (None,)
+        return self.decay_exponents
+
+
+@dataclass(frozen=True)
 class BackendTolerances:
     cpu: tuple[tuple[str, float], ...]
     cuda: tuple[tuple[str, float], ...]
@@ -211,6 +234,7 @@ class SyntheticErmConfig:
     timeout_seconds: int
     startup_timeout_seconds: int
     accuracy: AccuracyThresholds
+    features: FeatureGeneration
     multinomial: MultinomialExperiment
     elastic_net: ElasticNetExperiment
 
@@ -295,7 +319,11 @@ def _calibration_execution(data: dict[str, Any], name: str) -> SolverExecution:
 def _parse_synthetic_erm_config(
     root: dict[str, Any], *, calibration: bool = False
 ) -> SyntheticErmConfig:
-    _require_keys(root, {"experiment", "accuracy", "multinomial", "elastic_net"}, "root")
+    _require_keys(
+        root,
+        {"experiment", "accuracy", "features", "multinomial", "elastic_net"},
+        "root",
+    )
     experiment = dict(root["experiment"])
     _require_keys(
         experiment,
@@ -315,6 +343,12 @@ def _parse_synthetic_erm_config(
         "accuracy",
     )
     accuracy = AccuracyThresholds(**root["accuracy"])
+    feature_data = dict(root["features"])
+    _require_keys(feature_data, {"generator", "decay_exponents"}, "features")
+    features = FeatureGeneration(
+        generator=feature_data["generator"],
+        decay_exponents=tuple(feature_data["decay_exponents"]),
+    )
 
     multinomial_data = dict(root["multinomial"])
     _require_keys(
@@ -375,6 +409,7 @@ def _parse_synthetic_erm_config(
     )
     return SyntheticErmConfig(
         accuracy=accuracy,
+        features=features,
         multinomial=multinomial,
         elastic_net=elastic_net,
         seeds=tuple(experiment.pop("seeds")),
@@ -394,7 +429,14 @@ def load_synthetic_erm_calibration_config(
     root = tomllib.loads(path.read_text())
     _require_keys(
         root,
-        {"experiment", "accuracy", "multinomial", "elastic_net", "calibration"},
+        {
+            "experiment",
+            "accuracy",
+            "features",
+            "multinomial",
+            "elastic_net",
+            "calibration",
+        },
         "root",
     )
     calibration = dict(root.pop("calibration"))
