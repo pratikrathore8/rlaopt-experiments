@@ -48,7 +48,7 @@ class FakeWorker:
         }
 
     def solve(self, command: dict[str, Any], timeout_seconds: int) -> dict[str, Any]:
-        assert timeout_seconds == 1800
+        assert timeout_seconds == 3600
         self.commands.append(command)
         return {
             "kind": "result",
@@ -162,7 +162,9 @@ def test_top_level_dispatch_selects_real_runner(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     job = next(
-        item for item in build_manifest(CONFIG, "cpu") if item["problem_type"] == problem_type
+        item
+        for item in build_manifest(CONFIG, "cpu")
+        if item["problem_type"] == problem_type
     )
     captured: dict[str, Any] = {}
 
@@ -207,10 +209,14 @@ def test_real_execution_uses_distinct_record_ids_for_solver_seeds(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    config = load_real_erm_config(CONFIG)
+    config_path = tmp_path / "three-seed-real-erm.toml"
+    config_path.write_text(
+        CONFIG.read_text().replace("seeds = [300]", "seeds = [300, 301, 302]")
+    )
+    config = load_real_erm_config(config_path)
     jobs = [
         job
-        for job in build_manifest(CONFIG, "cpu")
+        for job in build_manifest(config_path, "cpu")
         if job["problem_type"] == "multinomial"
         and job["solver"] == "jaxopt_lbfgsb"
         and job["problem_spec"]["dataset"] == "cifar10"

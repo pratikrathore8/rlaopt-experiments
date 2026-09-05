@@ -93,15 +93,15 @@ response, intercept convention, and penalty values. Cache validation, feature ma
 device transfer, and computation of $\lambda_{\max}$ occur during worker startup and are
 excluded from solver time.
 
-The frozen production grid is `configs/real_erm.toml`. It uses run seeds 300--302 with
-one solve per seed, rather than nesting repetitions inside a seed. Thus stochastic methods
-receive three independent solver seeds while deterministic methods contribute three timing
-observations on the identical problem. Both elastic-net variants use
-$\gamma\in\{0.1,0.01\}$. Each JAXopt method is run twice: once with its default JIT-compiled
-optimization loop and once with `jit=False`; both executions include the complete `run` call
-in solver time and use the same native tolerance. Each backend manifest contains 285 jobs: 75
-multinomial, 120 vanilla elastic-net, and 90 bounded elastic-net jobs. CPU and CUDA together
-contain 570 jobs. Each solve has a 30-minute hard timeout.
+The frozen, time-constrained production grid is `configs/real_erm.toml`. It uses one fixed
+run seed, 300, and one measured solve per configuration. Runtime values are therefore single
+observations rather than estimates of timing variability, which is a limitation of this
+campaign. The bounded elastic-net experiment uses $\gamma=0.1$. Each multinomial JAXopt method is run twice: once with its default JIT-compiled optimization loop and once with `jit=False`; both executions
+include the complete `run` call in solver time and use the same native tolerance.
+Vanilla elastic net is omitted from this time-constrained campaign; its implementation and
+calibration remain available for follow-up work. Each backend manifest contains 40 jobs: 25
+multinomial and 15 bounded elastic-net jobs. CPU and CUDA together contain 80 jobs. Each solve
+has a one-hour hard timeout.
 
 Prepare the compact source and base-matrix cache with
 
@@ -157,12 +157,12 @@ uv run --frozen python scripts/plan_real_production.py \
 ```
 
 The planner freezes and checksums a copy of the TOML file and every JSONL batch, splits CPU
-jobs between `soal-8` and `soal-9`
-without confounding a solver with one node, and writes at most ten jobs per 12-hour batch.
-Since worker startup and solve time are each capped at 30 minutes, this leaves two hours of
-worst-case batch margin. It then creates five submission waves containing 18, 18, 12, 6, and
-5 array elements. Within each wave, each node's array is throttled to one task, so only one of
-our benchmark processes runs on a node at a time.
+jobs between `soal-8` and `soal-9` without confounding a solver with one node, and writes at
+most seven jobs per 12-hour batch.
+Worker startup is capped at 30 minutes and each solve at 60 minutes, so seven
+worst-case runs take at most 10.5 hours and leave 1.5 hours of batch margin. The 80-run grid fits in one QOS-safe submission wave containing 12 array elements.
+Each node's array is throttled to one task, so only one of our benchmark processes runs on
+a node at a time.
 
 After the previous wave has finished, submit the next one with
 

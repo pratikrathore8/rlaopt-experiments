@@ -2,12 +2,12 @@
 suite = "real_erm"
 # This cluster path is node-local and must be prepared on every execution node.
 data_root = "/scr/pratikr/rlaopt-real-data"
-# Fixed real data have no data seed. These provide independent stochastic-solver
-# seeds and three timing observations for every deterministic solver.
-seeds = [300, 301, 302]
+# The time-constrained production study uses one fixed solver seed and one timing
+# observation per configuration.
+seeds = [300]
 warmups = 0
 repetitions = 1
-timeout_seconds = 1800
+timeout_seconds = 3600
 startup_timeout_seconds = 1800
 
 [accuracy]
@@ -62,7 +62,7 @@ jaxopt_lbfgsb_no_jit = 1.0e-6
 
 [elastic_net]
 datasets = ["acsincome", "e2006", "realsim", "yearpredictionmsd", "yolanda"]
-regularization_fractions = [0.1, 0.01]
+regularization_fractions = [0.1]
 
 [elastic_net.vanilla_solvers]
 cpu = [

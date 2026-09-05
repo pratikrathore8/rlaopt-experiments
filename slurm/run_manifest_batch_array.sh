@@ -24,8 +24,8 @@ fi
 sha256sum --check --status "$BATCH_MANIFEST.sha256"
 
 LINE_COUNT="$(wc -l < "$BATCH_MANIFEST")"
-if (( LINE_COUNT < 1 || LINE_COUNT > 10 )); then
-  echo "Refusing batch with $LINE_COUNT jobs; the safe maximum is 10" >&2
+if (( LINE_COUNT < 1 || LINE_COUNT > 7 )); then
+  echo "Refusing batch with $LINE_COUNT jobs; the safe maximum is 7" >&2
   exit 2
 fi
 

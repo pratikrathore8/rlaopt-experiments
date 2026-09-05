@@ -17,8 +17,9 @@ PRODUCTION_TARGETS = (
     ("cpu-soal-9", "cpu"),
     ("cuda-soal-12", "cuda"),
 )
-MAX_SAFE_JOBS_PER_BATCH = 10
+MAX_SAFE_JOBS_PER_BATCH = 7
 MAX_SAFE_BATCHES_PER_NODE_PER_WAVE = 6
+PRODUCTION_PROBLEM_TYPES = {"multinomial", "bounded_elastic_net"}
 
 
 def shard_real_cpu_jobs(
@@ -71,7 +72,7 @@ def plan_real_production(
     config_path: Path,
     output_dir: Path,
     *,
-    max_jobs_per_batch: int = 10,
+    max_jobs_per_batch: int = 7,
     max_batches_per_node_per_wave: int = 6,
 ) -> dict[str, Any]:
     """Write immutable manifests, bounded batches, wave lists, and plan metadata."""
@@ -92,8 +93,16 @@ def plan_real_production(
     config_sha256 = hashlib.sha256(config_bytes).hexdigest()
     (output_dir / "config.toml.sha256").write_text(f"{config_sha256}  {frozen_config.resolve()}\n")
 
-    cpu = build_manifest(frozen_config, "cpu")
-    cuda = build_manifest(frozen_config, "cuda")
+    cpu = [
+        job
+        for job in build_manifest(frozen_config, "cpu")
+        if job["problem_type"] in PRODUCTION_PROBLEM_TYPES
+    ]
+    cuda = [
+        job
+        for job in build_manifest(frozen_config, "cuda")
+        if job["problem_type"] in PRODUCTION_PROBLEM_TYPES
+    ]
     cpu_8, cpu_9 = shard_real_cpu_jobs(cpu)
     target_jobs = {
         "cpu-soal-8": cpu_8,
@@ -143,6 +152,7 @@ def plan_real_production(
         "max_jobs_per_batch": max_jobs_per_batch,
         "max_batches_per_node_per_wave": max_batches_per_node_per_wave,
         "max_tasks_per_wave": len(PRODUCTION_TARGETS) * max_batches_per_node_per_wave,
+        "problem_types": sorted(PRODUCTION_PROBLEM_TYPES),
         "jobs": {target: len(jobs) for target, jobs in target_jobs.items()},
         "batches": {target: len(paths) for target, paths in target_batches.items()},
         "waves": waves,

@@ -14,7 +14,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=Path("configs/real_erm.toml"))
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--max-jobs-per-batch", type=int, default=10)
+    parser.add_argument("--max-jobs-per-batch", type=int, default=7)
     parser.add_argument("--max-batches-per-node-per-wave", type=int, default=6)
     args = parser.parse_args()
     plan = plan_real_production(

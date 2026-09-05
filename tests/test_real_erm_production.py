@@ -20,17 +20,18 @@ def test_real_production_plan_is_complete_balanced_and_qos_bounded(tmp_path: Pat
     root = tmp_path / "production"
     plan = plan_real_production(CONFIG, root)
 
+    assert plan["problem_types"] == ["bounded_elastic_net", "multinomial"]
     assert plan["jobs"] == {
-        "cpu-soal-8": 143,
-        "cpu-soal-9": 142,
-        "cuda-soal-12": 285,
+        "cpu-soal-8": 20,
+        "cpu-soal-9": 20,
+        "cuda-soal-12": 40,
     }
     assert plan["batches"] == {
-        "cpu-soal-8": 15,
-        "cpu-soal-9": 15,
-        "cuda-soal-12": 29,
+        "cpu-soal-8": 3,
+        "cpu-soal-9": 3,
+        "cuda-soal-12": 6,
     }
-    assert [wave["tasks"] for wave in plan["waves"]] == [18, 18, 12, 6, 5]
+    assert [wave["tasks"] for wave in plan["waves"]] == [12]
     assert all(wave["tasks"] <= 18 for wave in plan["waves"])
     assert (root / "config.toml").read_bytes() == CONFIG.read_bytes()
     assert (root / "config.toml.sha256").is_file()
@@ -40,7 +41,7 @@ def test_real_production_plan_is_complete_balanced_and_qos_bounded(tmp_path: Pat
     reconstructed: dict[str, list[dict]] = {}
     for target in plan["batches"]:
         batches = sorted((root / "batches" / target).glob("*.jsonl"))
-        assert all(1 <= len(_read_jsonl(path)) <= 10 for path in batches)
+        assert all(1 <= len(_read_jsonl(path)) <= 7 for path in batches)
         assert all(path.with_suffix(".jsonl.sha256").is_file() for path in batches)
         reconstructed[target] = [job for path in batches for job in _read_jsonl(path)]
 

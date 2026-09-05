@@ -16,13 +16,13 @@ def test_load_real_erm_production_config() -> None:
     config = load_real_erm_config(CONFIG)
 
     assert config.suite == "real_erm"
-    assert config.seeds == (300, 301, 302)
+    assert config.seeds == (300,)
     assert config.repetitions == 1
-    assert config.timeout_seconds == 1800
+    assert config.timeout_seconds == 3600
     assert config.accuracy.stationarity == 1e-4
     assert config.accuracy.feasibility == 1e-6
     assert config.accuracy.relative_duality_gap == 1e-4
-    assert config.elastic_net.regularization_fractions == (0.1, 0.01)
+    assert config.elastic_net.regularization_fractions == (0.1,)
     assert set(config.multinomial.solvers.cpu) == {
         "rlaopt_sapphire",
         "projected_gradient",
@@ -73,11 +73,11 @@ def test_real_erm_manifest_is_complete_and_deterministic(backend: str) -> None:
     second = build_manifest(CONFIG, backend)
 
     assert first == second
-    assert len(first) == 285
+    assert len(first) == 60
     assert len({json.dumps(job, sort_keys=True) for job in first}) == len(first)
     assert {job["suite"] for job in first} == {"real_erm"}
     assert {job["backend"] for job in first} == {backend}
-    assert {job["seed"] for job in first} == {300, 301, 302}
+    assert {job["seed"] for job in first} == {300}
     by_problem = {
         problem_type: [job for job in first if job["problem_type"] == problem_type]
         for problem_type in {
@@ -86,15 +86,15 @@ def test_real_erm_manifest_is_complete_and_deterministic(backend: str) -> None:
             "bounded_elastic_net",
         }
     }
-    assert len(by_problem["multinomial"]) == 75
-    assert len(by_problem["vanilla_elastic_net"]) == 120
-    assert len(by_problem["bounded_elastic_net"]) == 90
+    assert len(by_problem["multinomial"]) == 25
+    assert len(by_problem["vanilla_elastic_net"]) == 20
+    assert len(by_problem["bounded_elastic_net"]) == 15
     assert len({job["problem_id"] for job in by_problem["multinomial"]}) == 5
-    assert len({job["problem_id"] for job in by_problem["vanilla_elastic_net"]}) == 10
-    assert len({job["problem_id"] for job in by_problem["bounded_elastic_net"]}) == 10
+    assert len({job["problem_id"] for job in by_problem["vanilla_elastic_net"]}) == 5
+    assert len({job["problem_id"] for job in by_problem["bounded_elastic_net"]}) == 5
     assert {
-        job["problem_spec"]["regularization_fraction"] for job in by_problem["vanilla_elastic_net"]
-    } == {0.1, 0.01}
+        job["problem_spec"]["regularization_fraction"] for job in by_problem["bounded_elastic_net"]
+    } == {0.1}
     assert all(job["problem_spec"]["data_root"] for job in first)
 
 
