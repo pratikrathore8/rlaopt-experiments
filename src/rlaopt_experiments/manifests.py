@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 
 from rlaopt_experiments.config import load_experiment, load_solvers
+from rlaopt_experiments.suites.real_erm.config import load_real_erm_config
+from rlaopt_experiments.suites.real_erm.manifest import build_real_erm_manifest
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
 from rlaopt_experiments.suites.synthetic_erm.manifest import build_synthetic_erm_manifest
 
@@ -25,6 +27,8 @@ def configured_suite(path: Path) -> str:
 def build_manifest(path: Path, backend: str) -> list[dict[str, Any]]:
     """Build the selected suite's manifest from one strict configuration."""
     suite = configured_suite(path)
+    if suite == "real_erm":
+        return build_real_erm_manifest(load_real_erm_config(path), backend)
     if suite == "synthetic_erm":
         return build_synthetic_erm_manifest(load_synthetic_erm_config(path), backend)
     if suite == "synthetic_ridge":

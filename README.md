@@ -93,6 +93,13 @@ response, intercept convention, and penalty values. Cache validation, feature ma
 device transfer, and computation of $\lambda_{\max}$ occur during worker startup and are
 excluded from solver time.
 
+The frozen production grid is `configs/real_erm.toml`. It uses run seeds 300--302 with
+one solve per seed, rather than nesting repetitions inside a seed. Thus stochastic methods
+receive three independent solver seeds while deterministic methods contribute three timing
+observations on the identical problem. Both elastic-net variants use
+$\gamma\in\{0.1,0.01\}$. Each backend manifest contains 225 jobs: 45 multinomial, 90
+vanilla elastic-net, and 90 bounded elastic-net jobs. CPU and CUDA together contain 450 jobs.
+
 Prepare the compact source and base-matrix cache with
 
 ```bash
