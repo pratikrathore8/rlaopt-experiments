@@ -179,3 +179,33 @@ def test_load_prepared_dataset_rejects_corrupt_artifact(tmp_path, monkeypatch) -
 
     with pytest.raises(ValueError, match="artifact SHA-256 mismatch"):
         data.load_prepared_dataset("fixture", tmp_path / "cache")
+
+    [rebuilt] = data.prepare_datasets(["fixture"], tmp_path / "cache")
+    verified = data.verify_prepared_datasets(["fixture"], tmp_path / "cache")
+    assert verified == [rebuilt]
+    np.testing.assert_array_equal(
+        data.load_prepared_dataset("fixture", tmp_path / "cache").target,
+        [-1.0, 1.0],
+    )
+
+
+def test_verify_prepared_datasets_rejects_missing_cache(tmp_path, monkeypatch) -> None:
+    source = tmp_path / "fixture.parquet"
+    pd.DataFrame({"a": [1.0, 2.0], "target": [3.0, 4.0]}).to_parquet(source, index=False)
+    spec = data.DatasetSpec(
+        name="fixture",
+        problem="elastic_net",
+        source="openml_parquet",
+        url=source.as_uri(),
+        raw_filename=source.name,
+        source_rows=2,
+        training_rows=2,
+        features=1,
+        classes=None,
+        target="target",
+        sha256=_digest(source),
+    )
+    monkeypatch.setattr(data, "DATASETS", {"fixture": spec})
+
+    with pytest.raises(FileNotFoundError, match="prepare-real-data first"):
+        data.verify_prepared_datasets(["fixture"], tmp_path / "cache")

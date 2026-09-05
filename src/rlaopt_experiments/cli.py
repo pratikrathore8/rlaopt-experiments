@@ -54,6 +54,11 @@ def _parser() -> argparse.ArgumentParser:
     real_data.add_argument("--data-root", type=Path, required=True)
     real_data.add_argument("--redownload", action="store_true")
     real_data.add_argument("--reprocess", action="store_true")
+    verify_real_data = subparsers.add_parser("verify-real-data")
+    verify_selection = verify_real_data.add_mutually_exclusive_group(required=True)
+    verify_selection.add_argument("--all", action="store_true")
+    verify_selection.add_argument("--dataset", action="append", dest="datasets")
+    verify_real_data.add_argument("--data-root", type=Path, required=True)
     return parser
 
 
@@ -69,6 +74,16 @@ def main() -> None:
             redownload=args.redownload,
             reprocess=args.reprocess,
         )
+        return
+
+    if args.command == "verify-real-data":
+        from rlaopt_experiments.suites.real_erm.data import (
+            DATASETS,
+            verify_prepared_datasets,
+        )
+
+        names = list(DATASETS) if args.all else args.datasets
+        verify_prepared_datasets(names, args.data_root)
         return
 
     if args.command == "manifest":

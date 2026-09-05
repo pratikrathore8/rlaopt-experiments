@@ -414,13 +414,21 @@ def _prepare_one(
     destination = data_root / "processed" / spec.name
     metadata_path = destination / "metadata.json"
     if metadata_path.exists() and not reprocess and not redownload:
-        metadata = json.loads(metadata_path.read_text())
-        if (
-            metadata.get("catalog_version") == CATALOG_VERSION
-            and metadata.get("source_sha256") == source_sha256
-        ):
-            print(f"using prepared {spec.name}: {destination}", flush=True)
-            return destination
+        try:
+            metadata = json.loads(metadata_path.read_text())
+            metadata_matches = (
+                metadata.get("catalog_version") == CATALOG_VERSION
+                and metadata.get("source_sha256") == source_sha256
+            )
+            if metadata_matches:
+                load_prepared_dataset(spec.name, data_root)
+                print(f"using verified {spec.name}: {destination}", flush=True)
+                return destination
+        except Exception as error:
+            print(
+                f"rebuilding invalid prepared {spec.name}: {type(error).__name__}: {error}",
+                flush=True,
+            )
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=f".{spec.name}-", dir=destination.parent))
@@ -518,6 +526,22 @@ def prepare_datasets(
         )
         for name in names
     ]
+
+
+def verify_prepared_datasets(names: list[str], data_root: Path) -> list[Path]:
+    """Verify cached metadata, artifact hashes, shapes, and dtypes without rebuilding."""
+    unknown = sorted(set(names) - DATASETS.keys())
+    if unknown:
+        raise ValueError(f"unknown real datasets: {', '.join(unknown)}")
+    if not names:
+        raise ValueError("at least one real dataset is required")
+    verified: list[Path] = []
+    for name in names:
+        load_prepared_dataset(name, data_root)
+        directory = data_root.expanduser().resolve() / "processed" / name
+        print(f"verified {name}: {directory}", flush=True)
+        verified.append(directory)
+    return verified
 
 
 def load_prepared_dataset(name: str, data_root: Path) -> PreparedDataset:

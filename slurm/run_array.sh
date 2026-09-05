@@ -64,6 +64,17 @@ if [[ "$JOB_BACKEND" != "$BACKEND" ]]; then
 fi
 
 APPTAINER_ARGS=(--bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY")
+if [[ "$SUITE" == "real_erm" ]]; then
+  DATA_ROOT="$(apptainer exec "$DERIVED_IMAGE" \
+    /opt/rlaopt-experiments/.venv/bin/python -c \
+    'import json,sys; print(json.loads(sys.argv[1])["problem_spec"]["data_root"])' "$LINE")"
+  if [[ "$DATA_ROOT" != /* || ! -d "$DATA_ROOT/processed" ]]; then
+    echo "Real-data cache directory is unavailable on $(hostname): $DATA_ROOT" >&2
+    echo "Run slurm/stage_real_data.sh on this node first." >&2
+    exit 2
+  fi
+  APPTAINER_ARGS+=(--bind "$DATA_ROOT:$DATA_ROOT")
+fi
 if [[ "$BACKEND" == "cuda" ]]; then
   APPTAINER_ARGS=(--nv "${APPTAINER_ARGS[@]}")
 fi

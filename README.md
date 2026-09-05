@@ -116,6 +116,21 @@ float64 matrix, target, and JSON provenance with source and artifact SHA-256 dig
 The data root is explicit because `/scr` is node-local on this cluster; production
 jobs must point to a prepared cache visible on their execution node.
 
+Stage and verify the cache once on each production node after rebuilding the SIF:
+
+```bash
+for node in soal-8 soal-9 soal-12; do
+  sbatch --nodelist="$node" --export=ALL,DATA_ROOT=/scr/pratikr/rlaopt-real-data \
+    slurm/stage_real_data.sh
+done
+```
+
+The staging job is idempotent: it verifies reusable artifacts by metadata, SHA-256 digest,
+shape, and dtype; an invalid processed artifact is rebuilt from the verified raw download.
+`REDOWNLOAD=1` forces a new source download and `REPROCESS=1` forces preprocessing. The
+production launcher explicitly binds the configured node-local data root into the container
+and refuses to start a `real_erm` worker if the processed cache directory is absent.
+
 Generate the two production manifests with
 
 ```bash
