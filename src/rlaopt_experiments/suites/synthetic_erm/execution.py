@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import math
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from rlaopt_experiments.isolation import ProblemWorker
 from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, MultinomialSpec
 from rlaopt_experiments.records import TrialRecord
 from rlaopt_experiments.runner import record_outcome
 from rlaopt_experiments.seeds import derive_seed
+from rlaopt_experiments.suites.erm_execution import run_repetitions, validate_controls
 from rlaopt_experiments.suites.synthetic_erm.config import (
     SolverExecution,
     SyntheticErmConfig,
@@ -25,82 +25,6 @@ def _native_tolerances_calibrated(
     if execution.native_tolerances_calibrated is None:
         return False
     return execution.tolerances_calibrated_for(backend)
-
-
-def _validate_controls(
-    native_tolerance: float,
-    max_iterations: int,
-    batch_size: int,
-) -> None:
-    if not math.isfinite(native_tolerance) or native_tolerance <= 0:
-        raise ValueError("native_tolerance must be finite and positive")
-    if max_iterations < 1:
-        raise ValueError("max_iterations must be positive")
-    if batch_size < 1:
-        raise ValueError("batch_size must be positive")
-
-
-def _run_repetitions(
-    *,
-    worker: ProblemWorker,
-    ready: dict[str, Any],
-    config: SyntheticErmConfig,
-    command: dict[str, Any],
-    max_iterations: int,
-    persist: Callable[..., TrialRecord],
-) -> list[TrialRecord]:
-    """Apply the common warmup, repetition, and worker-lifecycle protocol."""
-    try:
-        if ready["kind"] != "ready":
-            outcome = ready | {"runtime_seconds": 0.0}
-            return [
-                persist(
-                    outcome,
-                    repetition=0,
-                    runtimes=[0.0],
-                    phase="startup",
-                    iteration_limit=None,
-                )
-            ]
-
-        for _ in range(config.warmups):
-            warmup_limit = min(max_iterations, 10)
-            warmup = worker.solve(
-                command | {"max_iters": warmup_limit},
-                config.timeout_seconds,
-            )
-            if warmup["kind"] != "result":
-                return [
-                    persist(
-                        warmup,
-                        repetition=0,
-                        runtimes=[warmup["runtime_seconds"]],
-                        phase="warmup",
-                        iteration_limit=warmup_limit,
-                    )
-                ]
-
-        first = worker.solve(command, config.timeout_seconds)
-        outcomes = [first]
-        if first["kind"] == "result" and first["runtime_eligible"]:
-            for _ in range(config.repetitions - 1):
-                repeated = worker.solve(command, config.timeout_seconds)
-                outcomes.append(repeated)
-                if not worker.alive:
-                    break
-        runtimes = [outcome["runtime_seconds"] for outcome in outcomes]
-        return [
-            persist(
-                outcome,
-                repetition=repetition,
-                runtimes=runtimes,
-                phase="measurement",
-                iteration_limit=max_iterations,
-            )
-            for repetition, outcome in enumerate(outcomes)
-        ]
-    finally:
-        worker.close()
 
 
 def _validate_multinomial_job(
@@ -160,7 +84,7 @@ def run_multinomial_job(
     record_metadata: dict[str, Any] | None = None,
 ) -> list[TrialRecord]:
     """Execute one multinomial manifest job through an isolated worker."""
-    _validate_controls(native_tolerance, max_iterations, batch_size)
+    validate_controls(native_tolerance, max_iterations, batch_size)
     spec = _validate_multinomial_job(job, config)
     backend = job["backend"]
     solver = job["solver"]
@@ -243,7 +167,7 @@ def run_multinomial_job(
             ),
         )
 
-    return _run_repetitions(
+    return run_repetitions(
         worker=worker,
         ready=ready,
         config=config,
@@ -318,7 +242,7 @@ def run_vanilla_elastic_net_job(
     record_metadata: dict[str, Any] | None = None,
 ) -> list[TrialRecord]:
     """Execute one vanilla elastic-net manifest job through an isolated worker."""
-    _validate_controls(native_tolerance, max_iterations, batch_size)
+    validate_controls(native_tolerance, max_iterations, batch_size)
     spec = _validate_elastic_net_job(job, config, bounded=False)
     backend = job["backend"]
     solver = job["solver"]
@@ -400,7 +324,7 @@ def run_vanilla_elastic_net_job(
             ),
         )
 
-    return _run_repetitions(
+    return run_repetitions(
         worker=worker,
         ready=ready,
         config=config,
@@ -422,7 +346,7 @@ def run_bounded_elastic_net_job(
     record_metadata: dict[str, Any] | None = None,
 ) -> list[TrialRecord]:
     """Execute one bounded elastic-net manifest job through an isolated worker."""
-    _validate_controls(native_tolerance, max_iterations, batch_size)
+    validate_controls(native_tolerance, max_iterations, batch_size)
     spec = _validate_elastic_net_job(job, config, bounded=True)
     backend = job["backend"]
     solver = job["solver"]
@@ -506,7 +430,7 @@ def run_bounded_elastic_net_job(
             ),
         )
 
-    return _run_repetitions(
+    return run_repetitions(
         worker=worker,
         ready=ready,
         config=config,

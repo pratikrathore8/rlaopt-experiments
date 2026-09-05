@@ -68,7 +68,7 @@ if [[ "$BACKEND" == "cuda" ]]; then
   APPTAINER_ARGS=(--nv "${APPTAINER_ARGS[@]}")
 fi
 
-if [[ "$SUITE" == "synthetic_erm" ]]; then
+if [[ "$SUITE" == "synthetic_erm" || "$SUITE" == "real_erm" ]]; then
   timeout --signal=TERM 179m apptainer exec "${APPTAINER_ARGS[@]}" \
     "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/rlaopt-bench run-manifest-job \
     --manifest "$MANIFEST" --index "$MANIFEST_INDEX" \

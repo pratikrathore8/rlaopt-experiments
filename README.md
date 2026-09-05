@@ -97,8 +97,11 @@ The frozen production grid is `configs/real_erm.toml`. It uses run seeds 300--30
 one solve per seed, rather than nesting repetitions inside a seed. Thus stochastic methods
 receive three independent solver seeds while deterministic methods contribute three timing
 observations on the identical problem. Both elastic-net variants use
-$\gamma\in\{0.1,0.01\}$. Each backend manifest contains 225 jobs: 45 multinomial, 90
-vanilla elastic-net, and 90 bounded elastic-net jobs. CPU and CUDA together contain 450 jobs.
+$\gamma\in\{0.1,0.01\}$. Each JAXopt method is run twice: once with its default JIT-compiled
+optimization loop and once with `jit=False`; both executions include the complete `run` call
+in solver time and use the same native tolerance. Each backend manifest contains 285 jobs: 75
+multinomial, 120 vanilla elastic-net, and 90 bounded elastic-net jobs. CPU and CUDA together
+contain 570 jobs. Each solve has a 30-minute hard timeout.
 
 Prepare the compact source and base-matrix cache with
 
@@ -112,6 +115,23 @@ to rebuild from the current verified raw files. Each processed directory contain
 float64 matrix, target, and JSON provenance with source and artifact SHA-256 digests.
 The data root is explicit because `/scr` is node-local on this cluster; production
 jobs must point to a prepared cache visible on their execution node.
+
+Generate the two production manifests with
+
+```bash
+uv run rlaopt-bench manifest --config configs/real_erm.toml \
+  --backend cpu --output artifacts/real-erm/manifests/cpu.jsonl
+uv run rlaopt-bench manifest --config configs/real_erm.toml \
+  --backend cuda --output artifacts/real-erm/manifests/cuda.jsonl
+```
+
+`run-manifest-job` and `slurm/run_array.sh` dispatch `real_erm` jobs through the same
+isolated worker lifecycle used by the synthetic ERM suite. Before loading data, the executor
+checks the suite, problem type, dataset, data root, bounds or regularization fraction, problem
+ID, backend, solver, master seed, and derived solver seed against the TOML configuration.
+Every persisted run ID includes the run seed, preventing the three timing observations for
+a fixed real-data problem from overwriting one another. Startup failures and per-solve
+timeouts are retained as atomic result records.
 
 ## Synthetic ERM development suite
 

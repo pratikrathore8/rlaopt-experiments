@@ -7,6 +7,12 @@ from pathlib import Path
 from typing import Any
 
 from rlaopt_experiments.records import TrialRecord
+from rlaopt_experiments.suites.real_erm.config import load_real_erm_config
+from rlaopt_experiments.suites.real_erm.execution import (
+    run_real_bounded_elastic_net_job,
+    run_real_multinomial_job,
+    run_real_vanilla_elastic_net_job,
+)
 from rlaopt_experiments.suites.synthetic_erm.config import load_synthetic_erm_config
 from rlaopt_experiments.suites.synthetic_erm.execution import (
     run_bounded_elastic_net_job,
@@ -39,27 +45,37 @@ def run_manifest_job(
 ) -> list[TrialRecord]:
     """Dispatch one self-contained manifest job to its suite executor."""
     suite = job.get("suite")
-    if suite == "synthetic_erm":
-        config = load_synthetic_erm_config(config_path)
+    if suite in {"synthetic_erm", "real_erm"}:
+        if suite == "synthetic_erm":
+            config = load_synthetic_erm_config(config_path)
+            runners = {
+                "multinomial": run_multinomial_job,
+                "vanilla_elastic_net": run_vanilla_elastic_net_job,
+                "bounded_elastic_net": run_bounded_elastic_net_job,
+            }
+        else:
+            config = load_real_erm_config(config_path)
+            runners = {
+                "multinomial": run_real_multinomial_job,
+                "vanilla_elastic_net": run_real_vanilla_elastic_net_job,
+                "bounded_elastic_net": run_real_bounded_elastic_net_job,
+            }
         problem_type = job.get("problem_type")
         if problem_type == "multinomial":
             controls = config.multinomial.execution
-            runner = run_multinomial_job
         elif problem_type == "vanilla_elastic_net":
             controls = config.elastic_net.vanilla_execution
-            runner = run_vanilla_elastic_net_job
         elif problem_type == "bounded_elastic_net":
             controls = config.elastic_net.bounded_execution
-            runner = run_bounded_elastic_net_job
         else:
-            raise ValueError(f"unsupported synthetic ERM problem type: {problem_type}")
+            raise ValueError(f"unsupported {suite} problem type: {problem_type}")
         if controls.native_tolerances is None:
             raise ValueError("manifest execution requires frozen native tolerances")
         native_tolerance = controls.native_tolerances.for_solver(
             job.get("backend"),
             job.get("solver"),
         )
-        return runner(
+        return runners[problem_type](
             job,
             config,
             native_tolerance=native_tolerance,

@@ -18,10 +18,38 @@ def test_load_real_erm_production_config() -> None:
     assert config.suite == "real_erm"
     assert config.seeds == (300, 301, 302)
     assert config.repetitions == 1
+    assert config.timeout_seconds == 1800
     assert config.accuracy.stationarity == 1e-4
     assert config.accuracy.feasibility == 1e-6
     assert config.accuracy.relative_duality_gap == 1e-4
     assert config.elastic_net.regularization_fractions == (0.1, 0.01)
+    assert set(config.multinomial.solvers.cpu) == {
+        "rlaopt_sapphire",
+        "projected_gradient",
+        "projected_gradient_no_jit",
+        "jaxopt_lbfgsb",
+        "jaxopt_lbfgsb_no_jit",
+    }
+    assert set(config.elastic_net.vanilla_solvers.cpu) == {
+        "rlaopt_sapphire",
+        "sklearn_coordinate_descent",
+        "jaxopt_proximal_gradient",
+        "jaxopt_proximal_gradient_no_jit",
+    }
+    for backend in ("cpu", "cuda"):
+        multinomial_tolerances = config.multinomial.execution.native_tolerances
+        vanilla_tolerances = config.elastic_net.vanilla_execution.native_tolerances
+        assert multinomial_tolerances is not None
+        assert vanilla_tolerances is not None
+        assert multinomial_tolerances.for_solver(
+            backend, "projected_gradient_no_jit"
+        ) == multinomial_tolerances.for_solver(backend, "projected_gradient")
+        assert multinomial_tolerances.for_solver(
+            backend, "jaxopt_lbfgsb_no_jit"
+        ) == multinomial_tolerances.for_solver(backend, "jaxopt_lbfgsb")
+        assert vanilla_tolerances.for_solver(
+            backend, "jaxopt_proximal_gradient_no_jit"
+        ) == vanilla_tolerances.for_solver(backend, "jaxopt_proximal_gradient")
     assert config.multinomial.datasets == (
         "cifar10",
         "rcv1",
@@ -45,7 +73,7 @@ def test_real_erm_manifest_is_complete_and_deterministic(backend: str) -> None:
     second = build_manifest(CONFIG, backend)
 
     assert first == second
-    assert len(first) == 225
+    assert len(first) == 285
     assert len({json.dumps(job, sort_keys=True) for job in first}) == len(first)
     assert {job["suite"] for job in first} == {"real_erm"}
     assert {job["backend"] for job in first} == {backend}
@@ -58,8 +86,8 @@ def test_real_erm_manifest_is_complete_and_deterministic(backend: str) -> None:
             "bounded_elastic_net",
         }
     }
-    assert len(by_problem["multinomial"]) == 45
-    assert len(by_problem["vanilla_elastic_net"]) == 90
+    assert len(by_problem["multinomial"]) == 75
+    assert len(by_problem["vanilla_elastic_net"]) == 120
     assert len(by_problem["bounded_elastic_net"]) == 90
     assert len({job["problem_id"] for job in by_problem["multinomial"]}) == 5
     assert len({job["problem_id"] for job in by_problem["vanilla_elastic_net"]}) == 10

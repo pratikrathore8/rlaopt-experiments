@@ -183,6 +183,7 @@ def solve_jaxopt_projected_gradient(
     *,
     native_tolerance: float,
     max_iterations: int,
+    jit: bool = True,
 ) -> MultinomialSolverResult:
     """Solve with JAXopt default projected-gradient configuration."""
     _validate_inputs(problem, native_tolerance, max_iterations)
@@ -194,6 +195,7 @@ def solve_jaxopt_projected_gradient(
         projection=jaxopt.projection.projection_box,
         maxiter=max_iterations,
         tol=native_tolerance,
+        jit=jit,
     )
     started = time.perf_counter()
     step = solver.run(initial, bounds, features, labels)
@@ -211,7 +213,7 @@ def solve_jaxopt_projected_gradient(
         metadata={
             "acceleration": solver.acceleration,
             "data_arguments": "dynamic",
-            "first_jit_compilation_included": True,
+            "first_jit_compilation_included": solver.jit,
             "jit_enabled": solver.jit,
             "line_search": "backtracking",
         },
@@ -223,6 +225,7 @@ def solve_jaxopt_lbfgsb(
     *,
     native_tolerance: float,
     max_iterations: int,
+    jit: bool = True,
 ) -> MultinomialSolverResult:
     """Solve with JAXopt L-BFGS-B and its zoom line search."""
     _validate_inputs(problem, native_tolerance, max_iterations)
@@ -233,6 +236,7 @@ def solve_jaxopt_lbfgsb(
         fun=objective,
         maxiter=max_iterations,
         tol=native_tolerance,
+        jit=jit,
     )
     started = time.perf_counter()
     step = solver.run(initial, bounds, features, labels)
@@ -256,7 +260,7 @@ def solve_jaxopt_lbfgsb(
         metadata={
             "history_size": solver.history_size,
             "data_arguments": "dynamic",
-            "first_jit_compilation_included": True,
+            "first_jit_compilation_included": solver.jit,
             "jit_enabled": solver.jit,
             "line_search": solver.linesearch,
             "line_search_failed": line_search_failed,

@@ -114,10 +114,18 @@ class SyntheticErmSuite:
                 batch_size=command["batch_size"],
                 seed=command["solver_seed"],
             )
-        elif solver_name == "projected_gradient":
-            result = solve_jaxopt_projected_gradient(problem, **common)
-        elif solver_name == "jaxopt_lbfgsb":
-            result = solve_jaxopt_lbfgsb(problem, **common)
+        elif solver_name in {"projected_gradient", "projected_gradient_no_jit"}:
+            result = solve_jaxopt_projected_gradient(
+                problem,
+                **common,
+                jit=solver_name == "projected_gradient",
+            )
+        elif solver_name in {"jaxopt_lbfgsb", "jaxopt_lbfgsb_no_jit"}:
+            result = solve_jaxopt_lbfgsb(
+                problem,
+                **common,
+                jit=solver_name == "jaxopt_lbfgsb",
+            )
         else:
             raise ValueError(f"unknown multinomial solver: {solver_name}")
         return self._multinomial_outcome(problem, result, command)
@@ -143,8 +151,12 @@ class SyntheticErmSuite:
             result = solve_sklearn_coordinate_descent(problem, **common)
         elif solver_name == "cuml_coordinate_descent":
             result = solve_cuml_coordinate_descent(problem, **common)
-        elif solver_name == "jaxopt_proximal_gradient":
-            result = solve_jaxopt_proximal_gradient(problem, **common)
+        elif solver_name in {"jaxopt_proximal_gradient", "jaxopt_proximal_gradient_no_jit"}:
+            result = solve_jaxopt_proximal_gradient(
+                problem,
+                **common,
+                jit=solver_name == "jaxopt_proximal_gradient",
+            )
         else:
             raise ValueError(f"unknown vanilla elastic-net solver: {solver_name}")
         return self._vanilla_elastic_net_outcome(problem, result, command)

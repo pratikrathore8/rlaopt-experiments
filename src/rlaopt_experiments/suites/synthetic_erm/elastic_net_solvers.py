@@ -255,6 +255,7 @@ def solve_jaxopt_proximal_gradient(
     *,
     native_tolerance: float,
     max_iterations: int,
+    jit: bool = True,
 ) -> ElasticNetSolverResult:
     """Solve with JAXopt's default accelerated proximal-gradient method."""
     _validate_inputs(problem, native_tolerance, max_iterations)
@@ -276,6 +277,7 @@ def solve_jaxopt_proximal_gradient(
         prox=prox,
         maxiter=max_iterations,
         tol=native_tolerance,
+        jit=jit,
     )
     started = time.perf_counter()
     step = solver.run(
@@ -300,7 +302,7 @@ def solve_jaxopt_proximal_gradient(
         metadata={
             "acceleration": solver.acceleration,
             "data_arguments": "dynamic",
-            "first_jit_compilation_included": True,
+            "first_jit_compilation_included": solver.jit,
             "jit_enabled": solver.jit,
             "line_search": "backtracking",
         },

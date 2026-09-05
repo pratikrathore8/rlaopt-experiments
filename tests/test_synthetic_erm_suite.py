@@ -80,6 +80,33 @@ def test_multinomial_suite_executes_and_adjudicates_jaxopt_lbfgsb() -> None:
     assert outcome["diagnostics"]["class_counts"]
 
 
+@pytest.mark.parametrize(
+    "solver",
+    ["projected_gradient_no_jit", "jaxopt_lbfgsb_no_jit"],
+)
+def test_multinomial_suite_dispatches_no_jit_variants(solver: str) -> None:
+    suite = get_suite("synthetic_erm")
+    problem = suite.generate(
+        _multinomial_specification(n=8, p=2),
+        device=torch.device("cpu"),
+    )
+
+    outcome = suite.execute(
+        problem,
+        {
+            "solver": solver,
+            "native_tolerance": 1e-12,
+            "max_iters": 2,
+            "stationarity_tolerance": 1.0,
+            "feasibility_tolerance": 1e-8,
+        },
+        backend="cpu",
+    )
+
+    assert outcome["solver_metadata"]["jit_enabled"] is False
+    assert outcome["solver_metadata"]["first_jit_compilation_included"] is False
+
+
 def test_vanilla_elastic_net_suite_executes_and_uses_external_gap() -> None:
     suite = get_suite("synthetic_erm")
     problem = suite.generate(
@@ -106,6 +133,29 @@ def test_vanilla_elastic_net_suite_executes_and_uses_external_gap() -> None:
     assert outcome["accuracy"]["feasibility"] == 0.0
     assert outcome["accuracy"]["stationarity"] <= 1e-6
     assert outcome["diagnostics"]["bounded"] is False
+
+
+def test_vanilla_elastic_net_suite_dispatches_no_jit_variant() -> None:
+    suite = get_suite("synthetic_erm")
+    problem = suite.generate(
+        _vanilla_elastic_net_specification(),
+        device=torch.device("cpu"),
+    )
+
+    outcome = suite.execute(
+        problem,
+        {
+            "solver": "jaxopt_proximal_gradient_no_jit",
+            "native_tolerance": 1e-12,
+            "max_iters": 2,
+            "relative_duality_gap_tolerance": 1.0,
+            "feasibility_tolerance": 1e-8,
+        },
+        backend="cpu",
+    )
+
+    assert outcome["solver_metadata"]["jit_enabled"] is False
+    assert outcome["solver_metadata"]["first_jit_compilation_included"] is False
 
 
 def test_bounded_elastic_net_suite_executes_and_uses_external_kkt(
