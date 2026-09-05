@@ -183,6 +183,8 @@ def test_top_level_dispatch_selects_real_runner(
     assert captured["max_iterations"] == 100_000
     assert captured["batch_size"] == 256
     assert captured["output_dir"] == tmp_path
+    assert "record_run_key" not in captured
+    assert "record_metadata" not in captured
 
 
 def test_real_execution_rejects_tampered_data_root(tmp_path: Path) -> None:

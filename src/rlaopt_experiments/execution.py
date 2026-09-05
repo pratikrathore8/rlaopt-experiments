@@ -75,14 +75,16 @@ def run_manifest_job(
             job.get("backend"),
             job.get("solver"),
         )
-        return runners[problem_type](
-            job,
-            config,
-            native_tolerance=native_tolerance,
-            max_iterations=controls.max_iterations,
-            batch_size=controls.batch_size,
-            output_dir=output_dir,
-            record_run_key=problem_type,
-            record_metadata={},
-        )
+        execution_kwargs = {
+            "native_tolerance": native_tolerance,
+            "max_iterations": controls.max_iterations,
+            "batch_size": controls.batch_size,
+            "output_dir": output_dir,
+        }
+        if suite == "synthetic_erm":
+            execution_kwargs |= {
+                "record_run_key": problem_type,
+                "record_metadata": {},
+            }
+        return runners[problem_type](job, config, **execution_kwargs)
     raise ValueError(f"manifest execution is not implemented for suite: {suite}")
