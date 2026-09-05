@@ -17,6 +17,78 @@ Every suite must document:
 - resource limits, failure handling, and the exact hardware scope; and
 - suite-specific limitations and confirmatory versus exploratory analyses.
 
+## Real-data corpus and preparation
+
+The real-data ERM study uses the following frozen training datasets. When a source
+publishes separate training and test files, only its training file is used. Sources
+without a separate test file contribute all their rows because this is an optimization
+benchmark rather than a predictive-accuracy study. Fashion-MNIST is the exception:
+OpenML stores its original 60,000 training and 10,000 test examples together, so only
+the first 60,000 official training examples are selected.
+
+| application | dataset | source | base training shape | solver shape | feature map |
+|---|---|---|---:|---:|---|
+| elastic net | ACSIncome | OpenML 43141 | $1{,}664{,}500\times11$ | $1{,}664{,}500\times1{,}000$ | Gaussian, nominal bandwidth 1 |
+| elastic net | E2006-tfidf | LIBSVM training file | $16{,}087\times150{,}360$ | unchanged | none |
+| elastic net | Real-sim | LIBSVM | $72{,}309\times20{,}958$ | unchanged | none |
+| elastic net | YearPredictionMSD | LIBSVM training file | $463{,}715\times90$ | $463{,}715\times4{,}367$ | ReLU |
+| elastic net | Yolanda | OpenML 42705 | $400{,}000\times100$ | $400{,}000\times1{,}000$ | Gaussian, nominal bandwidth 1 |
+| multinomial | CIFAR-10 | LIBSVM training file | $50{,}000\times3{,}072$ | unchanged | none |
+| multinomial | RCV1 multiclass | LIBSVM training file | $15{,}564\times47{,}236$ | unchanged | none |
+| multinomial | SVHN | LIBSVM training file | $73{,}257\times3{,}072$ | unchanged | none |
+| multinomial | News20 | LIBSVM classic training file | $15{,}935\times62{,}061$ | unchanged | none |
+| multinomial | Fashion-MNIST | OpenML 40996 official training rows | $60{,}000\times784$ | unchanged | none |
+
+The News20 entry is the classic 15,935-row multiclass training file, not LIBSVM's
+newer 18,846-observation collection. RCV1 likewise uses `rcv1_train.multiclass`, not
+the binary RCV1 formulation. Its training file contains 51 observed labels even though
+the combined training/test collection is described as having 53 topics; the training-only
+optimization problem therefore uses 51 contiguous classes. Sparse LIBSVM matrices remain
+CSR and every nonzero row is scaled to unit Euclidean norm; zero rows remain zero. Dense
+OpenML features are standardized columnwise to population mean zero and standard deviation
+one using only the selected training rows. Continuous OpenML regression targets are
+standardized in the same way. LIBSVM regression targets retain their source values.
+Multinomial labels are deterministically mapped from sorted source labels to contiguous
+integers starting at zero. Missing or nonfinite values and unexpected shapes are hard errors.
+
+The nonlinear maps reproduce the PROMISE implementation with NumPy seed 2468. For
+$G\in\mathbb{R}^{m\times p}$ with independent standard Gaussian entries and
+$\beta_j$ independent and uniform on $[0,2\pi]$, Gaussian features use
+
+$$
+W=\frac{G}{b\sqrt{m}},
+\qquad
+Z=\sqrt{\frac{2}{m}}\cos(XW^{\mathsf T}+\beta),
+$$
+
+with $b=1$ and $m=1000$. This is explicitly called the PROMISE convention because
+its frequency scaling differs from textbook fixed-bandwidth random Fourier features.
+ReLU features use
+
+$$
+W=\frac{G}{\sqrt{m}},
+\qquad
+Z=\max\{XW^{\mathsf T},0\},
+$$
+
+with $m=4367$. `materialize_random_features` regenerates the complete float64 feature
+matrix deterministically in RAM or VRAM and applies its nonlinearity in place; expanded
+matrices are never stored. Benchmark workers will call this function before solver timing,
+and feature generation and transfer will be recorded separately.
+
+Prepare the compact source and base-matrix cache with
+
+```bash
+scripts/prepare_real_data.sh --data-root /scr/pratikr/rlaopt-real-data --all
+```
+
+Use repeated `--dataset NAME` arguments to select datasets, `--redownload` to replace
+the raw downloads atomically and rebuild their processed artifacts, or `--reprocess`
+to rebuild from the current verified raw files. Each processed directory contains the
+float64 matrix, target, and JSON provenance with source and artifact SHA-256 digests.
+The data root is explicit because `/scr` is node-local on this cluster; production
+jobs must point to a prepared cache visible on their execution node.
+
 ## Synthetic ERM development suite
 
 This suite develops the three problem classes intended for the later real-data study on deterministic synthetic data first. All generated arrays and all solver computations use float64. The calibration, smoke, and scaling-pilot grids generate features on CPU from seeded Gaussian streams, then center and scale each column to unit population root-mean-square; the separate conditioning diagnostic uses the SORF construction documented below. Problem generation and host-to-device transfer are measured separately from solver time and are not included in the primary solve-time comparison. Every competitor receives the same materialized data and mathematical formulation.
@@ -150,7 +222,7 @@ The CUDA image uses a small dynamically linked Python 3.12 launcher because CUDA
 
 CuClarabel's current CuPy bridge wraps device pointers without taking ownership and converts zero-based CSR indices to Julia's one-based indices in place. This can leave Julia and cuDSS referring to allocations returned to CuPy's memory pool, producing the [stochastic use-after-free reported upstream](https://github.com/oxfordcontrol/Clarabel.jl/issues/233). The adapter therefore creates dedicated CuPy inputs and immediately copies every aliased vector and CSR component into Julia-owned device memory; the index shift mutates only the Julia-owned copies. These device-to-device copies are separately recorded as preparation rather than native solver time. This is an interface-safety requirement, not a benchmark optimization. The pre-production probe solves the same deterministic bounded elastic-net QP with CPU QDLDL and GPU cuDSS, recomputes objective, KKT stationarity, and box violation from both returned primal solutions, and checks CPU/GPU agreement. It then performs ten sequential GPU solves of the pilot's $(2^{14},2^{11})$ configuration using one persistent Julia runtime and CuPy memory pool to expose cross-solve lifetime failures before production.
 
-Final real-dataset identities, sizes, preprocessing, and resource limits will be added and frozen before production. Solver versions are already pinned by the Python and Julia lockfiles and the immutable CUDA image. The study will include instances demonstrably too large for the considered interior-point baselines; such claims will be supported by explicit memory estimates or observed structured resource failures rather than assumed from dimensions alone.
+The real-dataset identities, sizes, and preprocessing are frozen above; production resource limits will be frozen after the prepared matrices and solver workspaces are measured. Solver versions are already pinned by the Python and Julia lockfiles and the immutable CUDA image. The study will include instances demonstrably too large for the considered interior-point baselines; such claims will be supported by explicit memory estimates or observed structured resource failures rather than assumed from dimensions alone.
 
 The initial development grid is intentionally small and is defined in `configs/synthetic_erm_smoke.toml`. It uses $(n,p)\in\{(1024,64),(4096,256)\}$, five classes for multinomial regression, three data seeds, one measured repetition per seed, and regularization fractions $\gamma\in\{0.1,0.01\}$. The vanilla and bounded elastic-net variants share one configuration block, which prevents their shapes or data-generating parameters from drifting apart. This original smoke grid retains its strict $10^{-6}$ thresholds for stationarity, feasibility, and relative duality gap so that the completed synthetic campaign remains reproducible; those historical thresholds do not define real-data production qualification. Native-tolerance calibration state is tracked separately by backend so freezing CPU values cannot accidentally qualify provisional CUDA values.
 

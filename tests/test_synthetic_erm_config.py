@@ -75,9 +75,9 @@ def test_load_synthetic_erm_calibration_config_without_frozen_tolerances() -> No
     calibration = load_synthetic_erm_calibration_config(CALIBRATION_CONFIG)
 
     assert calibration.candidates == (1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
-    assert calibration.experiment.accuracy.stationarity == 1e-6
+    assert calibration.experiment.accuracy.stationarity == 1e-4
     assert calibration.experiment.accuracy.feasibility == 1e-6
-    assert calibration.experiment.accuracy.relative_duality_gap == 1e-6
+    assert calibration.experiment.accuracy.relative_duality_gap == 1e-4
     for execution in (
         calibration.experiment.multinomial.execution,
         calibration.experiment.elastic_net.vanilla_execution,

@@ -47,11 +47,30 @@ def _parser() -> argparse.ArgumentParser:
     plot.add_argument("--input", type=Path, default=Path("artifacts/records"))
     plot.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     plot.add_argument("--output", type=Path, default=Path("artifacts/figures"))
+    real_data = subparsers.add_parser("prepare-real-data")
+    selection = real_data.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--all", action="store_true")
+    selection.add_argument("--dataset", action="append", dest="datasets")
+    real_data.add_argument("--data-root", type=Path, required=True)
+    real_data.add_argument("--redownload", action="store_true")
+    real_data.add_argument("--reprocess", action="store_true")
     return parser
 
 
 def main() -> None:
     args = _parser().parse_args()
+    if args.command == "prepare-real-data":
+        from rlaopt_experiments.suites.real_erm.data import DATASETS, prepare_datasets
+
+        names = list(DATASETS) if args.all else args.datasets
+        prepare_datasets(
+            names,
+            args.data_root,
+            redownload=args.redownload,
+            reprocess=args.reprocess,
+        )
+        return
+
     if args.command == "manifest":
         from rlaopt_experiments.manifests import build_manifest
 
