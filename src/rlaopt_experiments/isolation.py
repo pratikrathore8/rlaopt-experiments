@@ -35,15 +35,18 @@ def _worker(
             torch.set_num_threads(int(os.environ["OMP_NUM_THREADS"]))
         device = torch.device("cuda" if backend == "cuda" else "cpu")
         suite = get_suite(suite_name)
+        preparation_started = time.perf_counter()
         problem = suite.generate(specification, device=device)
         if backend == "cuda":
             torch.cuda.synchronize()
+        problem_preparation_seconds = time.perf_counter() - preparation_started
         connection.send(
             {
                 "kind": "ready",
                 "worker_metadata": {
                     "torch_version": torch.__version__,
                     "pre_torch_runtime": runtime_name,
+                    "problem_preparation_seconds": problem_preparation_seconds,
                     **suite.problem_metadata(problem),
                     "torch_num_threads": torch.get_num_threads(),
                     "cuda_version": torch.version.cuda,

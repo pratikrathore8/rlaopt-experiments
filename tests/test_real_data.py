@@ -66,6 +66,9 @@ def test_prepare_libsvm_is_resumable_and_redownloadable(tmp_path, monkeypatch) -
     np.testing.assert_array_equal(target, [0, 1, 0])
     assert metadata["preprocessing"]["class_labels"] == [10.0, 20.0]
     assert metadata["preprocessing"]["representation"] == "csr"
+    loaded = data.load_prepared_dataset("fixture", root)
+    assert sparse.isspmatrix_csr(loaded.matrix)
+    np.testing.assert_array_equal(loaded.target, target)
 
     data.prepare_datasets(["fixture"], root)
     raw = root / "raw" / "fixture" / source.name
@@ -122,3 +125,57 @@ def test_prepare_openml_uses_training_prefix_and_standardizes(tmp_path, monkeypa
         "target.npy",
         "metadata.json",
     }
+    loaded = data.load_prepared_dataset("fixture", tmp_path / "cache")
+    assert isinstance(loaded.matrix, np.ndarray)
+    np.testing.assert_array_equal(loaded.target, target)
+
+
+def test_load_prepared_dataset_rejects_stale_metadata(tmp_path, monkeypatch) -> None:
+    source = tmp_path / "fixture.parquet"
+    pd.DataFrame({"a": [1.0, 2.0], "target": [3.0, 4.0]}).to_parquet(source, index=False)
+    spec = data.DatasetSpec(
+        name="fixture",
+        problem="elastic_net",
+        source="openml_parquet",
+        url=source.as_uri(),
+        raw_filename=source.name,
+        source_rows=2,
+        training_rows=2,
+        features=1,
+        classes=None,
+        target="target",
+        sha256=_digest(source),
+    )
+    monkeypatch.setattr(data, "DATASETS", {"fixture": spec})
+    [prepared] = data.prepare_datasets(["fixture"], tmp_path / "cache")
+    metadata_path = prepared / "metadata.json"
+    metadata = json.loads(metadata_path.read_text())
+    metadata["rows"] = 3
+    metadata_path.write_text(json.dumps(metadata))
+
+    with pytest.raises(ValueError, match="does not match"):
+        data.load_prepared_dataset("fixture", tmp_path / "cache")
+
+
+def test_load_prepared_dataset_rejects_corrupt_artifact(tmp_path, monkeypatch) -> None:
+    source = tmp_path / "fixture.parquet"
+    pd.DataFrame({"a": [1.0, 2.0], "target": [3.0, 4.0]}).to_parquet(source, index=False)
+    spec = data.DatasetSpec(
+        name="fixture",
+        problem="elastic_net",
+        source="openml_parquet",
+        url=source.as_uri(),
+        raw_filename=source.name,
+        source_rows=2,
+        training_rows=2,
+        features=1,
+        classes=None,
+        target="target",
+        sha256=_digest(source),
+    )
+    monkeypatch.setattr(data, "DATASETS", {"fixture": spec})
+    [prepared] = data.prepare_datasets(["fixture"], tmp_path / "cache")
+    (prepared / "target.npy").write_bytes(b"corrupt")
+
+    with pytest.raises(ValueError, match="artifact SHA-256 mismatch"):
+        data.load_prepared_dataset("fixture", tmp_path / "cache")

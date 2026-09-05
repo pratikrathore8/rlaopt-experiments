@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Protocol
 
 import torch
 import torch.nn.functional as functional
@@ -11,6 +12,28 @@ import torch.nn.functional as functional
 from rlaopt_experiments.structured_orthogonal import materialize_sorf_matrix
 
 GENERATOR_VERSION = "synthetic-erm2"
+
+
+class MultinomialModelSpec(Protocol):
+    n: int
+    p: int
+    n_classes: int
+    box_lower: float
+    box_upper: float
+    feature_generator: str
+    feature_decay_exponent: float | None
+
+    @property
+    def problem_id(self) -> str: ...
+
+
+class ElasticNetModelSpec(Protocol):
+    n: int
+    p: int
+    feature_generator: str
+    feature_decay_exponent: float | None
+
+    def problem_id(self, *, bounded: bool) -> str: ...
 
 
 def _validate_shape(n: int, p: int) -> None:
@@ -128,10 +151,11 @@ class MultinomialSpec:
 class MultinomialProblem:
     """Average cross-entropy with elementwise bounds on the coefficient matrix."""
 
-    spec: MultinomialSpec
+    spec: MultinomialModelSpec
     X: torch.Tensor
     y: torch.Tensor
-    teacher: torch.Tensor
+    teacher: torch.Tensor | None
+    feature_frobenius_norm: float
 
     def objective(self, coefficients: torch.Tensor) -> torch.Tensor:
         self._validate_coefficients(coefficients)
@@ -175,17 +199,20 @@ class MultinomialProblem:
         )
         return violations.max()
 
-    def diagnostics(self) -> dict[str, float | list[int]]:
+    def diagnostics(self) -> dict[str, float | list[int] | None]:
         counts = torch.bincount(self.y, minlength=self.spec.n_classes)
-        return {
+        diagnostics: dict[str, float | list[int] | None] = {
             "class_counts": counts.cpu().tolist(),
-            "teacher_max_abs": float(self.teacher.abs().max()),
             "box_lower": self.spec.box_lower,
             "box_upper": self.spec.box_upper,
             "feature_generator": self.spec.feature_generator,
             "feature_decay_exponent": self.spec.feature_decay_exponent,
-            "feature_frobenius_norm": float(torch.linalg.vector_norm(self.X)),
+            "feature_frobenius_norm": self.feature_frobenius_norm,
         }
+        diagnostics["teacher_max_abs"] = (
+            float(self.teacher.abs().max()) if self.teacher is not None else None
+        )
+        return diagnostics
 
     def _validate_coefficients(self, coefficients: torch.Tensor) -> None:
         expected = (self.spec.p, self.spec.n_classes)
@@ -233,6 +260,7 @@ def generate_multinomial_problem(
         X=features.to(target),
         y=labels.to(target),
         teacher=teacher.to(target),
+        feature_frobenius_norm=float(torch.linalg.vector_norm(features)),
     )
 
 
@@ -280,15 +308,16 @@ class ElasticNetSpec:
 class ElasticNetProblem:
     """Average squared loss plus elastic net, optionally constrained to [0, 1]."""
 
-    spec: ElasticNetSpec
+    spec: ElasticNetModelSpec
     X: torch.Tensor
     y: torch.Tensor
-    teacher_weights: torch.Tensor
-    teacher_intercept: torch.Tensor
+    teacher_weights: torch.Tensor | None
+    teacher_intercept: torch.Tensor | None
     lambda_max: float
     lambda_l1: float
     lambda_l2: float
     bounded: bool
+    feature_frobenius_norm: float
 
     @property
     def problem_id(self) -> str:
@@ -404,17 +433,22 @@ class ElasticNetProblem:
         )
         return (primal - dual) / scale
 
-    def diagnostics(self) -> dict[str, float | int | bool]:
-        return {
+    def diagnostics(self) -> dict[str, float | int | bool | None]:
+        diagnostics: dict[str, float | int | bool | None] = {
             "lambda_max": self.lambda_max,
             "lambda_l1": self.lambda_l1,
             "lambda_l2": self.lambda_l2,
-            "teacher_nonzeros": int(torch.count_nonzero(self.teacher_weights)),
             "bounded": self.bounded,
             "feature_generator": self.spec.feature_generator,
             "feature_decay_exponent": self.spec.feature_decay_exponent,
-            "feature_frobenius_norm": float(torch.linalg.vector_norm(self.X)),
+            "feature_frobenius_norm": self.feature_frobenius_norm,
         }
+        diagnostics["teacher_nonzeros"] = (
+            int(torch.count_nonzero(self.teacher_weights))
+            if self.teacher_weights is not None
+            else None
+        )
+        return diagnostics
 
     def _validate_weights(self, weights: torch.Tensor) -> None:
         if weights.shape != (self.spec.p,):
@@ -496,4 +530,5 @@ def generate_elastic_net_problem(
         lambda_l1=regularization,
         lambda_l2=regularization,
         bounded=bounded,
+        feature_frobenius_norm=float(torch.linalg.vector_norm(features)),
     )

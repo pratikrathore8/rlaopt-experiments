@@ -239,6 +239,16 @@ DATASETS: dict[str, DatasetSpec] = {
 }
 
 
+@dataclass(frozen=True)
+class PreparedDataset:
+    """One validated base matrix and target loaded from the prepared cache."""
+
+    spec: DatasetSpec
+    matrix: np.ndarray | sparse.csr_matrix
+    target: np.ndarray
+    metadata: dict[str, object]
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as source:
@@ -508,3 +518,71 @@ def prepare_datasets(
         )
         for name in names
     ]
+
+
+def load_prepared_dataset(name: str, data_root: Path) -> PreparedDataset:
+    """Load one prepared artifact after validating it against the frozen catalog."""
+    try:
+        spec = DATASETS[name]
+    except KeyError as error:
+        raise ValueError(f"unknown real dataset: {name}") from error
+    directory = data_root.expanduser().resolve() / "processed" / name
+    metadata_path = directory / "metadata.json"
+    if not metadata_path.is_file():
+        raise FileNotFoundError(
+            f"prepared metadata is missing for {name}: run prepare-real-data first"
+        )
+    metadata = json.loads(metadata_path.read_text())
+    expected = {
+        "catalog_version": CATALOG_VERSION,
+        "dataset": name,
+        "problem": spec.problem,
+        "source_sha256": spec.sha256,
+        "rows": spec.training_rows,
+        "features": spec.features,
+        "classes": spec.classes,
+        "dtype": "float64",
+    }
+    mismatches = {
+        key: (metadata.get(key), value)
+        for key, value in expected.items()
+        if metadata.get(key) != value
+    }
+    if mismatches:
+        raise ValueError(f"prepared metadata does not match {name} catalog: {mismatches}")
+
+    matrix_filename = metadata.get("matrix_file")
+    if matrix_filename not in {"matrix.npz", "matrix.npy"}:
+        raise ValueError(f"prepared {name} has an unsupported matrix file: {matrix_filename!r}")
+    artifact_sha256 = metadata.get("artifact_sha256")
+    expected_artifacts = {matrix_filename, "target.npy"}
+    if not isinstance(artifact_sha256, dict) or set(artifact_sha256) != expected_artifacts:
+        raise ValueError(f"prepared {name} has incomplete artifact digests")
+    for filename, expected_digest in artifact_sha256.items():
+        artifact_path = directory / filename
+        if not artifact_path.is_file():
+            raise FileNotFoundError(f"prepared artifact is missing: {artifact_path}")
+        observed_digest = _sha256(artifact_path)
+        if observed_digest != expected_digest:
+            raise ValueError(
+                f"prepared artifact SHA-256 mismatch for {name}/{filename}: "
+                f"expected {expected_digest}, observed {observed_digest}"
+            )
+    if matrix_filename == "matrix.npz":
+        matrix = sparse.load_npz(directory / matrix_filename).tocsr()
+    else:
+        matrix = np.load(directory / matrix_filename, mmap_mode="c")
+    target = np.load(directory / "target.npy", mmap_mode="c")
+    if matrix.shape != spec.base_shape or matrix.dtype != np.float64:
+        raise ValueError(
+            f"prepared {name} matrix is {matrix.shape}/{matrix.dtype}; "
+            f"expected {spec.base_shape}/float64"
+        )
+    if target.shape != (spec.training_rows,):
+        raise ValueError(f"prepared {name} target has unexpected shape {target.shape}")
+    expected_target_dtype = np.int64 if spec.problem == "multinomial" else np.float64
+    if target.dtype != expected_target_dtype:
+        raise ValueError(
+            f"prepared {name} target is {target.dtype}; expected {expected_target_dtype}"
+        )
+    return PreparedDataset(spec=spec, matrix=matrix, target=target, metadata=metadata)

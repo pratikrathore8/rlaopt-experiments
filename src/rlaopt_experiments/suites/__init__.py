@@ -18,6 +18,10 @@ def get_suite(name: str) -> BenchmarkSuite:
         from rlaopt_experiments.suites.synthetic_erm.suite import SyntheticErmSuite
 
         return SyntheticErmSuite()
+    if name == "real_erm":
+        from rlaopt_experiments.suites.real_erm.suite import RealErmSuite
+
+        return RealErmSuite()
     raise ValueError(f"unknown benchmark suite: {name}")
 
 

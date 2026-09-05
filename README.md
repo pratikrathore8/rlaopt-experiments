@@ -76,6 +76,23 @@ matrix deterministically in RAM or VRAM and applies its nonlinearity in place; e
 matrices are never stored. Benchmark workers will call this function before solver timing,
 and feature generation and transfer will be recorded separately.
 
+Production workers verify the processed matrix and target digests before loading them. Sparse
+base matrices remain compact on disk but are converted to the same explicit dense float64
+matrix supplied to every solver; random-feature outputs are likewise fully materialized. For
+elastic net, the response is used as prepared and the intercept remains unregularized. Letting
+$\bar y$ denote its training mean, the data-dependent regularization scale is
+
+$$
+\lambda_{\max}=\frac{1}{n}\left\lVert X^{\mathsf T}
+\left(y-\bar y\mathbf{1}\right)\right\rVert_\infty.
+$$
+
+Both penalties use $\lambda_1=\lambda_2=\gamma\lambda_{\max}$ for each configured fraction
+$\gamma$. The vanilla and box-constrained variants therefore share exactly the same matrix,
+response, intercept convention, and penalty values. Cache validation, feature materialization,
+device transfer, and computation of $\lambda_{\max}$ occur during worker startup and are
+excluded from solver time.
+
 Prepare the compact source and base-matrix cache with
 
 ```bash

@@ -32,6 +32,7 @@ def test_problem_worker_dispatches_selected_ridge_suite():
         ready = worker.wait_until_ready(30)
         assert ready["kind"] == "ready"
         assert ready["worker_metadata"]["problem_generator"]
+        assert ready["worker_metadata"]["problem_preparation_seconds"] >= 0
 
         outcome = worker.solve(
             {
