@@ -148,6 +148,35 @@ Every persisted run ID includes the run seed, preventing the three timing observ
 a fixed real-data problem from overwriting one another. Startup failures and per-solve
 timeouts are retained as atomic result records.
 
+Create a fresh, immutable campaign plan with ten jobs per batch:
+
+```bash
+uv run --frozen python scripts/plan_real_production.py \
+  --config configs/real_erm.toml \
+  --output artifacts/real-erm-production-YYYYMMDD
+```
+
+The planner freezes and checksums a copy of the TOML file and every JSONL batch, splits CPU
+jobs between `soal-8` and `soal-9`
+without confounding a solver with one node, and writes at most ten jobs per 12-hour batch.
+Since worker startup and solve time are each capped at 30 minutes, this leaves two hours of
+worst-case batch margin. It then creates five submission waves containing 18, 18, 12, 6, and
+5 array elements. Within each wave, each node's array is throttled to one task, so only one of
+our benchmark processes runs on a node at a time.
+
+After the previous wave has finished, submit the next one with
+
+```bash
+scripts/submit_real_production_wave.sh \
+  artifacts/real-erm-production-YYYYMMDD WAVE_INDEX
+```
+
+The submission helper refuses a dirty repository, another active real-data production wave,
+more than six tasks per node, more than 18 tasks in a wave, or any submission that would
+exceed the user-wide 20-job QOS limit. Individual launcher failures are reported while the
+remaining jobs in that batch continue, and all successful or solver-level failure outcomes
+remain atomic records under the campaign directory.
+
 ## Synthetic ERM development suite
 
 This suite develops the three problem classes intended for the later real-data study on deterministic synthetic data first. All generated arrays and all solver computations use float64. The calibration, smoke, and scaling-pilot grids generate features on CPU from seeded Gaussian streams, then center and scale each column to unit population root-mean-square; the separate conditioning diagnostic uses the SORF construction documented below. Problem generation and host-to-device transfer are measured separately from solver time and are not included in the primary solve-time comparison. Every competitor receives the same materialized data and mathematical formulation.
