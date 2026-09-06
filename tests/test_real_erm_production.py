@@ -85,3 +85,36 @@ def test_real_production_plan_enforces_safe_limits(
             max_jobs_per_batch=max_jobs,
             max_batches_per_node_per_wave=max_batches,
         )
+
+
+def test_scs_supplement_has_ten_individual_tasks_for_the_original_problems(tmp_path):
+    supplement = CONFIG.with_name("real_erm_scs_backends.toml")
+    root = tmp_path / "scs"
+    plan = plan_real_production(
+        supplement, root, max_jobs_per_batch=1, gpu_concurrency=4, gpu_cpu_threads=32,
+    )
+    assert plan["problem_types"] == ["bounded_elastic_net"]
+    assert sorted(plan["jobs"].values()) == [2, 3, 5]
+    assert plan["batches"] == plan["jobs"]
+    assert plan["waves"][0]["tasks"] == 10
+    assert plan["gpu_concurrency"] == 4
+    assert plan["gpu_cpu_threads"] == 32
+    from rlaopt_experiments.manifests import build_manifest
+    from rlaopt_experiments.suites.real_erm.config import load_real_erm_config
+
+    config = load_real_erm_config(supplement)
+    execution = config.elastic_net.bounded_execution
+    for backend, solver in [("cpu", "scs_cpu_indirect"), ("cuda", "scs_cuda_direct")]:
+        jobs = _read_jsonl(root / "manifests" / f"{backend}.jsonl")
+        original = [j for j in build_manifest(CONFIG, backend)
+                    if j["problem_type"] == "bounded_elastic_net"]
+        assert len(jobs) == 5
+        assert {j["solver"] for j in jobs} == {solver}
+        assert {j["problem_type"] for j in jobs} == {"bounded_elastic_net"}
+        assert {(j["problem_id"], j["seed"], j["solver_seed"]) for j in jobs} == {
+            (j["problem_id"], j["seed"], j["solver_seed"]) for j in original
+        }
+        assert not execution.tolerances_calibrated_for(backend)
+        assert execution.native_tolerances.for_solver(backend, solver) == 1e-7
+        assert "New backend calibration not performed" in execution.native_tolerance_source
+    assert all(len(_read_jsonl(p)) == 1 for p in (root / "batches").glob("*/*.jsonl"))

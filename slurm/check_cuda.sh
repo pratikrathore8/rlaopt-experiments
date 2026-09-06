@@ -38,4 +38,4 @@ apptainer inspect "$DERIVED_IMAGE"
 apptainer exec --nv --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
   "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python scripts/check_gpu_environment.py
 apptainer exec --nv --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
-  "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python scripts/check_scs_cuda.py
+  "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python scripts/check_scs_backends.py --backend cuda

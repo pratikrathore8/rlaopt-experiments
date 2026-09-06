@@ -32,6 +32,28 @@ if [[ -n "$(git -C "$REPOSITORY" status --porcelain)" ]]; then
   exit 2
 fi
 
+read -r GPU_CONCURRENCY GPU_CPU_THREADS SCS_SUPPLEMENT < <(python3 - "$PLAN_DIRECTORY/plan.json" "$CONFIG" <<'PY'
+import json, sys, tomllib
+plan = json.load(open(sys.argv[1]))
+config = tomllib.load(open(sys.argv[2], 'rb'))
+subset = config['experiment'].get('solver_subset', [])
+print(plan.get('gpu_concurrency', 1), plan.get('gpu_cpu_threads', 64),
+      int(bool({'scs_cpu_indirect', 'scs_cuda_direct'} & set(subset))))
+PY
+)
+if [[ ! "$GPU_CONCURRENCY" =~ ^[1-4]$ || ! "$GPU_CPU_THREADS" =~ ^[1-9][0-9]*$ ]] || \
+   (( GPU_CPU_THREADS > 64 || GPU_CONCURRENCY * GPU_CPU_THREADS > 144 )); then
+  echo "Invalid GPU concurrency or host-core allocation in plan.json." >&2
+  exit 2
+fi
+if [[ "$SCS_SUPPLEMENT" == 1 ]]; then
+  # Import-only check: fail before sbatch if the old image is still selected.
+  source "$REPOSITORY/containers/cuda.env"
+  IMAGE="$REPOSITORY/$RLAOPT_CUDA_IMAGE"
+  apptainer exec "$IMAGE" /opt/rlaopt-experiments/.venv/bin/python -c \
+    'from scs import _scs_cudss, _scs_indirect; from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import solve_scs_cuda_direct, solve_scs_cpu_indirect; assert _scs_cudss.sizeof_float() == 8 and _scs_cudss.sizeof_int() == 4'
+fi
+
 required=0
 for list in "$WAVE_DIRECTORY"/*.txt; do
   count="$(wc -l < "$list")"
@@ -65,13 +87,23 @@ submit_target() {
   [[ -f "$list" ]] || return 0
   local count
   count="$(wc -l < "$list")"
+  local concurrency=1
+  local threads=64
+  if [[ "$backend" == "cuda" ]]; then
+    concurrency="$GPU_CONCURRENCY"
+    threads="$GPU_CPU_THREADS"
+  fi
   local args=(
-    --array="0-$((count - 1))%1"
+    --array="0-$((count - 1))%$concurrency"
+    --cpus-per-task="$threads"
     --nodelist="$node"
     --job-name="real-erm-prod-$WAVE_NAME-$target"
     --output="$PLAN_DIRECTORY/logs/$WAVE_NAME-$target-%A_%a.out"
-    --export="ALL,BACKEND=$backend,BATCH_LIST=$list,CONFIG=$CONFIG,OUTPUT_DIR=$OUTPUT_DIR"
+    --export="ALL,BACKEND=$backend,BATCH_LIST=$list,CONFIG=$CONFIG,OUTPUT_DIR=$OUTPUT_DIR,BENCHMARK_CPU_THREADS=$threads"
   )
+  if [[ "$SCS_SUPPLEMENT" == 1 ]]; then
+    args+=(--time=03:00:00)
+  fi
   if [[ "$backend" == "cuda" ]]; then
     args+=(--gres=gpu:h200nvl:1)
   fi

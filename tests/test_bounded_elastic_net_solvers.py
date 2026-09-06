@@ -20,6 +20,8 @@ from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import 
     solve_rlaopt_admm,
     solve_scs,
     solve_scs_cuda,
+    solve_scs_cpu_indirect,
+    solve_scs_cuda_direct,
 )
 from rlaopt_experiments.clarabel_bridge import ClarabelRuntime
 
@@ -138,6 +140,7 @@ def test_rlaopt_native_objective_matches_canonical_inside_box(problem) -> None:
     ("adapter", "extra"),
     [
         (solve_scs, {}),
+        (solve_scs_cpu_indirect, {}),
         (solve_rlaopt_admm, {"batch_size": 32, "seed": 33}),
     ],
 )
@@ -328,17 +331,22 @@ def test_scs_does_not_treat_inaccurate_status_as_native_convergence(
     assert "inaccurate" in result.native_status
 
 
+@pytest.mark.parametrize(
+    ("adapter", "module", "method"),
+    [(solve_scs_cuda, "scs._scs_gpu", "indirect"),
+     (solve_scs_cuda_direct, "scs._scs_cudss", "direct cuDSS")],
+)
 def test_scs_cuda_never_falls_back_when_gpu_module_is_missing(
-    problem, monkeypatch: pytest.MonkeyPatch
+    problem, monkeypatch: pytest.MonkeyPatch, adapter, module, method
 ) -> None:
     monkeypatch.setattr(
         "rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers._require_device",
         lambda *_args: None,
     )
-    monkeypatch.setitem(sys.modules, "scs._scs_gpu", None)
+    monkeypatch.setitem(sys.modules, module, None)
 
-    with pytest.raises(RuntimeError, match="not built with its CUDA indirect backend"):
-        solve_scs_cuda(
+    with pytest.raises(RuntimeError, match=f"not built with its CUDA {method} backend"):
+        adapter(
             problem,
             native_tolerance=1e-8,
             max_iterations=100,
@@ -370,3 +378,46 @@ def test_bounded_adapters_reject_invalid_controls(problem) -> None:
             batch_size=0,
             seed=33,
         )
+
+
+@pytest.mark.parametrize(
+    ("adapter", "gpu", "indirect", "module"),
+    [
+        (solve_scs, False, False, "scs._scs_direct"),
+        (solve_scs_cpu_indirect, False, True, "scs._scs_indirect"),
+        (solve_scs_cuda, True, True, "scs._scs_gpu"),
+        (solve_scs_cuda_direct, True, False, "scs._scs_cudss"),
+    ],
+)
+def test_scs_backend_controls_and_metadata(problem, monkeypatch, adapter, gpu, indirect, module):
+    import scs
+
+    real_solve = scs.solve
+    calls = []
+
+    def checked_solve(data, cone, **settings):
+        calls.append(settings.copy())
+        # Exercise extraction and diagnostics using a real CPU solution.
+        return real_solve(data, cone, **(settings | {"gpu": False}))
+
+    if gpu:
+        monkeypatch.setattr(
+            "rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers._require_device",
+            lambda *_args: None,
+        )
+        monkeypatch.setitem(sys.modules, module, SimpleNamespace(
+            sizeof_float=lambda: 8, sizeof_int=lambda: 4,
+        ))
+    monkeypatch.setattr(scs, "solve", checked_solve)
+    result = adapter(problem, native_tolerance=1e-7, max_iterations=5000)
+    assert len(calls) == 1
+    assert calls[0] == {
+        "eps_abs": 1e-7, "eps_rel": 1e-7, "max_iters": 5000,
+        "verbose": False, "gpu": gpu, "use_indirect": indirect,
+    }
+    assert result.native_status == "converged"
+    assert result.metadata["scs_gpu"] is gpu
+    assert result.metadata["scs_use_indirect"] is indirect
+    assert result.metadata["linear_solver"] == (
+        f"{'gpu' if gpu else 'cpu'}_{'indirect' if indirect else 'direct'}"
+    )

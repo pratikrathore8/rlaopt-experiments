@@ -95,8 +95,11 @@ def build_real_bounded_elastic_net_manifest(
 
 def build_real_erm_manifest(config: RealErmConfig, backend: str) -> list[dict[str, Any]]:
     """Return every executable real-data ERM job for one backend."""
-    return (
+    jobs = (
         build_real_multinomial_manifest(config, backend)
         + build_real_vanilla_elastic_net_manifest(config, backend)
         + build_real_bounded_elastic_net_manifest(config, backend)
     )
+    return [
+        job for job in jobs if config.solver_subset is None or job["solver"] in config.solver_subset
+    ]

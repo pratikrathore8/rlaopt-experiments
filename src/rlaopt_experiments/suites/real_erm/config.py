@@ -53,8 +53,12 @@ def _validate_solver_tolerances(
         raise ValueError(f"{name} requires frozen native tolerances")
     if execution.native_tolerances_calibrated is None:
         raise ValueError(f"{name} requires native-tolerance calibration state")
-    if not all(
-        execution.native_tolerances_calibrated.for_backend(backend) for backend in ("cpu", "cuda")
+    if (
+        not all(
+            execution.native_tolerances_calibrated.for_backend(backend)
+            for backend in ("cpu", "cuda")
+        )
+        and execution.native_tolerance_source is None
     ):
         raise ValueError(f"{name} native tolerances must be calibrated for both backends")
     for backend in ("cpu", "cuda"):
@@ -124,6 +128,8 @@ class RealErmConfig:
     accuracy: AccuracyThresholds
     multinomial: RealMultinomialExperiment
     elastic_net: RealElasticNetExperiment
+    # An explicit subset lets a supplemental campaign retain the full protocol.
+    solver_subset: tuple[str, ...] | None = None
 
     def __post_init__(self) -> None:
         if self.suite != "real_erm":
@@ -141,6 +147,17 @@ class RealErmConfig:
             raise ValueError("timeouts must be positive")
         if not self.accuracy.calibrated:
             raise ValueError("real-data production accuracy thresholds must be calibrated")
+        if self.solver_subset is not None:
+            _unique_nonempty(self.solver_subset, "solver_subset")
+            configured = set()
+            for solvers in (
+                self.multinomial.solvers,
+                self.elastic_net.vanilla_solvers,
+                self.elastic_net.bounded_solvers,
+            ):
+                configured.update(solvers.cpu + solvers.cuda)
+            if not set(self.solver_subset) <= configured:
+                raise ValueError("solver_subset contains unconfigured solvers")
 
 
 def _backend_solvers(data: dict[str, Any], name: str) -> BackendSolvers:
@@ -150,6 +167,7 @@ def _backend_solvers(data: dict[str, Any], name: str) -> BackendSolvers:
 
 def _execution(data: dict[str, Any], name: str) -> SolverExecution:
     values = dict(data)
+    source = values.pop("native_tolerance_source", None)
     _require_keys(
         values,
         {
@@ -167,6 +185,7 @@ def _execution(data: dict[str, Any], name: str) -> SolverExecution:
     if not all(isinstance(states[backend], bool) for backend in ("cpu", "cuda")):
         raise ValueError(f"{name} calibration states must be Boolean")
     return SolverExecution(
+        native_tolerance_source=source,
         native_tolerances_calibrated=BackendCalibrationState(**states),
         native_tolerances=BackendTolerances(
             cpu=tuple(sorted(tolerances["cpu"].items())),
@@ -181,6 +200,7 @@ def load_real_erm_config(path: Path) -> RealErmConfig:
     root = tomllib.loads(path.read_text())
     _require_keys(root, {"experiment", "accuracy", "multinomial", "elastic_net"}, "root")
     experiment = dict(root["experiment"])
+    subset = experiment.pop("solver_subset", None)
     _require_keys(
         experiment,
         {
@@ -244,6 +264,7 @@ def load_real_erm_config(path: Path) -> RealErmConfig:
         ),
     )
     return RealErmConfig(
+        solver_subset=tuple(subset) if subset is not None else None,
         accuracy=AccuracyThresholds(**accuracy_data),
         multinomial=multinomial,
         elastic_net=elastic_net,

@@ -74,8 +74,14 @@ def plan_real_production(
     *,
     max_jobs_per_batch: int = 7,
     max_batches_per_node_per_wave: int = 6,
+    gpu_concurrency: int = 1,
+    gpu_cpu_threads: int = 64,
 ) -> dict[str, Any]:
     """Write immutable manifests, bounded batches, wave lists, and plan metadata."""
+    if not 1 <= gpu_concurrency <= 4:
+        raise ValueError("gpu_concurrency must be between 1 and 4")
+    if not 1 <= gpu_cpu_threads <= 64 or gpu_concurrency * gpu_cpu_threads > 144:
+        raise ValueError("GPU tasks must fit soal-12's 144 physical cores (1-64 threads/task)")
     if not 1 <= max_jobs_per_batch <= MAX_SAFE_JOBS_PER_BATCH:
         raise ValueError(f"max_jobs_per_batch must be between 1 and {MAX_SAFE_JOBS_PER_BATCH}")
     if not 1 <= max_batches_per_node_per_wave <= MAX_SAFE_BATCHES_PER_NODE_PER_WAVE:
@@ -152,7 +158,9 @@ def plan_real_production(
         "max_jobs_per_batch": max_jobs_per_batch,
         "max_batches_per_node_per_wave": max_batches_per_node_per_wave,
         "max_tasks_per_wave": len(PRODUCTION_TARGETS) * max_batches_per_node_per_wave,
-        "problem_types": sorted(PRODUCTION_PROBLEM_TYPES),
+        "gpu_concurrency": gpu_concurrency,
+        "gpu_cpu_threads": gpu_cpu_threads,
+        "problem_types": sorted({job["problem_type"] for job in cpu + cuda}),
         "jobs": {target: len(jobs) for target, jobs in target_jobs.items()},
         "batches": {target: len(paths) for target, paths in target_batches.items()},
         "waves": waves,

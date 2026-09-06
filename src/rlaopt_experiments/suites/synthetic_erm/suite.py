@@ -22,6 +22,8 @@ from rlaopt_experiments.suites.synthetic_erm.bounded_elastic_net_solvers import 
     solve_rlaopt_admm,
     solve_scs,
     solve_scs_cuda,
+    solve_scs_cpu_indirect,
+    solve_scs_cuda_direct,
 )
 from rlaopt_experiments.suites.synthetic_erm.elastic_net_solvers import (
     ElasticNetSolverResult,
@@ -182,6 +184,10 @@ class SyntheticErmSuite:
             result = solve_scs(problem, **common)
         elif solver_name == "scs_cuda":
             result = solve_scs_cuda(problem, **common)
+        elif solver_name == "scs_cpu_indirect":
+            result = solve_scs_cpu_indirect(problem, **common)
+        elif solver_name == "scs_cuda_direct":
+            result = solve_scs_cuda_direct(problem, **common)
         elif solver_name in {"clarabel_qdldl", "cuclarabel_cudss"}:
             runtime = command.get("clarabel_runtime")
             if runtime is None:

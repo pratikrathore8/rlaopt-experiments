@@ -28,3 +28,5 @@ echo "starting SIF Python at $(date --iso-8601=seconds)"
 echo "RLAOPT_CUDA_IMAGE_SHA256=$(cut -d' ' -f1 "$DERIVED_IMAGE.sha256")"
 apptainer exec --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
   "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python scripts/check_cpu_environment.py
+apptainer exec --bind "$REPOSITORY:$REPOSITORY" --pwd "$REPOSITORY" \
+  "$DERIVED_IMAGE" /opt/rlaopt-experiments/.venv/bin/python scripts/check_scs_backends.py --backend cpu

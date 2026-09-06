@@ -245,3 +245,26 @@ def test_real_execution_uses_distinct_record_ids_for_solver_seeds(
     assert len(records) == 3
     assert len({record.run_id for record in records}) == 3
     assert len(list((tmp_path / "records").glob("*.json"))) == 3
+
+
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_scs_supplement_persists_transferred_tolerance(tmp_path, monkeypatch, backend):
+    path = CONFIG.with_name("real_erm_scs_backends.toml")
+    config = load_real_erm_config(path)
+    job = build_manifest(path, backend)[0]
+    monkeypatch.setattr("rlaopt_experiments.suites.real_erm.execution.ProblemWorker", FakeWorker)
+    monkeypatch.setattr("rlaopt_experiments.runner.wandb_run", lambda *a, **k: nullcontext(None))
+    records = run_real_bounded_elastic_net_job(
+        job, config, native_tolerance=1e-7, max_iterations=100_000,
+        batch_size=256, output_dir=tmp_path,
+    )
+    assert FakeWorker.instances[0].commands[0]["solver"] == job["solver"]
+    record = records[0]
+    assert record.solver == job["solver"]
+    assert record.metadata["native_tolerances_calibrated"] is False
+    assert record.metadata["native_tolerance_source"] == (
+        config.elastic_net.bounded_execution.native_tolerance_source
+    )
+    persisted = read_record(next((tmp_path / "records").glob("*.json")))
+    assert persisted["metadata"]["native_tolerances_calibrated"] is False
+    assert persisted["metadata"]["native_tolerance"] == 1e-7

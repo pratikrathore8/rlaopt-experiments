@@ -31,6 +31,8 @@ def _validate_common_job(
     solver = job.get("solver")
     if solver not in getattr(solvers, backend):
         raise ValueError("manifest solver is not configured for its backend")
+    if config.solver_subset is not None and solver not in config.solver_subset:
+        raise ValueError("manifest solver is excluded by solver_subset")
     seed = job.get("seed")
     if not isinstance(seed, int) or seed not in config.seeds:
         raise ValueError("manifest seed is not configured")
@@ -181,6 +183,7 @@ def _run_job(
             **accuracy_fields,
             "accuracy_thresholds_calibrated": config.accuracy.calibrated,
             "native_tolerances_calibrated": execution.tolerances_calibrated_for(backend),
+            "native_tolerance_source": execution.native_tolerance_source,
         }
         timing_scope = (
             "native solver invocation; excludes dataset loading, random-feature "

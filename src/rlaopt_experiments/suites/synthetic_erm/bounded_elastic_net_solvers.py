@@ -250,6 +250,7 @@ def solve_scs(
         native_tolerance=native_tolerance,
         max_iterations=max_iterations,
         use_gpu=False,
+        use_indirect=False,
     )
 
 
@@ -266,6 +267,41 @@ def solve_scs_cuda(
         native_tolerance=native_tolerance,
         max_iterations=max_iterations,
         use_gpu=True,
+        use_indirect=True,
+    )
+
+
+def solve_scs_cpu_indirect(
+    problem: ElasticNetProblem,
+    *,
+    native_tolerance: float,
+    max_iterations: int,
+) -> BoundedElasticNetSolverResult:
+    """Use SCS CPU CG linear solves under a distinct, persistent solver ID."""
+    return _solve_scs(
+        problem,
+        expected_device="cpu",
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
+        use_gpu=False,
+        use_indirect=True,
+    )
+
+
+def solve_scs_cuda_direct(
+    problem: ElasticNetProblem,
+    *,
+    native_tolerance: float,
+    max_iterations: int,
+) -> BoundedElasticNetSolverResult:
+    """Use SCS GPU sparse direct cuDSS; never fall back to another backend."""
+    return _solve_scs(
+        problem,
+        expected_device="cuda",
+        native_tolerance=native_tolerance,
+        max_iterations=max_iterations,
+        use_gpu=True,
+        use_indirect=False,
     )
 
 
@@ -276,6 +312,7 @@ def _solve_scs(
     native_tolerance: float,
     max_iterations: int,
     use_gpu: bool,
+    use_indirect: bool,
 ) -> BoundedElasticNetSolverResult:
     _validate_problem(problem)
     _validate_controls(native_tolerance, max_iterations)
@@ -283,11 +320,14 @@ def _solve_scs(
     import scs
 
     if use_gpu:
+        from importlib import import_module
+
         try:
-            from scs import _scs_gpu
+            extension = import_module("scs._scs_gpu" if use_indirect else "scs._scs_cudss")
         except ImportError as error:
-            raise RuntimeError("SCS was not built with its CUDA indirect backend") from error
-        if _scs_gpu.sizeof_float() != 8 or _scs_gpu.sizeof_int() != 4:
+            method = "indirect" if use_indirect else "direct cuDSS"
+            raise RuntimeError(f"SCS was not built with its CUDA {method} backend") from error
+        if extension.sizeof_float() != 8 or extension.sizeof_int() != 4:
             raise RuntimeError("SCS CUDA must use float64 values and 32-bit indices")
 
     preparation_started = time.perf_counter()
@@ -305,9 +345,9 @@ def _solve_scs(
         "eps_rel": native_tolerance,
         "max_iters": max_iterations,
         "verbose": False,
+        "gpu": use_gpu,
+        "use_indirect": use_indirect,
     }
-    if use_gpu:
-        settings |= {"gpu": True, "use_indirect": True}
     _synchronize(problem.X.device)
     started = time.perf_counter()
     native_result = scs.solve(data, cone, **settings)
@@ -333,7 +373,9 @@ def _solve_scs(
         native_error=None,
         metadata={
             "conic_preparation_seconds": preparation_seconds,
-            "linear_solver": "gpu_indirect" if use_gpu else "cpu_direct",
+            "linear_solver": f"{'gpu' if use_gpu else 'cpu'}_{'indirect' if use_indirect else 'direct'}",
+            "scs_gpu": use_gpu,
+            "scs_use_indirect": use_indirect,
             "native_duality_gap": float(info["gap"]),
             "native_primal_residual": float(info["res_pri"]),
             "native_dual_residual": float(info["res_dual"]),

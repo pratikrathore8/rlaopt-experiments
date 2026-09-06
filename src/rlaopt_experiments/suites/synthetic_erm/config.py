@@ -133,8 +133,15 @@ class SolverExecution:
     # Calibration configurations explicitly carry no frozen native tolerances.
     native_tolerances_calibrated: BackendCalibrationState | None
     native_tolerances: BackendTolerances | None
+    # Optional provenance for an explicitly transferred, uncalibrated tolerance.
+    native_tolerance_source: str | None = None
 
     def __post_init__(self) -> None:
+        if self.native_tolerance_source is not None and (
+            not isinstance(self.native_tolerance_source, str)
+            or not self.native_tolerance_source.strip()
+        ):
+            raise ValueError("native_tolerance_source must be a nonempty provenance string")
         if self.max_iterations < 1:
             raise ValueError("max_iterations must be positive")
         if self.batch_size < 1:

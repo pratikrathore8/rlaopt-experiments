@@ -177,6 +177,51 @@ exceed the user-wide 20-job QOS limit. Individual launcher failures are reported
 remaining jobs in that batch continue, and all successful or solver-level failure outcomes
 remain atomic records under the campaign directory.
 
+## SCS bounded elastic-net backend supplement
+
+The SCS adapters share the same conic formulation, timing boundaries, and external
+accuracy checks in both ERM suites. Solver IDs explicitly select these backends:
+
+| Solver ID | Device | Linear solver |
+|---|---|---|
+| `scs` | CPU | Sparse direct QDLDL (original baseline) |
+| `scs_cpu_indirect` | CPU | Indirect CG |
+| `scs_cuda` | CUDA | GPU indirect CG (original baseline) |
+| `scs_cuda_direct` | CUDA | Sparse direct cuDSS |
+
+`configs/real_erm_scs_backends.toml` adds only CPU indirect and GPU direct for the
+same five bounded elastic-net problems used in the original real-data campaign.
+It retains seed 300, regularization fraction 0.1, one cold measured solve, 100,000
+iterations, and a one-hour solve timeout. Both added backends reuse
+`eps_abs = eps_rel = 1e-7`; their native tolerances are explicitly **not recalibrated**.
+Records preserve the transfer provenance and the existing external KKT/feasibility checks.
+Internal SCS setup and factorization remain inside solver timing; benchmark-side conic
+construction is recorded separately. Each solver ID has separate result records.
+
+Rebuild the existing container with `sbatch slurm/build_cuda.sh`. The recipe builds
+all four SCS 3.2.11 backends in float64 with 32-bit indices, reusing cuDSS 0.7.1 from
+the pinned Julia artifact. A missing CUDA backend raises an error, with no fallback.
+After the build, `slurm/check_cpu.sh` and `slurm/check_cuda.sh` run small correctness
+checks of both SCS backends on their respective device. These checks use the frozen
+production tolerance; they do not perform a calibration sweep.
+
+Prepare one solve per task with:
+
+```bash
+uv run --frozen python scripts/plan_real_production.py \
+  --config configs/real_erm_scs_backends.toml \
+  --output artifacts/real-erm-scs-backends-20260906 \
+  --max-jobs-per-batch 1 --gpu-concurrency 4 --gpu-cpu-threads 32
+```
+
+The ten tasks fit in one wave. CPU tasks are split 3/2 between `soal-8` and `soal-9`,
+with one 64-core task at a time on each node. GPU tasks run on `soal-12`, with up to
+four concurrent tasks, each reserving one H200, 32 host cores, and 128 GB host memory.
+The GPU host-core allocation differs from the original campaign's 64 cores; report
+that and shared-node execution when comparing timings. After the build and checks,
+submit wave 0 with `scripts/submit_real_production_wave.sh
+artifacts/real-erm-scs-backends-20260906 0` from a clean checkout.
+
 ## Synthetic ERM development suite
 
 This suite develops the three problem classes intended for the later real-data study on deterministic synthetic data first. All generated arrays and all solver computations use float64. The calibration, smoke, and scaling-pilot grids generate features on CPU from seeded Gaussian streams, then center and scale each column to unit population root-mean-square; the separate conditioning diagnostic uses the SORF construction documented below. Problem generation and host-to-device transfer are measured separately from solver time and are not included in the primary solve-time comparison. Every competitor receives the same materialized data and mathematical formulation.

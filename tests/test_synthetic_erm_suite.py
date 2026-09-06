@@ -158,8 +158,9 @@ def test_vanilla_elastic_net_suite_dispatches_no_jit_variant() -> None:
     assert outcome["solver_metadata"]["first_jit_compilation_included"] is False
 
 
+@pytest.mark.parametrize("solver", ["scs", "scs_cpu_indirect", "scs_cuda", "scs_cuda_direct"])
 def test_bounded_elastic_net_suite_executes_and_uses_external_kkt(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: pytest.MonkeyPatch, solver: str,
 ) -> None:
     suite = get_suite("synthetic_erm")
     problem = suite.generate(
@@ -176,14 +177,14 @@ def test_bounded_elastic_net_suite_executes_and_uses_external_kkt(
         metadata={"linear_solver": "fake"},
     )
     monkeypatch.setattr(
-        "rlaopt_experiments.suites.synthetic_erm.suite.solve_scs",
+        f"rlaopt_experiments.suites.synthetic_erm.suite.solve_{solver}",
         lambda *_args, **_kwargs: result,
     )
 
     outcome = suite.execute(
         problem,
         {
-            "solver": "scs",
+            "solver": solver,
             "native_tolerance": 1e-6,
             "max_iters": 100,
             "stationarity_tolerance": 1e6,
