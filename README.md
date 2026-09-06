@@ -210,17 +210,17 @@ Prepare one solve per task with:
 ```bash
 uv run --frozen python scripts/plan_real_production.py \
   --config configs/real_erm_scs_backends.toml \
-  --output artifacts/real-erm-scs-backends-20260906 \
-  --max-jobs-per-batch 1 --gpu-concurrency 4 --gpu-cpu-threads 32
+  --output artifacts/real-erm-scs-backends-20260906-64threads \
+  --max-jobs-per-batch 1 --gpu-concurrency 2 --gpu-cpu-threads 64
 ```
 
 The ten tasks fit in one wave. CPU tasks are split 3/2 between `soal-8` and `soal-9`,
 with one 64-core task at a time on each node. GPU tasks run on `soal-12`, with up to
-four concurrent tasks, each reserving one H200, 32 host cores, and 128 GB host memory.
-The GPU host-core allocation differs from the original campaign's 64 cores; report
-that and shared-node execution when comparing timings. After the build and checks,
+two concurrent tasks, each reserving one H200, 64 host cores, and 128 GB host memory.
+This matches the original campaign's host-thread allocation. Report shared-node
+execution when comparing timings. After the build and checks,
 submit wave 0 with `scripts/submit_real_production_wave.sh
-artifacts/real-erm-scs-backends-20260906 0` from a clean checkout.
+artifacts/real-erm-scs-backends-20260906-64threads 0` from a clean checkout.
 
 ## Synthetic ERM development suite
 
