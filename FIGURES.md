@@ -142,3 +142,9 @@ selected attempt; a timeout is displayed but never selected as a successful solv
 and hashes all consumed records, completed summaries, manifests and plotting code.
 Startup and warmup wall times remain available in the ridge trial summaries; they
 are excluded from the cumulative measured solver times in the plotting audit.
+
+## Differentiable optimization
+
+[PDF](artifacts/paper-figures/diff_solver_plot.pdf) · [PNG](artifacts/paper-figures/diff_solver_plot.png)
+
+The lasso tuning objective versus iterations, with a logarithmic objective axis. Run `scripts/run_differentiable_optimization.py`, then `scripts/make_paper_figures.py --differentiable-only`. The latter updates the existing figure and trace CSV; full figure regeneration also includes the saved result.

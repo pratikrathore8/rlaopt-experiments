@@ -785,3 +785,12 @@ Limitations: SORF factors are structured random orthogonal matrices rather than 
 The accuracy-refinement plotting command and captions are documented in
 [FIGURES.md](FIGURES.md#figures-incorporating-accuracy-refinement). This mode updates
 only ridge scaling and bounded elastic net; attempt costs stay in audit files.
+
+### Differentiable optimization demonstration
+
+```sh
+.venv/bin/python scripts/run_differentiable_optimization.py
+.venv/bin/python scripts/make_paper_figures.py --differentiable-only
+```
+
+The script generates seeded synthetic data, differentiates through the lasso solver, and saves the validation objective in `artifacts/differentiable-optimization/result.json`. Its data and solver settings are specified directly in the script. The plot uses Iterations on the linear x-axis and Objective Value on the logarithmic y-axis. Full figure regeneration includes this saved result when available.

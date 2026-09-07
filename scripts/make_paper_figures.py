@@ -653,6 +653,18 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
+def differentiable_figure(path, output):
+    trace = json.loads(path.read_text())["trace"]
+    fig, ax = plt.subplots(figsize=(5.4, 3.4), layout="constrained")
+    ax.semilogy([r["iteration"] for r in trace], [r["validation_mse"] for r in trace],
+                color=SOLVER_COLORS["rlaopt_nystrom_pcg"], linewidth=1.8)
+    ax.set(xlabel="Iterations", ylabel="Objective Value")
+    grid(ax)
+    save(fig, output, "diff_solver_plot")
+    write_csv(output / "differentiable_optimization_trace.csv", trace)
+    return [path, Path(__file__).with_name("run_differentiable_optimization.py")]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ridge", type=Path, default=Path("artifacts/production-20260831"))
@@ -667,6 +679,10 @@ def main():
     parser.add_argument("--ridge-refinement", type=Path)
     parser.add_argument("--real-supplement", type=Path, action="append", default=[])
     parser.add_argument("--real-refinement", type=Path, action="append", default=[])
+    parser.add_argument("--differentiable", type=Path,
+                        default=Path("artifacts/differentiable-optimization/result.json"))
+    parser.add_argument("--differentiable-only", action="store_true",
+                        help="Regenerate only the differentiable optimization figure")
     args = parser.parse_args()
     if (args.ridge_refinement or args.real_refinement) and not args.accuracy_refinement:
         parser.error("Refinement inputs require --accuracy-refinement")
@@ -684,6 +700,10 @@ def main():
             "axes.unicode_minus": False,
         }
     )
+    if args.differentiable_only:
+        differentiable_figure(args.differentiable, args.output)
+        print(f"Updated diff_solver_plot.pdf/png in {args.output}")
+        return
     config = tomllib.loads(Path("configs/synthetic.toml").read_text())["experiment"]
     ridge = {}
     sources = []
@@ -907,6 +927,13 @@ def main():
     )
     if not main_only:
         speedups(list(ridge.values()), entries, args.output)
+    diff_sources = []
+    if not main_only:
+        if args.differentiable.exists():
+            diff_sources = differentiable_figure(args.differentiable, args.output)
+        else:
+            print("Differentiable figure skipped: run scripts/run_differentiable_optimization.py first")
+    sources.extend(diff_sources)
     dataset_rows = []
     for dataset in sorted({r["dataset"] for r in entries}):
         record = next(r for r in real_records.values() if r["metadata"]["dataset"] == dataset)
@@ -947,7 +974,7 @@ def main():
     }
     (args.output / "audit.json").write_text(json.dumps(audit, indent=2) + "\n")
     print(json.dumps({k: v for k, v in audit.items() if k != "source_sha256"}, indent=2))
-    print(f"Updated {2 if main_only else 22} PDF/PNG figure pairs in {args.output}")
+    print(f"Updated {2 if main_only else 22 + bool(diff_sources)} PDF/PNG figure pairs in {args.output}")
 
 
 if __name__ == "__main__":
