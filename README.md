@@ -222,6 +222,38 @@ execution when comparing timings. After the build and checks,
 submit wave 0 with `scripts/submit_real_production_wave.sh
 artifacts/real-erm-scs-backends-20260906-64threads 0` from a clean checkout.
 
+### YearPredictionMSD-rf tolerance sensitivity follow-up
+
+The 64-thread SCS GPU-direct run at `eps_abs = eps_rel = 1e-7` reported native
+convergence after 350 iterations and 365.56 seconds, but missed the common
+stationarity and feasibility targets: `0.0117797 > 1e-4` and `5.00225e-6 > 1e-6`,
+respectively. This result remains in
+`artifacts/real-erm-scs-backends-20260906-64threads`; it is not replaced.
+
+A separate, post-production sensitivity study tests the two native tolerances
+`1e-8` and `1e-9`, both specified before running the follow-up. The self-contained
+configurations are `configs/real_erm_scs_yearpredictionmsd_1e-8.toml` and
+`configs/real_erm_scs_yearpredictionmsd_1e-9.toml`. Only YearPredictionMSD-rf and
+`scs_cuda_direct` are selected. This study was motivated by the observed accuracy
+miss and must not be described as held-out calibration. Native-tolerance calibration
+remains false and the motivation is recorded in `native_tolerance_source`.
+
+Each attempt is a fresh, cold solve of the same seeded problem with the same
+regularization, SCS 3.2.11 container, 100,000-iteration ceiling, one-hour solve limit,
+one H200, 64 host CPU threads, and 128 GiB host-memory allocation. At most two GPU
+attempts run concurrently. Dataset preparation and conic construction remain outside
+the solve timer; native setup and factorization remain inside it. The external
+stationarity (`1e-4`) and feasibility (`1e-6`) targets are unchanged.
+
+The two outputs are kept separately under
+`artifacts/scs-yearpredictionmsd-tolerance-20260906/1e-8` and `1e-9`, each with its
+own frozen config, manifest, logs, and result records. Always identify these records
+by campaign and native tolerance when aggregating: the solver/problem/seed identity
+is intentionally the same. Report every attempt's runtime, native status, and
+external metrics, including misses or resource failures; report tuning cost
+separately from any selected solve time. These results supplement the original
+frozen-protocol comparison.
+
 ## Synthetic ERM development suite
 
 This suite develops the three problem classes intended for the later real-data study on deterministic synthetic data first. All generated arrays and all solver computations use float64. The calibration, smoke, and scaling-pilot grids generate features on CPU from seeded Gaussian streams, then center and scale each column to unit population root-mean-square; the separate conditioning diagnostic uses the SORF construction documented below. Problem generation and host-to-device transfer are measured separately from solver time and are not included in the primary solve-time comparison. Every competitor receives the same materialized data and mathematical formulation.
