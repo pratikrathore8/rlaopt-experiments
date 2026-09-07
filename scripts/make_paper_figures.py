@@ -659,12 +659,18 @@ def main():
     parser.add_argument("--real", type=Path, default=Path("artifacts/real-erm-production-20260905"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/paper-figures"))
     parser.add_argument("--accuracy-refinement", action="store_true")
+    parser.add_argument(
+        "--all-figures",
+        action="store_true",
+        help="Regenerate the full figure set, including in refinement mode",
+    )
     parser.add_argument("--ridge-refinement", type=Path)
     parser.add_argument("--real-supplement", type=Path, action="append", default=[])
     parser.add_argument("--real-refinement", type=Path, action="append", default=[])
     args = parser.parse_args()
     if (args.ridge_refinement or args.real_refinement) and not args.accuracy_refinement:
         parser.error("Refinement inputs require --accuracy-refinement")
+    main_only = args.accuracy_refinement and not args.all_figures
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update(
         {
@@ -888,9 +894,9 @@ def main():
         (args.output / "refinement_attempts.json").write_text(
             json.dumps(refinement_audit, indent=2) + "\n"
         )
-    ridge_figures(list(ridge.values()), args.output, main_only=args.accuracy_refinement)
+    ridge_figures(list(ridge.values()), args.output, main_only=main_only)
     multi = ["cifar10", "fashion_mnist", "news20", "rcv1", "svhn"]
-    if not args.accuracy_refinement:
+    if not main_only:
         real_figures(entries, args.output, multi, "multinomial")
         real_figures(entries, args.output, multi, "multinomial", jit=True)
     real_figures(
@@ -899,7 +905,7 @@ def main():
         ["acsincome", "yearpredictionmsd", "yolanda", "e2006", "realsim"],
         "bounded_elastic_net",
     )
-    if not args.accuracy_refinement:
+    if not main_only:
         speedups(list(ridge.values()), entries, args.output)
     dataset_rows = []
     for dataset in sorted({r["dataset"] for r in entries}):
@@ -922,6 +928,7 @@ def main():
     sources.extend(root / "config.toml" for root in args.real_supplement)
     sources.append(Path(__file__).with_name("paper_refinement.py"))
     audit = {
+        "figure_scope": "main ridge and elastic net" if main_only else "all figures",
         "ridge_trials": len(ridge),
         "ridge_statuses": dict(Counter(r["plot_status"] for r in ridge.values())),
         "real_trials": len(entries),
@@ -940,7 +947,7 @@ def main():
     }
     (args.output / "audit.json").write_text(json.dumps(audit, indent=2) + "\n")
     print(json.dumps({k: v for k, v in audit.items() if k != "source_sha256"}, indent=2))
-    print(f"Updated {2 if args.accuracy_refinement else 22} PDF/PNG figure pairs in {args.output}")
+    print(f"Updated {2 if main_only else 22} PDF/PNG figure pairs in {args.output}")
 
 
 if __name__ == "__main__":

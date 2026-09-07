@@ -96,8 +96,10 @@ MPLCONFIGDIR=/tmp/pratikr/mpl-paper .venv/bin/python scripts/make_paper_figures.
 ```
 
 These two figures update the existing files in `artifacts/paper-figures`.
-Original experiment records remain unchanged. No extra appendix or cost figures are generated in this
-mode. Rerunning the command incorporates newly completed trials; an attempt is
+Original experiment records remain unchanged. By default this mode updates only these two figures. Add `--all-figures`
+to regenerate every existing main and appendix figure with the same refined
+results and eligibility rule; this includes preconditioning, multinomial, and
+CPU/GPU speedup figures. No separate cost figure is generated. Rerunning the command incorporates newly completed trials; an attempt is
 included only once its trial summary is saved. Until all planned trials finish,
 this is a provisional snapshot. A trial with no completed refinement retains its
 original outcome. If no attempt passes, the displayed outcome comes from the last
