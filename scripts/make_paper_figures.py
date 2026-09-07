@@ -26,6 +26,9 @@ from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 
+from rlaopt_experiments.records import read_record
+from paper_refinement import apply_real_refinement, apply_ridge_refinement
+
 
 SOLVER_COLORS = {
     "rlaopt_nystrom_pcg": "#163e64",
@@ -39,8 +42,10 @@ SOLVER_COLORS = {
     "projected_gradient_no_jit": "#0072b2",
     "jaxopt_lbfgsb": "#009e73",
     "jaxopt_lbfgsb_no_jit": "#009e73",
+    "scs_cpu_indirect": "#b47a00",
+    "scs_cuda_direct": "#e69f00",
     "scs": "#e69f00",
-    "scs_cuda": "#e69f00",
+    "scs_cuda": "#b47a00",
     "clarabel_qdldl": "#56b4e9",
     "cuclarabel_cudss": "#56b4e9",
 }
@@ -56,12 +61,15 @@ LABELS = {
     "jaxopt_lbfgsb_no_jit": "JAXopt L-BFGS-B (JIT off)",
     "projected_gradient": "JAXopt APG (JIT on)",
     "jaxopt_lbfgsb": "JAXopt L-BFGS-B (JIT on)",
-    "scs": "SCS",
-    "scs_cuda": "SCS",
+    "scs_cpu_indirect": "SCS indirect",
+    "scs_cuda_direct": "SCS direct",
+    "scs": "SCS direct",
+    "scs_cuda": "SCS indirect",
     "clarabel_qdldl": "Clarabel",
     "cuclarabel_cudss": "cuClarabel",
 }
 STATUS_COLORS = {
+    "ACC": "#ead4c0",
     "OK": "#d5e9e1",
     "TO": "#f7e3ba",
     "NC": "#ecdbe9",
@@ -74,6 +82,7 @@ STATUS_COLORS = {
     "WARMUP_OOM": "#efc9c9",
 }
 STATUS_LABELS = {
+    "ACC": "Accuracy miss",
     "OK": "Success",
     "TO": "Timeout",
     "ITER": "Iteration limit",
@@ -106,6 +115,8 @@ def read_json(path):
 def success(row):
     if row is None:
         return False
+    if "plot_eligible" in row:
+        return bool(row["plot_eligible"])
     if "runtime_eligible" in row:
         return bool(row["runtime_eligible"])
     return row["metadata"].get("worker_outcome") == "result" and row["native_status"] in {
@@ -129,6 +140,8 @@ def status(row):
         return "MISS"
     if success(row):
         return "OK"
+    if row.get("native_success") and row.get("external_success") is False:
+        return "ACC"
     if row.get("timed_out") or row["native_status"] == "timeout":
         return "TO"
     error = row["metadata"].get("error_message", "")
@@ -184,7 +197,7 @@ def dataset_label(row):
     return tex(row["display"]) + "\n" + rf"${row['n']:,}\times {row['p']:,}$"
 
 
-def ridge_figures(rows, output):
+def ridge_figures(rows, output, main_only=False):
     solvers = {
         "cpu": ["rlaopt_nystrom_pcg", "rlaopt_cg", "scipy_lsqr", "torch_qr"],
         "cuda": ["rlaopt_nystrom_pcg", "rlaopt_cg", "cuml_lsmr", "torch_qr"],
@@ -198,6 +211,8 @@ def ridge_figures(rows, output):
     }
     for family, (belongs, scale, xlabel) in families.items():
         for ridge in lambdas:
+            if main_only and (family != "fixed_n" or ridge != min(lambdas)):
+                continue
             selected = [r for r in rows if belongs(r) and r["ridge"] == ridge]
             sizes = sorted({r[scale] for r in selected})
             lower = min(runtime(r) for r in selected if success(r)) * 0.65
@@ -224,6 +239,15 @@ def ridge_figures(rows, output):
                                 ys.append(median)
                                 lo.append(median - min(valid))
                                 hi.append(max(valid) - median)
+                                if any(r.get("refined") for r in group):
+                                    ax.scatter(
+                                        size,
+                                        median,
+                                        marker="D",
+                                        s=27,
+                                        color=SOLVER_COLORS[solver],
+                                        zorder=4,
+                                    )
                                 if len(valid) < len(group):
                                     ax.annotate(
                                         tex(f"{len(valid)}/{len(group)}"),
@@ -293,7 +317,8 @@ def ridge_figures(rows, output):
             )
             save(fig, output, name)
 
-    preconditioning_figures(rows, output, alphas, lambdas)
+    if not main_only:
+        preconditioning_figures(rows, output, alphas, lambdas)
 
 
 def preconditioning_figures(rows, output, alphas, lambdas):
@@ -421,8 +446,12 @@ def real_figures(entries, output, datasets, kind, jit=False):
             "cpu": ["rlaopt_admm", "scs", "clarabel_qdldl"],
             "cuda": ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"],
         }
+    if kind != "multinomial":
+        for backend, extra in (("cpu", "scs_cpu_indirect"), ("cuda", "scs_cuda_direct")):
+            if any(r["solver"] == extra for r in entries):
+                solver_sets[backend].insert(2, extra)
     fig, axes = plt.subplots(
-        2, 2, figsize=(12.5, 6.8), gridspec_kw={"height_ratios": [3.4, 1.1]}, layout="constrained"
+        2, 2, figsize=(12.5, 7.4), gridspec_kw={"height_ratios": [3.4, 1.1]}, layout="constrained"
     )
     lookup = {(r["backend"], r["solver"], r["dataset"]): r for r in entries if r["kind"] == kind}
     for col, (backend, solvers) in enumerate(solver_sets.items()):
@@ -430,14 +459,14 @@ def real_figures(entries, output, datasets, kind, jit=False):
         for si, solver in enumerate(solvers):
             for di, dataset in enumerate(datasets):
                 r = lookup[backend, solver, dataset]
-                x = di + (si - 1) * 0.21
+                x = di + (si - (len(solvers) - 1) / 2) * 0.19
                 if r["plot_status"] == "OK":
                     ax.scatter(
                         x,
                         r["runtime"],
                         color=SOLVER_COLORS[solver],
                         s=40,
-                        marker="o",
+                        marker="D" if r.get("refined") else "o",
                         zorder=3,
                     )
                 elif r["plot_status"] == "TO":
@@ -459,8 +488,8 @@ def real_figures(entries, output, datasets, kind, jit=False):
                 )
                 table.text(di, si, tex(STATUS_LABELS[s]), ha="center", va="center", fontsize=7)
         ax.axhline(3600, color=".5", ls=":", lw=0.8)
-        ax.set(yscale="log", ylim=(10, 4700), xlim=(-0.6, len(datasets) - 0.4))
-        timeout_ticks(ax, 3600, 10)
+        ax.set(yscale="log", ylim=(1, 4700), xlim=(-0.6, len(datasets) - 0.4))
+        timeout_ticks(ax, 3600, 1)
         ax.set_xticks(
             range(len(datasets)),
             [dataset_label(lookup[backend, solvers[0], d]) for d in datasets],
@@ -480,8 +509,8 @@ def real_figures(entries, output, datasets, kind, jit=False):
             loc="upper right" if jit and backend == "cuda" else "lower right",
         )
         grid(ax)
-        table.set(xlim=(-0.6, len(datasets) - 0.4), ylim=(2.5, -0.5))
-        table.set_yticks(range(3), [label(s) for s in solvers], fontsize=8)
+        table.set(xlim=(-0.6, len(datasets) - 0.4), ylim=(len(solvers) - 0.5, -0.5))
+        table.set_yticks(range(len(solvers)), [label(s) for s in solvers], fontsize=8)
         table.set_xticks([])
         table.spines[:].set_visible(False)
         table.tick_params(length=0)
@@ -621,7 +650,15 @@ def main():
     parser.add_argument("--ridge", type=Path, default=Path("artifacts/production-20260831"))
     parser.add_argument("--real", type=Path, default=Path("artifacts/real-erm-production-20260905"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/paper-figures"))
+    parser.add_argument("--accuracy-refinement", action="store_true")
+    parser.add_argument("--ridge-refinement", type=Path)
+    parser.add_argument("--real-supplement", type=Path, action="append", default=[])
+    parser.add_argument("--real-refinement", type=Path, action="append", default=[])
     args = parser.parse_args()
+    if (args.ridge_refinement or args.real_refinement) and not args.accuracy_refinement:
+        parser.error("Refinement inputs require --accuracy-refinement")
+    if args.accuracy_refinement and args.output == Path("artifacts/paper-figures"):
+        args.output = Path("artifacts/paper-figures-refined")
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update(
         {
@@ -639,7 +676,7 @@ def main():
     ridge = {}
     sources = []
     for path in sorted((args.ridge / "records").glob("*.json")):
-        r = read_json(path)
+        r = read_record(path) | {"_source": str(path)}
         r["plot_status"] = status(r)
         assert ridge_key(r) not in ridge, f"Duplicate trial: {path}"
         ridge[ridge_key(r)] = r
@@ -697,21 +734,39 @@ def main():
                         r["plot_status"] = "WARMUP_OOM"
                         r["failure_evidence"] = str(log)
         sources.extend([log, manifest])
+    refinement_audit = []
+    if args.accuracy_refinement:
+        refinement_audit.extend(
+            apply_ridge_refinement(ridge, args.ridge_refinement, ridge_key, sources)
+        )
+        for r in ridge.values():
+            if r.get("plot_status") not in {"MISS", "WARMUP_OOM"}:
+                r["plot_status"] = status(r)
+    real_roots = [args.real, *args.real_supplement]
     real_records = {}
-    for path in sorted((args.real / "results/records").glob("*.json")):
-        r = read_json(path)
+    for path in sorted(p for root in real_roots for p in (root / "results/records").glob("*.json")):
+        r = read_record(path) | {"_source": str(path)}
         assert real_key(r) not in real_records, f"Duplicate trial: {path}"
         real_records[real_key(r)] = r
         sources.append(path)
+    if args.accuracy_refinement:
+        refinement_audit.extend(
+            apply_real_refinement(real_records, args.real_refinement, real_key, sources)
+        )
     # Associate scheduler OOM evidence only when a batch has one failed command.
     failure_keys = {}
-    for path in sorted((args.real / "logs").glob("wave-*-cpu-*.out")):
+    for path in sorted(p for root in real_roots for p in (root / "logs").glob("wave-*.out")):
         text = path.read_text()
         failures = re.findall(r"BATCH_FAILURE batch=(\d+) manifest_index=(\d+) status=\d+", text)
-        host = re.search(r"cpu-(soal-\d+)-", path.name)
+        host = re.search(r"(cpu|cuda)-(soal-\d+)-", path.name)
         if host:
             for batch, index in failures:
-                manifest = args.real / "batches" / f"cpu-{host[1]}" / f"batch-{int(batch):03}.jsonl"
+                manifest = (
+                    path.parent.parent
+                    / "batches"
+                    / f"{host[1]}-{host[2]}"
+                    / f"batch-{int(batch):03}.jsonl"
+                )
                 job = json.loads(manifest.read_text().splitlines()[int(index)])
                 classification = (
                     "HOST" if "oom_kill event" in text and len(failures) == 1 else "ERR"
@@ -720,8 +775,8 @@ def main():
                 sources.extend([path, manifest])
     entries = []
     seen = set()
-    for backend in ("cpu", "cuda"):
-        path = args.real / "manifests" / f"{backend}.jsonl"
+    for root, backend in ((root, b) for root in real_roots for b in ("cpu", "cuda")):
+        path = root / "manifests" / f"{backend}.jsonl"
         sources.append(path)
         for line in path.read_text().splitlines():
             job = json.loads(line)
@@ -771,6 +826,13 @@ def main():
                     "native_status": r["native_status"] if r else "missing",
                     "external_success": r.get("external_success") if r else None,
                     "evidence": evidence,
+                    "refined": r.get("refined", False) if r else False,
+                    "selected_native_tolerance": r.get("selected_native_tolerance") if r else None,
+                    "refinement_attempts": r.get("refinement_attempts", 0) if r else 0,
+                    "refinement_last_status": r.get("refinement_last_status") if r else None,
+                    "total_measured_solver_seconds": r.get("total_measured_solver_seconds")
+                    if r
+                    else None,
                 }
             )
     assert set(real_records) <= seen, "Unexpected real-data records"
@@ -793,22 +855,35 @@ def main():
                     "runtime_seconds",
                     "relative_kkt",
                     "failure_evidence",
+                    "refined",
+                    "selected_native_tolerance",
+                    "refinement_attempts",
+                    "refinement_last_status",
+                    "original_runtime_seconds",
+                    "total_measured_solver_seconds",
                 )
             }
             for r in ridge.values()
         ],
     )
-    ridge_figures(list(ridge.values()), args.output)
+    if refinement_audit:
+        write_csv(args.output / "refinement_attempts.csv", refinement_audit)
+        (args.output / "refinement_attempts.json").write_text(
+            json.dumps(refinement_audit, indent=2) + "\n"
+        )
+    ridge_figures(list(ridge.values()), args.output, main_only=args.accuracy_refinement)
     multi = ["cifar10", "fashion_mnist", "news20", "rcv1", "svhn"]
-    real_figures(entries, args.output, multi, "multinomial")
-    real_figures(entries, args.output, multi, "multinomial", jit=True)
+    if not args.accuracy_refinement:
+        real_figures(entries, args.output, multi, "multinomial")
+        real_figures(entries, args.output, multi, "multinomial", jit=True)
     real_figures(
         entries,
         args.output,
         ["acsincome", "yearpredictionmsd", "yolanda", "e2006", "realsim"],
         "bounded_elastic_net",
     )
-    speedups(list(ridge.values()), entries, args.output)
+    if not args.accuracy_refinement:
+        speedups(list(ridge.values()), entries, args.output)
     dataset_rows = []
     for dataset in sorted({r["dataset"] for r in entries}):
         record = next(r for r in real_records.values() if r["metadata"]["dataset"] == dataset)
@@ -827,12 +902,20 @@ def main():
         )
     write_csv(args.output / "dataset_regimes.csv", dataset_rows)
     sources.extend([Path(__file__), Path("configs/synthetic.toml"), args.real / "config.toml"])
+    sources.extend(root / "config.toml" for root in args.real_supplement)
+    sources.append(Path(__file__).with_name("paper_refinement.py"))
     audit = {
         "ridge_trials": len(ridge),
         "ridge_statuses": dict(Counter(r["plot_status"] for r in ridge.values())),
         "real_trials": len(entries),
         "real_statuses": dict(Counter(r["plot_status"] for r in entries)),
-        "success_rule": "frozen calibrated native criterion; external diagnostics do not filter runtime points",
+        "success_rule": (
+            "first native-and-external passing tolerance; cumulative attempt cost reported separately"
+            if args.accuracy_refinement
+            else "frozen calibrated native criterion; external diagnostics do not filter runtime points"
+        ),
+        "refined_trials": sum(r.get("refined", False) for r in ridge.values())
+        + sum(r["refined"] for r in entries),
         "source_sha256": {
             str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(set(sources))
         },

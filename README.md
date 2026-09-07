@@ -254,6 +254,11 @@ external metrics, including misses or resource failures; report tuning cost
 separately from any selected solve time. These results supplement the original
 frozen-protocol comparison.
 
+Both follow-ups finished with a 3,600-second solve timeout and returned no solution
+for external evaluation. Neither tolerance supplies an accuracy-qualified runtime.
+Together with the original `1e-7` solve, the measured solver cost is 7,565.56 seconds.
+The refined plot retains an unresolved accuracy miss and discloses both timeouts.
+
 ## Synthetic ERM development suite
 
 This suite develops the three problem classes intended for the later real-data study on deterministic synthetic data first. All generated arrays and all solver computations use float64. The calibration, smoke, and scaling-pilot grids generate features on CPU from seeded Gaussian streams, then center and scale each column to unit population root-mean-square; the separate conditioning diagnostic uses the SORF construction documented below. Problem generation and host-to-device transfer are measured separately from solver time and are not included in the primary solve-time comparison. Every competitor receives the same materialized data and mathematical formulation.
@@ -774,3 +779,7 @@ Plotting uses LaTeX math rendering with Computer Modern fonts. Dataset names are
 The ridge production campaign completed under `artifacts/production-20260831`. Its manifests contain the expected 288 jobs per backend and 1,728 solver/ridge trials. The campaign retained 1,701 atomic records: 27 CPU QR trials produced no record, while the corresponding 27 CUDA QR trials recorded solver errors. The retained records also contain six CPU identity-PCG timeouts, six SciPy LSQR external KKT misses, and seven cuML LSMR external KKT misses; these outcomes remain visible in `figures/failure_summary.json` rather than being silently discarded. Fifteen-minute per-solve limits remained fixed, and generation time and memory were measured separately.
 
 Limitations: SORF factors are structured random orthogonal matrices rather than Haar draws; the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs.
+
+The accuracy-refinement plotting command and captions are documented in
+[FIGURES.md](FIGURES.md#figures-incorporating-accuracy-refinement). This mode updates
+only ridge scaling and bounded elastic net; attempt costs stay in audit files.

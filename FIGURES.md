@@ -77,3 +77,56 @@ no historical worker signal could be recovered. Evidence is retained in
 `artifacts/scs-crash-reports-17300717.out`, and `artifacts/scs-crash-reports-17300718.out`.
 A controlled rerun with explicit child exit-code/signal capture and native SCS
 logging would be needed to investigate a reproducible cause without administrator logs.
+
+## Figures incorporating accuracy refinement
+
+To update only the main ridge scaling and bounded elastic-net figures:
+
+```bash
+MPLCONFIGDIR=/tmp/pratikr/mpl-paper .venv/bin/python scripts/make_paper_figures.py \
+  --accuracy-refinement \
+  --ridge-refinement artifacts/ridge-tolerance-refinement-20260906 \
+  --real-supplement artifacts/real-erm-scs-backends-20260906-64threads \
+  --real-refinement artifacts/scs-yearpredictionmsd-tolerance-20260906/1e-8 \
+  --real-refinement artifacts/scs-yearpredictionmsd-tolerance-20260906/1e-9
+```
+
+These two figures go to `artifacts/paper-figures-refined`, preserving the original
+frozen-protocol figures. No extra appendix or cost figures are generated in this
+mode. Rerunning the command incorporates newly completed trials; an attempt is
+included only once its trial summary is saved. Until all planned trials finish,
+this is a provisional snapshot: an original accuracy miss with no completed
+passing refinement remains an accuracy miss, not a success or timeout.
+
+**Refined ridge caption:** Points summarize the first attempted native tolerance
+that meets both native success/completion and the fixed common relative KKT target
+of `1e-6`, for each seed. Diamonds mark groups containing at least one refined
+measurement; whiskers and incomplete-seed counts retain their existing meanings.
+The original calibrated setting is tried first, followed by the documented finite
+refinement ladder only for native-success accuracy misses. Selection follows
+attempt order, not minimum runtime. All attempts, original measurements, selected
+tolerances and cumulative measured solver cost are retained in the accompanying
+audit files. The displayed runtime is the qualifying solve's runtime, not the
+cumulative cost of finding that setting. This is a disclosed post-production
+refinement study, not held-out calibration.
+
+**Refined bounded elastic-net caption addition:** The CPU and GPU panels include
+both SCS direct and indirect backends. Runtime points require both native success
+and the unchanged common stationarity and feasibility checks. “Accuracy miss”
+means native success without satisfying those checks and has no qualifying runtime
+coordinate. SCS GPU-direct on YearPredictionMSD-rf returned native success in
+365.56 seconds at `1e-7` but missed both common targets; follow-ups at `1e-8` and
+`1e-9` each reached the 3,600-second solve timeout without returning a solution.
+This remains an unresolved accuracy miss; the two timed-out attempts are recorded
+in the audit rather than replacing the original outcome with a single timeout.
+Their aggregate measured solver cost, including the original attempt, is 7,565.56
+seconds. Worker-error causes and attributable OOM labels retain the evidence rules
+above. CPU-indirect results still in progress remain “No record.”
+
+`refinement_attempts.csv` and `.json` retain each original/refinement attempt, native
+and external status, residuals, tolerance, runtime, selection flag, and cumulative
+measured cost. The outcome CSVs identify refined measurements, selected tolerance,
+attempt count and last refinement status. `audit.json` records the eligibility rule
+and hashes all consumed records, completed summaries, manifests and plotting code.
+Startup and warmup wall times remain available in the ridge trial summaries; they
+are excluded from the cumulative measured solver times in the plotting audit.
