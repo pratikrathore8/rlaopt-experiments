@@ -14,7 +14,7 @@ def qualified(row):
 
 
 def select_attempt(original, attempts):
-    """Select the first passing setting, never the fastest; retain misses if none pass."""
+    """Use the first passing setting, or the final completed attempt if none passes."""
     if attempts and not (original["native_success"] and not original["external_success"]):
         raise ValueError("Refinement requires an original native-success accuracy miss")
     previous = original.get("metadata", {}).get("native_tolerance")
@@ -25,7 +25,9 @@ def select_attempt(original, attempts):
         previous = tolerance
     rows = [original, *attempts]
     chosen = next((i for i, row in enumerate(rows) if qualified(row)), None)
-    selected = dict(rows[chosen] if chosen is not None else original)
+    displayed = chosen if chosen is not None else len(rows) - 1
+    selected = dict(rows[displayed])
+    selected["displayed_native_tolerance"] = selected.get("metadata", {}).get("native_tolerance")
     selected["plot_eligible"] = chosen is not None
     selected["refined"] = chosen is not None and chosen > 0
     selected["selected_native_tolerance"] = (
@@ -61,6 +63,7 @@ def select_attempt(original, attempts):
                 "stationarity": row.get("stationarity"),
                 "feasibility": row.get("feasibility"),
                 "selected": i == chosen,
+                "displayed": i == displayed,
                 "total_measured_solver_seconds": selected["total_measured_solver_seconds"],
             }
         )
@@ -103,7 +106,11 @@ def apply_ridge_refinement(records, root, key, sources):
                 for index, attempt in enumerate(summary["attempts"]):
                     if attempt["native_tolerance"] != job["native_tolerances"][index]:
                         raise ValueError("Attempt does not match predefined ladder")
+                    if attempts and (qualified(attempts[-1]) or not attempts[-1]["native_success"]):
+                        raise ValueError("Ridge refinement continued after its stopping condition")
                     row = load_attempt(Path(attempt["record"]), sources)
+                    if row["metadata"].get("cuda_image_sha256") != job["image_sha256"]:
+                        raise ValueError("Ridge refinement image differs from frozen plan")
                     if (
                         key(row) != k
                         or row["metadata"]["native_tolerance"] != attempt["native_tolerance"]
@@ -134,6 +141,27 @@ def apply_real_refinement(records, roots, key, sources):
             k = key(row)
             if k not in records:
                 raise ValueError("Real refinement has no matching original; include its supplement")
+            original = records[k]
+            for field in (
+                "source_sha256",
+                "solver_seed",
+                "stationarity_tolerance",
+                "feasibility_tolerance",
+                "max_iterations",
+                "dtype",
+            ):
+                if original["metadata"].get(field) != row["metadata"].get(field):
+                    raise ValueError(f"Real refinement changed {field}")
+            # A timed-out worker has no returned solution diagnostics. Compare
+            # formulation fields, which remain available for both outcomes.
+            original_problem = {
+                k: v for k, v in original.get("problem", {}).items() if k != "diagnostics"
+            }
+            refined_problem = {
+                k: v for k, v in row.get("problem", {}).items() if k != "diagnostics"
+            }
+            if original_problem != refined_problem:
+                raise ValueError("Real refinement changed the mathematical problem")
             attempts.setdefault(k, []).append(row)
     audit = []
     for k, row in records.items():

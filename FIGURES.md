@@ -1,6 +1,8 @@
 # Production figures
 
-Generate all figures from the repository root:
+To reproduce the original frozen-protocol figures from the repository root
+(use the [accuracy-refinement command below](#figures-incorporating-accuracy-refinement)
+for the current ridge and bounded elastic-net figures):
 
 ```bash
 MPLCONFIGDIR=/tmp/pratikr/mpl-paper .venv/bin/python scripts/make_paper_figures.py
@@ -38,7 +40,9 @@ Solver runtimes on five real datasets, with one seed and one production paramete
 
 [PDF](artifacts/paper-figures/bounded_elastic_net.pdf) · [PNG](artifacts/paper-figures/bounded_elastic_net.png)
 
-Solver runtimes for bounded elastic net, grouped by dense and sparse data. Dataset names ending in `-rf` use random features. Each configuration uses one seed and one regularization setting. Successful times are plotted numerically; timeouts are arrows at the one-hour boundary. Outcome matrices distinguish native success, timeout, native nonconvergence, host/device memory exhaustion, index overflow, solver/worker error, and missing records. Nyström ADMM succeeds on large dense GPU problems where the tested conic implementations encounter resource or runtime limits, while sparse conic factorization can be much faster on sparse data. The current `rlaopt` path materializes sparse input densely, whereas the conic paths retain exact sparsity. SCS uses CPU sparse-direct QDLDL and GPU indirect CG in this figure. The “Worker error” entries for CPU SCS on acsincome-rf and yearpredictionmsd-rf mean that the isolated worker connection closed before a solution or measured runtime was returned; the cause of termination is undetermined. These entries do not establish native nonconvergence or out-of-memory failure.
+Solver runtimes for bounded elastic net, grouped by dense and sparse data. Dataset names ending in `-rf` use random features. Each configuration uses one seed and one regularization setting. Successful times are plotted numerically; timeouts are arrows at the one-hour boundary. Outcome matrices distinguish native success, timeout, native nonconvergence, host/device memory exhaustion, index overflow, solver/worker error, and missing records. Nyström ADMM succeeds on large dense GPU problems where the tested conic implementations encounter resource or runtime limits, while sparse conic factorization can be much faster on sparse data. The current `rlaopt` path materializes sparse input densely, whereas the conic paths retain exact sparsity. The updated figure includes SCS indirect first and SCS direct second in both
+CPU and GPU panels. Runtime eligibility and completed refinement outcomes follow
+the accuracy-refinement caption below. The “Worker error” entries for CPU SCS on acsincome-rf and yearpredictionmsd-rf mean that the isolated worker connection closed before a solution or measured runtime was returned; the cause of termination is undetermined. These entries do not establish native nonconvergence or out-of-memory failure.
 
 ### CPU/GPU runtime ratios
 
@@ -95,8 +99,9 @@ These two figures update the existing files in `artifacts/paper-figures`.
 Original experiment records remain unchanged. No extra appendix or cost figures are generated in this
 mode. Rerunning the command incorporates newly completed trials; an attempt is
 included only once its trial summary is saved. Until all planned trials finish,
-this is a provisional snapshot: an original accuracy miss with no completed
-passing refinement remains an accuracy miss, not a success or timeout.
+this is a provisional snapshot. A trial with no completed refinement retains its
+original outcome. If no attempt passes, the displayed outcome comes from the last
+completed attempt; pending runs are never inferred to have timed out.
 
 **Refined ridge caption:** Points summarize the first attempted native tolerance
 that meets both native success/completion and the fixed common relative KKT target
@@ -117,8 +122,11 @@ means native success without satisfying those checks and has no qualifying runti
 coordinate. SCS GPU-direct on YearPredictionMSD-rf returned native success in
 365.56 seconds at `1e-7` but missed both common targets; follow-ups at `1e-8` and
 `1e-9` each reached the 3,600-second solve timeout without returning a solution.
-This remains an unresolved accuracy miss; the two timed-out attempts are recorded
-in the audit rather than replacing the original outcome with a single timeout.
+The figure therefore labels the refined outcome **Timeout** and places an arrow
+at the one-hour limit. This states that the tested stricter setting did not return
+a qualifying solution within the budget; it does not assert that every possible
+tolerance would time out. The original accuracy miss and both timeouts remain
+separate entries in the audit.
 Their aggregate measured solver cost, including the original attempt, is 7,565.56
 seconds. Worker-error causes and attributable OOM labels retain the evidence rules
 above. CPU-indirect results still in progress remain “No record.”
@@ -126,7 +134,9 @@ above. CPU-indirect results still in progress remain “No record.”
 `refinement_attempts.csv` and `.json` retain each original/refinement attempt, native
 and external status, residuals, tolerance, runtime, selection flag, and cumulative
 measured cost. The outcome CSVs identify refined measurements, selected tolerance,
-attempt count and last refinement status. `audit.json` records the eligibility rule
+attempt count, last refinement status, displayed tolerance, and original outcome.
+The attempt audit distinguishes the displayed attempt from an accuracy-qualified
+selected attempt; a timeout is displayed but never selected as a successful solve. `audit.json` records the eligibility rule
 and hashes all consumed records, completed summaries, manifests and plotting code.
 Startup and warmup wall times remain available in the ridge trial summaries; they
 are excluded from the cumulative measured solver times in the plotting audit.

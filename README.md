@@ -257,7 +257,8 @@ frozen-protocol comparison.
 Both follow-ups finished with a 3,600-second solve timeout and returned no solution
 for external evaluation. Neither tolerance supplies an accuracy-qualified runtime.
 Together with the original `1e-7` solve, the measured solver cost is 7,565.56 seconds.
-The refined plot retains an unresolved accuracy miss and discloses both timeouts.
+The refined plot labels the final outcome Timeout at the one-hour limit; its audit
+retains the original accuracy miss and both timed-out attempts.
 
 ## Synthetic ERM development suite
 
@@ -746,7 +747,8 @@ For reporting, retain the frozen-protocol results and present refinement results
 as a disclosed post-production study. Report all attempted tolerances and their
 native status, external residuals and measured runtime. A qualifying runtime is
 from the first attempted setting that meets both native and external requirements;
-if none qualifies, retain an unresolved accuracy miss or native failure. Report
+if none qualifies, display the final completed attempt's outcome (for example,
+timeout), while preserving the original accuracy miss and every attempted setting. Report
 cumulative measured solver time across the original and refinement attempts
 separately from the qualifying time. Also report refinement wall time, which
 includes new worker startup, generation and warmup; original per-trial preparation
@@ -772,7 +774,7 @@ JAXopt APG denotes accelerated projected gradient. Both production JIT variants 
 
 Run `.venv/bin/python scripts/make_paper_figures.py` from the repository root to generate the ridge, bounded multinomial, bounded elastic-net, and CPU/GPU runtime-ratio figures. Outputs are PDF and PNG files under `artifacts/paper-figures`, with CSV audit tables covering every expected trial. See [FIGURES.md](FIGURES.md) for reproduction details and suggested captions, and [RESULTS_NARRATIVE.md](RESULTS_NARRATIVE.md) for the presentation rationale.
 
-Plotting uses LaTeX math rendering with Computer Modern fonts. Dataset names are lowercase, with `-rf` suffixes for random features. Runtime points use frozen calibrated native success; external diagnostics remain separately reported and do not change marker style. The main multinomial comparison explicitly labels JIT-disabled JAXopt; the JIT-enabled appendix and main-text discussion disclose its faster performance. Timeouts are censored, resource failures are separate outcomes, and CPU/GPU ratios with CPU timeouts are lower bounds. Ridge whiskers are min–max ranges over three seeds; the one-seed real-data runs have no uncertainty bars.
+Plotting uses LaTeX math rendering with Computer Modern fonts. Dataset names are lowercase, with `-rf` suffixes for random features. The original plotting mode uses frozen calibrated native success. The current ridge and bounded elastic-net figures use the accuracy-refinement rule documented below: first native-and-external passing attempt, or the final completed failure outcome if none passes. The main multinomial comparison explicitly labels JIT-disabled JAXopt; the JIT-enabled appendix and main-text discussion disclose its faster performance. Timeouts are censored, resource failures are separate outcomes, and CPU/GPU ratios with CPU timeouts are lower bounds. Ridge whiskers are min–max ranges over three seeds; the one-seed real-data runs have no uncertainty bars.
 
 ## Synthetic ridge suite: production outcome and limitations
 

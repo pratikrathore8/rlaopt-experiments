@@ -157,7 +157,7 @@ def status(row):
 
 
 def real_key(row):
-    return row["backend"], row["solver"], row["problem_id"], row["seed"]
+    return (row["backend"], row["solver"], row["problem_id"], row["seed"], row.get("repetition", 0))
 
 
 def ridge_key(row):
@@ -434,7 +434,7 @@ def preconditioning_figures(rows, output, alphas, lambdas):
     write_csv(output / "preconditioning_values.csv", export)
 
 
-def real_figures(entries, output, datasets, kind, jit=False):
+def real_solver_sets(entries, kind, jit=False):
     if kind == "multinomial":
         suffix = "" if jit else "_no_jit"
         solver_sets = {
@@ -447,9 +447,17 @@ def real_figures(entries, output, datasets, kind, jit=False):
             "cuda": ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"],
         }
     if kind != "multinomial":
-        for backend, extra in (("cpu", "scs_cpu_indirect"), ("cuda", "scs_cuda_direct")):
+        for backend, extra, position in (
+            ("cpu", "scs_cpu_indirect", 1),
+            ("cuda", "scs_cuda_direct", 2),
+        ):
             if any(r["solver"] == extra for r in entries):
-                solver_sets[backend].insert(2, extra)
+                solver_sets[backend].insert(position, extra)
+    return solver_sets
+
+
+def real_figures(entries, output, datasets, kind, jit=False):
+    solver_sets = real_solver_sets(entries, kind, jit)
     fig, axes = plt.subplots(
         2, 2, figsize=(12.5, 7.4), gridspec_kw={"height_ratios": [3.4, 1.1]}, layout="constrained"
     )
@@ -823,7 +831,15 @@ def main():
                     "runtime": runtime(r) if r else None,
                     "native_status": r["native_status"] if r else "missing",
                     "external_success": r.get("external_success") if r else None,
-                    "evidence": evidence,
+                    "evidence": str(r.get("_source", evidence))
+                    if r and evidence == "record"
+                    else evidence,
+                    "original_native_status": r.get("original_native_status") if r else None,
+                    "original_external_success": r.get("original_external_success") if r else None,
+                    "original_runtime_seconds": r.get("original_runtime_seconds") if r else None,
+                    "displayed_native_tolerance": r.get("displayed_native_tolerance")
+                    if r
+                    else None,
                     "refined": r.get("refined", False) if r else False,
                     "selected_native_tolerance": r.get("selected_native_tolerance") if r else None,
                     "refinement_attempts": r.get("refinement_attempts", 0) if r else 0,
@@ -858,6 +874,9 @@ def main():
                     "refinement_attempts",
                     "refinement_last_status",
                     "original_runtime_seconds",
+                    "original_native_status",
+                    "original_external_success",
+                    "displayed_native_tolerance",
                     "total_measured_solver_seconds",
                 )
             }
@@ -912,6 +931,7 @@ def main():
             if args.accuracy_refinement
             else "frozen calibrated native criterion; external diagnostics do not filter runtime points"
         ),
+        "failure_rule": "final completed attempt if no native-and-external passing attempt exists",
         "refined_trials": sum(r.get("refined", False) for r in ridge.values())
         + sum(r["refined"] for r in entries),
         "source_sha256": {
@@ -920,7 +940,7 @@ def main():
     }
     (args.output / "audit.json").write_text(json.dumps(audit, indent=2) + "\n")
     print(json.dumps({k: v for k, v in audit.items() if k != "source_sha256"}, indent=2))
-    print(f"Wrote {len(list(args.output.glob('*.pdf')))} PDF/PNG figure pairs to {args.output}")
+    print(f"Updated {2 if args.accuracy_refinement else 22} PDF/PNG figure pairs in {args.output}")
 
 
 if __name__ == "__main__":
