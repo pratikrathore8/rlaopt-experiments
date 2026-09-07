@@ -678,6 +678,89 @@ uv run rlaopt-bench plot --input artifacts/records --output artifacts/figures
 
 The figure command creates log-log median-runtime scatterplots with native-success seed min--max ranges for fixed-$p$, fixed-$n$, and square families, faceted by $\alpha$ and $\lambda$, plus a machine-readable failure summary. Shared endpoints appear in each applicable scaling panel. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Points from different spectral profiles or ridge values are never placed in the same panel.
 
+## Post-production accuracy refinement
+
+Calibration supplies an initial native tolerance expected to satisfy the common
+accuracy criterion; it does not guarantee accuracy on every production instance.
+The refinement trigger is **native success (or normal completion for interfaces
+without a convergence flag) together with failure of the common external metric**.
+This rule is applied to every solver. Native nonconvergence, timeouts, worker
+failures, and missing results remain separate outcomes; they do not trigger this
+accuracy-refinement ladder. Original production records are retained unchanged.
+
+The production audit found six CPU SciPy LSQR and seven GPU cuML LSMR ridge
+measurements with native success/completion but relative KKT above `1e-6`, all at
+native tolerance `1e-9`. Their residuals ranged from approximately `1.05e-6` to
+`3.09e-6`. These are 13 individual seed/shape/spectrum/ridge measurements, not 13
+entire three-lambda jobs. No ridge Nyström PCG, unpreconditioned CG, or QR native
+success missed the external target. The real-data audit identified the SCS
+GPU-direct YearPredictionMSD-rf case discussed above; multinomial had no such miss.
+
+The ridge follow-up tries `1e-10` first and `1e-11` only if the first attempt again
+has native success but fails the common metric. Each attempt uses a fresh worker,
+the same problem seed, shape, spectrum and ridge coefficient, the original node,
+64 physical CPU cores, and one H200 for GPU trials. It preserves one untimed warmup
+(capped at 10 iterations), one measured solve, the `2*p` measured iteration ceiling,
+and the 900-second startup and per-solve limits. The external KKT target stays at
+`1e-6`. Trial outputs are separated by original trial ID and native tolerance.
+Both SCS diagnostic tolerances were submitted as a predeclared two-point sweep;
+the ridge ladder conditionally stops when an attempt passes or fails natively.
+
+The original ridge image digest was
+`b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e`.
+The prepared follow-up uses the current pinned image
+`3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d`, which adds ERM
+support. The targeted ridge solver implementations are unchanged from the original
+production commit. The extracted SORF generator was checked against the original
+implementation on nine small square/tall/wide CPU cases with bit-identical `X` and
+`y`. Both image digests and the source-record checksum are retained; this is not
+claimed to use an identical container image.
+
+Prepare the audited candidates and review submission commands without launching:
+
+```bash
+.venv/bin/python scripts/plan_ridge_refinement.py \
+  --output artifacts/ridge-tolerance-refinement-20260906
+.venv/bin/python scripts/submit_ridge_refinement.py \
+  artifacts/ridge-tolerance-refinement-20260906 0 --dry-run
+```
+
+The prepared plan contains three CPU tasks on each of `soal-8` and `soal-9` and
+seven GPU tasks on `soal-12`. Wave 0 has the six CPU tasks and six GPU tasks; wave 1
+has the remaining GPU task. CPU concurrency is one per node and GPU concurrency
+two, with 64 threads and 128 GiB host memory per task. The launcher verifies frozen
+manifests, source records and the actual image hash, requires a clean checkout,
+refuses overlap with active benchmark jobs on the selected nodes, and enforces the
+20-job QOS limit. Use `--node soal-9` (or another listed node) to submit that node
+independently; submission receipts are kept separately per wave and node.
+To submit a reviewed wave, remove `--dry-run`; wait for wave 0 to finish before
+submitting wave 1. Submission status and job IDs are recorded in `submission-<wave>-<node>.json`
+under the plan directory.
+
+For reporting, retain the frozen-protocol results and present refinement results
+as a disclosed post-production study. Report all attempted tolerances and their
+native status, external residuals and measured runtime. A qualifying runtime is
+from the first attempted setting that meets both native and external requirements;
+if none qualifies, retain an unresolved accuracy miss or native failure. Report
+cumulative measured solver time across the original and refinement attempts
+separately from the qualifying time. Also report refinement wall time, which
+includes new worker startup, generation and warmup; original per-trial preparation
+cost is not reconstructed from shared production jobs. Each trial's `summary.json`
+retains these quantities. Do not silently overwrite the original measurements or
+present the follow-up tolerance choices as held-out calibration.
+
+Suggested paper wording:
+
+> Native tolerances were initially selected on a separate calibration set. We
+> evaluated returned production solutions against fixed solver-independent accuracy
+> criteria. Following an audit of the production results, we performed a disclosed
+> accuracy-refinement study on every trial that reported native success or normal
+> completion but failed the common criterion. Refinement used a predefined finite
+> sequence of stricter native tolerances while retaining the original problem and
+> accuracy thresholds. We preserved all attempts and report qualifying solve time
+> separately from cumulative measured solver time, including unsuccessful accuracy
+> attempts. The refinement study is post-production and is not held-out calibration.
+
 ## Paper figures across the production suites
 
 JAXopt APG denotes accelerated projected gradient. Both production JIT variants retain JAXopt's default `acceleration=True`; turning off JIT does not turn off acceleration. Figures explicitly identify JIT on/off and label the seven real-data runs that exhausted 100,000 iterations as “Iteration limit,” distinct from one-hour timeouts. Dataset labels include samples-by-features dimensions after feature generation. Ridge preconditioning figures cover all tested shapes with direct speedup ratios, and runtime figures annotate unsuccessful methods with readable failure names and seed counts.

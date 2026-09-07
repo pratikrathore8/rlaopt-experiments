@@ -135,3 +135,17 @@ Do not replace these outcomes with the timeout value in runtime plots. Report th
 4. Conclude with the regime map: dense versus sparse, tall versus wide, and general framework versus specialized implementation.
 
 The final discussion should emphasize that the experiments are intended to locate useful operating regimes, not manufacture a clean sweep. One clear algorithmic win, one strong constrained-optimization robustness result, one breadth result, and well-explained limitations form a coherent empirical contribution.
+
+## Accuracy-refinement procedure in the paper
+
+Use the methods wording in README.md under “Post-production accuracy refinement.”
+Calibration chooses the initial tolerance; it does not certify unseen production
+instances. The follow-up trigger is native success/normal completion plus a miss
+of the fixed common accuracy criterion, applied symmetrically to all solvers.
+The audit identifies 13 ridge measurements and the SCS GPU-direct YearPredictionMSD-rf
+measurement. Preserve the original results, disclose the post-production timing of
+the decision, and report all attempts. Distinguish the first qualifying solve's
+runtime from cumulative measured solver time and refinement wall time. Never
+silently treat a native success as an external accuracy pass, or describe the
+refinement as held-out calibration. State that ridge refinement preserves its
+original warmup policy, and disclose the changed container digest.
