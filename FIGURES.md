@@ -91,8 +91,8 @@ MPLCONFIGDIR=/tmp/pratikr/mpl-paper .venv/bin/python scripts/make_paper_figures.
   --real-refinement artifacts/scs-yearpredictionmsd-tolerance-20260906/1e-9
 ```
 
-These two figures go to `artifacts/paper-figures-refined`, preserving the original
-frozen-protocol figures. No extra appendix or cost figures are generated in this
+These two figures update the existing files in `artifacts/paper-figures`.
+Original experiment records remain unchanged. No extra appendix or cost figures are generated in this
 mode. Rerunning the command incorporates newly completed trials; an attempt is
 included only once its trial summary is saved. Until all planned trials finish,
 this is a provisional snapshot: an original accuracy miss with no completed

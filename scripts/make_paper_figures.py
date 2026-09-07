@@ -657,8 +657,6 @@ def main():
     args = parser.parse_args()
     if (args.ridge_refinement or args.real_refinement) and not args.accuracy_refinement:
         parser.error("Refinement inputs require --accuracy-refinement")
-    if args.accuracy_refinement and args.output == Path("artifacts/paper-figures"):
-        args.output = Path("artifacts/paper-figures-refined")
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update(
         {
