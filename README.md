@@ -21,7 +21,7 @@ uv sync --frozen
 
 This creates `.venv` from the pinned dependencies in [pyproject.toml](pyproject.toml) and [uv.lock](uv.lock). For development tools, use `uv sync --frozen --group dev`.
 
-The paper's cluster runs use an Apptainer image with CUDA, all four SCS backends, and Julia/cuClarabel. Installing the local environment alone does not build those native GPU interfaces. See [cluster setup and execution](docs/cluster.md).
+The paper's cluster runs use an Apptainer image with CUDA, all four SCS backends, and Julia/cuClarabel. Installing the local environment alone does not build those native GPU interfaces. See [Stanford cluster setup and execution](docs/cluster.md).
 
 ## Reproduce the paper figures
 
@@ -76,7 +76,7 @@ For the bounded problems, generate a manifest and execute one entry:
 
 A manifest lists the exact problem, seed, solver, and backend for every job. Use the same configuration when generating and executing it. Synthetic bounded problems are used for smoke tests and tolerance calibration; the paper's bounded-problem results use real datasets.
 
-For full runs, prepare the [datasets](docs/datasets.md) and follow the [cluster workflow](docs/cluster.md). Write each new campaign to a new output directory so it cannot overwrite completed results. Use `rlaopt-bench --help` for all commands.
+For real-data runs, prepare the [datasets](docs/datasets.md), copy the configuration, and set its data paths for your machine before generating and executing a manifest. The supplied [Stanford cluster workflow](docs/cluster.md) documents our Slurm deployment; its node names, storage paths, and production planners need adaptation on other clusters. Write each new campaign to a new output directory so it cannot overwrite completed results. Use `rlaopt-bench --help` for all commands.
 
 ## How to interpret the results
 

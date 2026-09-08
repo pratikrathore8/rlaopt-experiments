@@ -50,7 +50,19 @@ SCS and Clarabel use a residual-variable QP: introduce $r=Xw+b\mathbf1-y$, minim
 
 ## Common bounded-problem checks
 
-Every returned solution is checked in float64. Let $\delta=10^{-6}$ and $(a)_+=\max(a,0)$. For a coordinate $z$ with gradient $g$ and bounds $[\ell,u]$, its stationarity violation is $(-g)_+$ when $z\leq\ell+\delta$, $(g)_+$ when $z\geq u-\delta$, and $|g|$ otherwise. Feasibility is the maximum amount by which any coordinate exceeds its bounds. These are absolute maxima, without dimension-dependent scaling.
+Every returned solution is checked in float64. For a coordinate with value z, gradient g, and lower and upper bounds, the stationarity violation is
+
+$$
+v(z,g;\ell,u)=
+\begin{cases}
+\max(-g,0), & z\leq\ell+\delta, \\
+\max(g,0), & z\geq u-\delta, \\
+|g|, & \text{otherwise},
+\end{cases}
+\qquad \delta=10^{-6}.
+$$
+
+The overall stationarity check takes the maximum violation across coordinates. Feasibility is the maximum amount by which any coordinate exceeds its bounds. These are absolute maxima, without dimension-dependent scaling.
 
 For multinomial regression, use $G=X^T(P-Y)/n$, where $P$ contains softmax probabilities and $Y$ contains one-hot labels. For bounded elastic net, use $g=X^Tr/n+\lambda_2w+\lambda_1\mathbf1$, and include $|\mathbf1^Tr/n|$ to check that the derivative with respect to the intercept is close to zero.
 

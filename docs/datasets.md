@@ -60,7 +60,7 @@ The same feature values are used across solvers. Sparse input is retained by ada
 ## Preparing data
 
 ```sh
-scripts/prepare_real_data.sh --data-root /scr/pratikr/rlaopt-real-data --all
+scripts/prepare_real_data.sh --data-root /path/to/your/data-cache --all
 ```
 
-Use `--dataset NAME` instead of `--all` to prepare a subset. The command saves the source files, processed arrays, and checksums. Existing verified files are reused. On the cluster, `/scr` is local to each node: stage the cache on every execution node using `slurm/stage_real_data.sh`. See [cluster instructions](cluster.md).
+Replace `/path/to/your/data-cache` with a writable directory and set `[experiment].data_root` in your experiment configuration to that same path. Use `--dataset NAME` instead of `--all` to prepare a subset. The command saves the source files, processed arrays, and checksums. Existing verified files are reused. On Stanford’s SC cluster, `/scr` is local to each node: prepare and verify the cache on every execution node using `slurm/stage_real_data.sh`. See [Stanford cluster instructions](cluster.md).

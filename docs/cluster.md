@@ -1,6 +1,12 @@
-# Cluster setup and execution
+# Stanford cluster setup and execution
 
-Run commands from the repository root. The Slurm scripts target the Stanford soal cluster; adapt account, partition, nodes, and local storage paths for another system.
+This guide records how we ran the benchmarks on Stanford's SC cluster. The account, partition, node names, and `/scr` storage paths below are specific to that environment. The supplied Slurm scripts are examples for that cluster, not portable submission commands.
+
+To reproduce the figures on another machine, use the saved results and the single plotting command in the [README](../README.md#reproduce-the-paper-figures). No cluster access is required.
+
+To rerun benchmarks elsewhere, start with the local manifest and execution commands in the [README](../README.md#run-experiments). Copy the configuration, set its data paths for your machine, and install the solver dependencies required by the selected backend. For a Slurm deployment, adapt the account, partition, node constraints, GPU requests, thread counts, and container/cache paths before submitting. The production planning scripts also encode soal node assignments and need adaptation. Preserve the problem settings, precision, accuracy checks, and timing boundaries described in [benchmark methods](benchmark_methods.md); record any hardware or resource differences alongside the new timings.
+
+Run the commands below from the repository root on the Stanford SC cluster.
 
 ## Native solver environment
 
@@ -23,7 +29,7 @@ The environment pins rlaopt 0.1.0, PyTorch 2.13.0, NumPy 2.4.2, SciPy 1.18.1, cu
 
 ## Data
 
-Prepare the base cache as described in [datasets.md](datasets.md). `/scr` is node-local, so stage it on each worker node before launching real-data jobs:
+The datasets and preprocessing are described in [datasets.md](datasets.md). `/scr` is node-local. The staging script downloads, prepares, and verifies each node’s cache, reusing existing verified files:
 
 ```sh
 sbatch --nodelist=soal-8 slurm/stage_real_data.sh
@@ -42,10 +48,11 @@ Check the staging logs before submission. The data root in the configuration mus
 
 BACKEND=cpu CONFIG=configs/smoke.toml \
 MANIFEST=artifacts/smoke-cpu.jsonl OUTPUT_DIR=artifacts/smoke-campaign \
-  sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
+  sbatch --account=soal --partition=soal --nodelist=soal-8 \
+    --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
 ```
 
-For production ridge, generate manifests from `configs/synthetic.toml`. Use `scripts/shard_cpu_manifest.py` and `slurm/run_chunk_array.sh` to group jobs rather than submit hundreds of array elements. Inspect each script's arguments before submission and use a fresh campaign directory.
+For production ridge, generate manifests from `configs/synthetic.toml`. `scripts/shard_cpu_manifest.py` divides the CPU manifest between two nodes; `slurm/run_chunk_array.sh` executes groups of jobs per array element. Inspect each script's arguments before submission and use a fresh campaign directory.
 
 ## Real-data production
 
