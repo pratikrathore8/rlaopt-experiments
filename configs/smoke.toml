@@ -1,4 +1,5 @@
 [experiment]
+suite = "synthetic_ridge"
 alphas = [1.0]
 lambdas = [0.01]
 seeds = [0]

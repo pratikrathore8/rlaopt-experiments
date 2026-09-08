@@ -1,0 +1,3328 @@
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=1
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+/opt/rlaopt-experiments/src/rlaopt_experiments/suites/real_erm/features.py:68: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/SparseCsrTensorImpl.cpp:49.)
+  return torch.sparse_csr_tensor(
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssMatrixCreateCsr] start
+[2026-09-05 15:11:32][CUDSS][2746406][Info][cudssMatrixCreateCsr] For mtype != CUDSS_MTYPE_GENERAL mview = CUDSS_MVIEW_FULL will be treated as CUDSS_MVIEW_UPPER
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssConfigCreate] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssCreate] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssSetStream] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssDataCreate] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssConfigSet] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssMatrixCreateDn] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssMatrixCreateDn] start
+[2026-09-05 15:11:32][CUDSS][2746406][Api][cudssExecute] start
+[2026-09-05 15:11:32][CUDSS][2746406][Info][cudssExecute] Run with phase 3
+[2026-09-05 15:11:37][CUDSS][2746406][Info][cudssExecute] CUDSS_CONFIG_REORDERING_ALG 0 requires = 98576893008 bytes (98.576893008 GB) in host memory
+[2026-09-05 15:11:41][CUDSS][2746406][Info][cudssExecute] Using 1 threads on host for the reordering
+[2026-09-05 15:12:51][CUDSS][2746406][Info][cudssExecute] top_n = 4289 cpu_slv_flag = 1 cpu_fct_flag = 0
+
+[2026-09-05 15:12:51][CUDSS][2746406][Error][cudssExecute] Memory allocation failed with error = 2 for size = 8228457040
+[2026-09-05 15:12:51][CUDSS][2746406][Error][cudssExecute] alloc device buffer failed
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 52fcb7ab553959499a6eba6f8fa50c13.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/diagnostics/cuclar-year/wandb/offline-run-20260905_151253-52fcb7ab553959499a6eba6f8fa50c13
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:         summary/native_success ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 0
+wandb:         summary/native_success 0
+wandb:       summary/runtime_eligible 0
+wandb:    summary/runtime_max_seconds 146.58498
+wandb: summary/runtime_median_seconds 146.58498
+wandb:    summary/runtime_min_seconds 146.58498
+wandb:        summary/runtime_seconds 146.58498
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/diagnostics/cuclar-year/wandb/offline-run-20260905_151253-52fcb7ab553959499a6eba6f8fa50c13
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/diagnostics/cuclar-year/wandb/offline-run-20260905_151253-52fcb7ab553959499a6eba6f8fa50c13/logs
+[2026-09-05 15:12:54][CUDSS][2746406][Api][cudssMatrixDestroy] start
+[2026-09-05 15:12:54][CUDSS][2746406][Api][cudssMatrixDestroy] start
+[2026-09-05 15:12:54][CUDSS][2746406][Api][cudssDataDestroy] start
+[2026-09-05 15:12:54][CUDSS][2746406][Error][cudssDataDestroy] Memory deallocation failed
+[2026-09-05 15:12:54][CUDSS][2746406][Error][cudssDataDestroy] free device buffer failed
+[2026-09-05 15:12:54][CUDSS][2746406][Error][cudssDataDestroy] Internal memory release failed on device 0
+[2026-09-05 15:12:54][CUDSS][2746406][Error][cudssDataDestroy] Memory deallocation failed
+[2026-09-05 15:12:54][CUDSS][2746406][Api][cudssConfigDestroy] start
+[2026-09-05 15:12:54][CUDSS][2746406][Api][cudssMatrixDestroy] start
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000001365dc6c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.588 MiB at 0x00000013639e5c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.176 MiB at 0x0000001365699c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.176 MiB at 0x0000001364f6cc00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.176 MiB at 0x000000136483fc00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.176 MiB at 0x0000001364112c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(15.285 GiB at 0x0000000f91651600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.642 GiB at 0x0000000da8487200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.588 MiB at 0x0000000da80f0a00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(3.588 MiB at 0x0000000da7d5a200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(1.802 MiB at 0x0000000da7b8ca00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x0000000da79c3800):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.819 GiB at 0x0000000cb32a9a00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.819 GiB at 0x0000000bbeb8fc00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x0000000bbe9c6a00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000bbe634600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbe299800):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000bbdf07400):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbdb6c600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000bbd7da200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbd43f400):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbd0a4600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000bbcd12200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuEventDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1041 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/events.jl:30 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/events.jl:29
+unknown function (ip: 0x56b30738a67)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuEventDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1041 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/events.jl:30 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/events.jl:29
+unknown function (ip: 0x56b30738a67)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuEventDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1041 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/events.jl:30 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/events.jl:29
+unknown function (ip: 0x56b30738a67)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuStreamDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1003 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:89
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:88
+jfptr_unsafe_destroyNOT._12178 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuStreamDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1003 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:89
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:88
+jfptr_unsafe_destroyNOT._12178 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuStreamDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1003 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:89
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:88
+jfptr_unsafe_destroyNOT._12178 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(4 bytes at 0x0000000bbcd12000):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbc977200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbc5dc400):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbc241600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(16 bytes at 0x0000000bbc241400):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{UnitRange{Int32}, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(16 bytes at 0x0000000bbc241200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{UnitRange{Int32}, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbbea4c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x0000000bbbb09e00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000bbb777a00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000bbb3e5600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(7.639 GiB at 0x00000009d25b1a00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.819 GiB at 0x00000008dde97c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x00000008ddccea00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x00000008dd933c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.639 GiB at 0x00000006f4b00000):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.819 GiB at 0x00000006003e6200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.802 MiB at 0x0000000600218a00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x00000005ffe86600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x00000005ffaf4200):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x00000005ff92b000):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x00000005ff761e00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x00000005ff3c7000):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x00000005ff034c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x00000005fec99e00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x00000005fe8ff000):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x00000005fe56cc00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.604 MiB at 0x00000005fe1d1e00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.802 MiB at 0x00000005fe004600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.819 GiB at 0x00000005098ea800):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(7.639 GiB at 0x0000000320ab6c00):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000320724800):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuModuleUnload at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1035 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:92 [inlined]
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+unsafe_unload! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/module.jl:91
+jfptr_unsafe_unloadNOT._12438 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x000000032055b600):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(1.786 MiB at 0x0000000320392400):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Int32, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+WARNING: Error while freeing DeviceMemory(3.571 MiB at 0x0000000320000000):
+CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+
+Stacktrace:
+  [1] throw_api_error
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+  [2] check
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuMemFreeAsync
+    @ /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+  [4] free(mem::CUDA.DeviceMemory; stream::CuStream)
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:87
+  [5] free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/memory.jl:82 [inlined]
+  [6] #1181
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:714 [inlined]
+  [7] #context!#1071
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168 [inlined]
+  [8] context!
+    @ /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163 [inlined]
+  [9] _pool_free
+    @ /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:713 [inlined]
+ [10] macro expansion
+    @ ./timing.jl:395 [inlined]
+ [11] pool_free(managed::CUDA.Managed{CUDA.DeviceMemory})
+    @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/memory.jl:695
+ [12] release
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:42
+ [13] unsafe_free!
+    @ /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:100 [inlined]
+ [14] unsafe_free!(x::CuArray{Float64, 1, CUDA.DeviceMemory})
+    @ GPUArrays /opt/julia-depot/packages/GPUArrays/SXVTt/src/host/abstractarray.jl:115
+error in running finalizer: CUDA.CuError(code=CUDA.cudaError_enum(0x000002bc))
+throw_api_error at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:30
+check at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/libcuda.jl:37 [inlined]
+cuStreamDestroy_v2 at /opt/julia-depot/packages/GPUToolbox/x8hVh/src/ccalls.jl:33 [inlined]
+#1003 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:89
+#context!#1071 at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:168
+context! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/state.jl:163
+unsafe_destroy! at /opt/julia-depot/packages/CUDA/FQwqy/lib/cudadrv/stream.jl:88
+jfptr_unsafe_destroyNOT._12178 at /opt/julia-depot/compiled/v1.10/CUDA/oWw5k_wlOxk.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:2897 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gf.c:3081
+run_finalizer at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:318
+jl_gc_run_finalizers_in_list at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:408
+run_finalizers at /cache/build/builder-amdci4-7/julialang/julia-ci/src/gc.c:454
+ijl_atexit_hook at /cache/build/builder-amdci4-7/julialang/julia-ci/src/init.c:299
+unknown function (ip: 0x57084d3bb15)
+unknown function (ip: 0x57084d383ee)
+ffi_call at /lib/x86_64-linux-gnu/libffi.so.8 (unknown line)
+unknown function (ip: 0x57084d54cbe)
+unknown function (ip: 0x57084d492ae)
+_PyObject_MakeTpCall at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+_PyEval_EvalFrameDefault at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d9feac)
+Py_FinalizeEx at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_Exit at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085cefd1c)
+PyRun_SimpleStringFlags at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x57085d177da)
+Py_RunMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+Py_BytesMain at /usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0 (unknown line)
+unknown function (ip: 0x5708580a1c9)
+__libc_start_main at /usr/lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+_start at /opt/rlaopt-experiments/.venv/bin/python3 (unknown line)
+┌ Warning: CUDA runtime library `libcublasLt.so.13` was loaded from a system path, `/usr/local/cuda/lib64/libcublasLt.so.13`.
+│ This may cause errors.
+│ 
+│ If you're running under a profiler, this situation is expected. Otherwise,
+│ ensure that your library path environment variable (e.g., `PATH` on Windows
+│ or `LD_LIBRARY_PATH` on Linux) does not include CUDA library paths.
+│ 
+│ In any other case, please file an issue.
+└ @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/initialization.jl:198
+┌ Warning: CUDA runtime library `libnvJitLink.so.13` was loaded from a system path, `/usr/local/cuda/lib64/libnvJitLink.so.13`.
+│ This may cause errors.
+│ 
+│ If you're running under a profiler, this situation is expected. Otherwise,
+│ ensure that your library path environment variable (e.g., `PATH` on Windows
+│ or `LD_LIBRARY_PATH` on Linux) does not include CUDA library paths.
+│ 
+│ In any other case, please file an issue.
+└ @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/initialization.jl:198
+┌ Warning: CUDA runtime library `libcusparse.so.12` was loaded from a system path, `/usr/local/cuda/lib64/libcusparse.so.12`.
+│ This may cause errors.
+│ 
+│ If you're running under a profiler, this situation is expected. Otherwise,
+│ ensure that your library path environment variable (e.g., `PATH` on Windows
+│ or `LD_LIBRARY_PATH` on Linux) does not include CUDA library paths.
+│ 
+│ In any other case, please file an issue.
+└ @ CUDA /opt/julia-depot/packages/CUDA/FQwqy/src/initialization.jl:198

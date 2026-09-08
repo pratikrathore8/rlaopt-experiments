@@ -5,36 +5,104 @@ From: @CUDA_IMAGE_REFERENCE@
     pyproject.toml /opt/rlaopt-experiments/pyproject.toml
     uv.lock /opt/rlaopt-experiments/uv.lock
     README.md /opt/rlaopt-experiments/README.md
+    containers/python-shared.c /opt/rlaopt-experiments/containers/python-shared.c
+    containers/scs-3.2.11-gpu-build.patch /opt/rlaopt-experiments/containers/scs-3.2.11-gpu-build.patch
+    containers/cudss.pc /opt/rlaopt-experiments/containers/cudss.pc
     src /opt/rlaopt-experiments/src
+    julia/cuclarabel/Project.toml /opt/rlaopt-experiments/julia/cuclarabel/Project.toml
+    julia/cuclarabel/LocalPreferences.toml /opt/rlaopt-experiments/julia/cuclarabel/LocalPreferences.toml
+    julia/cuclarabel/Manifest.toml /opt/rlaopt-experiments/julia/cuclarabel/Manifest.toml
 
 %post
     set -eu
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install -y --no-install-recommends ca-certificates curl python3.12 python3.12-venv
+    apt-get install -y --no-install-recommends \
+        build-essential ca-certificates curl git libopenblas-dev patch pkg-config \
+        python3.12 python3.12-dev python3.12-venv
+    gcc /opt/rlaopt-experiments/containers/python-shared.c \
+        $(python3.12-config --embed --cflags --ldflags) \
+        -Wl,-rpath,/usr/lib/x86_64-linux-gnu \
+        -o /usr/bin/python3.12-shared
     rm -rf /var/lib/apt/lists/*
     export UV_UNMANAGED_INSTALL=/usr/local/bin
     export UV_LINK_MODE=copy
     curl -LsSf https://astral.sh/uv/0.12.7/install.sh | sh
     cd /opt/rlaopt-experiments
-    uv venv --python /usr/bin/python3.12 .venv
+    uv venv --python /usr/bin/python3.12-shared .venv
     UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
         uv sync --frozen --no-dev --group gpu
+    curl -fL "https://julialang-s3.julialang.org/bin/linux/x64/1.10/julia-@JULIA_VERSION@-linux-x86_64.tar.gz" \
+        -o /tmp/julia.tar.gz
+    echo "@JULIA_SHA256@  /tmp/julia.tar.gz" | sha256sum --check --strict
+    mkdir -p /opt/julia
+    tar -xzf /tmp/julia.tar.gz --strip-components=1 -C /opt/julia
+    rm /tmp/julia.tar.gz
+    ln -s /opt/julia/bin/julia /usr/local/bin/julia
+    export JULIA_DEPOT_PATH=/opt/julia-depot
+    # Package images built for the native build-node CPU can segfault when this
+    # SIF runs on a different CPU family elsewhere in the cluster.
+    export JULIA_CPU_TARGET=generic
+    export JULIA_PKG_PRECOMPILE_AUTO=0
+    export JULIA_CONDAPKG_BACKEND=Null
+    export JULIA_PYTHONCALL_EXE=/opt/rlaopt-experiments/.venv/bin/python
+    julia --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
+        'using Pkg; Pkg.instantiate(); Pkg.precompile(); using PythonCall, Clarabel, CUDA, CUDSS; @assert !isnothing(Base.get_extension(Clarabel, :PythonExt))'
+    # Reuse the cuDSS 0.7.1 artifact already pinned by the Julia manifest.
+    CUDSS_ROOT="$(julia --project=/opt/rlaopt-experiments/julia/cuclarabel -e 'using CUDSS; print(CUDSS.CUDSS_jll.artifact_dir)')"
+    test -f "$CUDSS_ROOT/include/cudss.h"
+    ln -s "$CUDSS_ROOT" /opt/scs-cudss
+    export PKG_CONFIG_PATH=/opt/rlaopt-experiments/containers
+    curl -fL \
+        "https://files.pythonhosted.org/packages/9e/59/5cb7f9612a5a3ff6efd4ab2d899902a536cc5974a7edb589084c5577291c/scs-@SCS_VERSION@.tar.gz" \
+        -o /tmp/scs.tar.gz
+    echo "@SCS_SDIST_SHA256@  /tmp/scs.tar.gz" | sha256sum --check --strict
+    mkdir /tmp/scs-source
+    tar -xzf /tmp/scs.tar.gz --strip-components=1 -C /tmp/scs-source
+    patch --directory=/tmp/scs-source --strip=1 \
+        < /opt/rlaopt-experiments/containers/scs-3.2.11-gpu-build.patch
+    UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv \
+        uv pip install --python /opt/rlaopt-experiments/.venv/bin/python \
+        --reinstall --no-deps \
+        --config-setting=setup-args=-Duse_gpu=true \
+        --config-setting=setup-args=-Dlink_cudss=true \
+        --config-setting=setup-args=-Dint32=true \
+        --config-setting=setup-args=-Dgpu_atrans=true \
+        /tmp/scs-source
+    rm -rf /tmp/scs.tar.gz /tmp/scs-source
     uv --version
+    julia --version
 
 %environment
     export PATH=/opt/rlaopt-experiments/.venv/bin:$PATH
     export UV_PROJECT_ENVIRONMENT=/opt/rlaopt-experiments/.venv
     export PYTHONNOUSERSITE=1
+    export PYTHON_JULIACALL_EXE=/usr/local/bin/julia
+    export PYTHON_JULIACALL_PROJECT=/opt/rlaopt-experiments/julia/cuclarabel
+    export PYTHON_JULIACALL_THREADS=1
+    export JULIA_CPU_TARGET=generic
+    export JULIA_DEPOT_PATH="${TMPDIR:-/tmp}/rlaopt-julia-depot-${SLURM_JOB_ID:-local}:/opt/julia-depot"
+    export JULIA_PKG_OFFLINE=true
+    export JULIA_CONDAPKG_BACKEND=Null
+    export JULIA_PYTHONCALL_EXE=/opt/rlaopt-experiments/.venv/bin/python
 
 %labels
     org.opencontainers.image.title rlaopt-experiments-cuda
     io.rlaopt.cuda.base.digest @CUDA_BASE_IMAGE_DIGEST@
     io.rlaopt.cuda.version @CUDA_IMAGE_VERSION@
     io.rlaopt.uv.version 0.12.7
+    io.rlaopt.julia.version @JULIA_VERSION@
+    io.rlaopt.cuclarabel.commit @CUCLARABEL_COMMIT@
+    io.rlaopt.scs.version @SCS_VERSION@
+    io.rlaopt.scs.gpu_backend indirect,cudss
 
 %test
     export HOME=/tmp
     export CUPY_CACHE_DIR=/tmp/cupy-cache
+    mkdir -p /tmp/rlaopt-julia-test-depot
+    export JULIA_DEPOT_PATH=/tmp/rlaopt-julia-test-depot:/opt/julia-depot
     /opt/rlaopt-experiments/.venv/bin/python -c \
-        'import cupy, cuml, rlaopt, torch; print("container imports passed")'
+        'import cupy, cuml, juliacall, rlaopt, torch; from scs import _scs_direct, _scs_indirect, _scs_gpu, _scs_cudss; assert all(m.sizeof_float() == 8 and m.sizeof_int() == 4 for m in (_scs_direct, _scs_indirect, _scs_gpu, _scs_cudss)); print("container imports passed")'
+    ldd /opt/rlaopt-experiments/.venv/bin/python | grep -q libpython3.12
+    julia --project=/opt/rlaopt-experiments/julia/cuclarabel -e \
+        'using Clarabel; println("CuClarabel import passed")'

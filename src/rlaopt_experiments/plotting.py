@@ -9,14 +9,17 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
+from rlaopt_experiments.records import read_record
 from rlaopt_experiments.config import load_experiment, load_solvers
 
 
 def _records(path: Path) -> list[dict]:
-    return [json.loads(file.read_text()) for file in sorted(path.glob("*.json"))]
+    return [read_record(file) for file in sorted(path.glob("*.json"))]
 
 
 def _native_success(row: dict) -> bool:
+    if "runtime_eligible" in row:
+        return bool(row["runtime_eligible"])
     if row["metadata"].get("worker_outcome") != "result":
         return False
     status = row["native_status"]
@@ -58,7 +61,10 @@ def _aggregate(records: list[dict], family: str) -> list[dict]:
                 "runtime_min": min(valid) if valid else None,
                 "runtime_max": max(valid) if valid else None,
                 "native_success_rate": sum(_native_success(item) for item in values) / len(values),
-                "external_kkt_success_rate": sum(item["success"] for item in values) / len(values),
+                "external_kkt_success_rate": sum(
+                    item.get("external_success", item.get("success", False)) for item in values
+                )
+                / len(values),
             }
         )
     return result
@@ -66,7 +72,8 @@ def _aggregate(records: list[dict], family: str) -> list[dict]:
 
 def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    records = _records(input_dir)
+    config = load_experiment(config_path)
+    records = [row for row in _records(input_dir) if row["suite"] == config.suite]
     if not records:
         raise RuntimeError(f"no JSON records found in {input_dir}")
     for family, scale, label in (
@@ -139,7 +146,6 @@ def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
         figure.savefig(output_dir / f"runtime_{family}.png", dpi=200)
         plt.close(figure)
 
-    config = load_experiment(config_path)
     expected = {
         (backend, solver, shape.n, shape.p, alpha, ridge, seed, repetition)
         for backend in ("cpu", "cuda")
@@ -164,9 +170,10 @@ def make_figures(input_dir: Path, output_dir: Path, config_path: Path) -> None:
     for row in records:
         bucket = summary[f"{row['solver']}:{row['backend']}"]
         bucket["native_success"] += int(_native_success(row))
-        bucket["external_kkt_pass"] += int(row["success"])
+        external_success = row.get("external_success", row.get("success", False))
+        bucket["external_kkt_pass"] += int(external_success)
         bucket["external_kkt_miss"] += int(
-            row["metadata"].get("worker_outcome") == "result" and not row["success"]
+            row["metadata"].get("worker_outcome") == "result" and not external_success
         )
         bucket["timeout"] += int(row["timed_out"])
         bucket["error"] += int(row["metadata"].get("worker_outcome") == "error")

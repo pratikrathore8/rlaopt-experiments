@@ -1,213 +1,118 @@
 # rlaopt experiments
 
-This repository contains reproducible benchmark suites comparing rlaopt with other optimization and numerical linear algebra methods. It is intended to grow beyond least squares and ridge regression: each problem family should define its own mathematical model, competitors, accuracy contract, configuration, runner, and analysis while sharing the repository's environment, result-tracking, and orchestration conventions.
+Code and results for the experiments in the rlaopt paper. The repository compares CPU and GPU solvers on three problems and includes a small differentiable optimization example.
 
-The first implemented suite is controlled synthetic ridge regression. Its fixed-budget design is documented below.
-
-## Benchmark suite organization
-
-Repository-level dependencies and reproducibility policy live in `pyproject.toml`, `uv.lock`, and `containers/`. The current ridge suite uses `configs/synthetic.toml` and the `problem.py`, `solvers.py`, `diagnostics.py`, `runner.py`, and `plotting.py` modules. As additional benchmark families are introduced, their problem-specific configuration and implementation should be placed in named subpackages rather than added as conditionals to the ridge model. Shared concerns—stable run identifiers, atomic records, W&B recovery, hardware metadata, and Slurm submission—should remain reusable across suites.
-
-Every suite must document:
-
-- its mathematical problem and data-generating process;
-- the normalization and parameter scales used across problem sizes;
-- solver-specific mappings and a method-independent success criterion;
-- what setup, transfers, and synchronization are included in runtime;
-- resource limits, failure handling, and the exact hardware scope; and
-- suite-specific limitations and confirmatory versus exploratory analyses.
-
-The sections that follow describe only the synthetic ridge suite.
-
-## Synthetic ridge suite: mathematical model
-
-For every shape $(n,p)$, let $r=\min(n,p)$. Large Haar factors are prohibitively expensive to generate by Gaussian QR, so the suite uses independent Structured Orthogonal Random Feature (SORF) factors. Let $H_d$ denote the normalized $d\times d$ Walsh--Hadamard matrix and let each $D_i$ be an independently seeded diagonal matrix of Rademacher signs. Following [Yu et al. (2016)](https://arxiv.org/abs/1610.09072), define
-
-$$
-Q_d = H_d D_1 H_d D_2 H_d D_3.
-$$
-
-Every factor in this product is orthogonal, so $Q_d$ is orthogonal. Independent sign streams give $Q_n^{(L)}$ and $Q_p^{(R)}$. For decay exponent $\alpha$, define
-
-$$
-s_k = k^{-\alpha/2}, \qquad k=1,\ldots,r,
-$$
-
-and
-
-$$
-X = Q_n^{(L)}[:,1:r] \,\mathrm{diag}(s)\, Q_p^{(R)}[:,1:r]^{\mathsf T}.
-$$
-
-The implementation starts from the rectangular diagonal matrix containing $s$ and applies the SORF transforms directly along its row and column axes with the standard fast Walsh--Hadamard butterfly. It never materializes either dense singular-vector factor. The final $X$ is nevertheless an ordinary dense float64 tensor; the compact right-factor signs are retained only for the analytic oracle and are never used by a solver adapter. Thus the nonzero eigenvalues of $X^{\mathsf T}X$ are exactly $k^{-\alpha}$ and $\lVert X\rVert_2=1$. The three profiles are $\alpha \in \{1/2,1,2\}$. This normalization prevents sample count from changing the regularization scale.
-
-The response is generated from an independent Gaussian vector $z$, normalized as $\widehat z=z/\lVert z\rVert_2$, with
-
-$$
-y = Q_n^{(L)}[:,1:r]\widehat z, \qquad \lVert y\rVert_2=1.
-$$
-
-Every method solves, in float64,
-
-$$
-\min_w \frac{1}{2}\lVert Xw-y\rVert_2^2 + \frac{\lambda}{2}\lVert w\rVert_2^2,
-$$
-
-for $\lambda \in \{10^{-2},10^{-4},10^{-6}\}$. The exact reference solution is derived from the known SVD:
-
-$$
-w_\star
-= Q_p^{(R)}[:,1:r] \,\mathrm{diag}\left(\frac{s_k}{s_k^2+\lambda}\right)\widehat z.
-$$
-
-We report the effective dimension
-
-$$
-d_{\mathrm{eff}}(\lambda)
-= \sum_{k=1}^{r}\frac{s_k^2}{s_k^2+\lambda},
-$$
-
-the standard condition number
-
-$$
-\kappa(X^{\mathsf T}X+\lambda I)
-= \frac{1+\lambda}{p^{-\alpha}+\lambda},
-$$
-
-and the ratios $r/p$ and $r/d_{\mathrm{eff}}$. Every configured shape has $n\ge p$, so $X$ has full column rank.
-
-
-## Synthetic ridge suite: fixed experiment grid
-
-There are eight unique shapes:
-
-| family | $(n,p)$ |
-|---|---|
-| square scaling | $(2^{10},2^{10})$, $(2^{12},2^{12})$, $(2^{14},2^{14})$, $(2^{16},2^{16})$ |
-| sample scaling ($p=2^{14}$) | $(2^{14},2^{14})$, $(2^{15},2^{14})$, $(2^{16},2^{14})$ |
-| feature scaling ($n=2^{16}$) | $(2^{16},2^{10})$, $(2^{16},2^{12})$, $(2^{16},2^{14})$, $(2^{16},2^{16})$ |
-
-
-Each shape uses three decay profiles, three master seeds, and three ridge values. Factor, response, and Nyström randomness use separately derived deterministic streams. A job is $(\text{hardware},\text{solver},\text{shape},\alpha,\text{seed})$ and reuses the same data matrix $X$ for all three ridge values: 288 jobs per backend, 576 total, and 1,728 ridge trials before timing repetitions.
-
-We use the following hardware and solver combinations:
-
-| backend | hardware | solvers |
+| Experiment | Methods compared | Configuration |
 |---|---|---|
-| CPU | 64 physical cores on soal-8/soal-9 | rlaopt Nyström-PCG, rlaopt identity-PCG (CG), SciPy LSQR, PyTorch augmented QR |
-| GPU | NVIDIA H200 NVL on soal-12 | both rlaopt variants, cuML Ridge/LSMR, PyTorch augmented QR |
+| Synthetic ridge regression | Nyström PCG, CG, QR, CPU LSQR, GPU LSMR | [synthetic.toml](configs/synthetic.toml) |
+| Bounded multinomial regression | SAPPHIRE and JAXopt APG/L-BFGS-B, with and without JIT | [real_erm.toml](configs/real_erm.toml) |
+| Bounded elastic net | NysADMM, SCS indirect/direct, Clarabel/cuClarabel | [real_erm.toml](configs/real_erm.toml), [SCS supplement](configs/real_erm_scs_backends.toml) |
+| Differentiable optimization | Tune a lasso penalty by differentiating through proximal gradient | [Python example](scripts/run_differentiable_optimization.py) |
 
-rlaopt always receives $X^{\mathsf T}X$ as a linear operator over the fully materialized dense $X$ (i.e., it never forms the Gram matrix) and $B=X^{\mathsf T}y$, with `reg=lambda`. Nyström PCG fixes $\mathtt{rank\_init}=\mathtt{rank\_max}=\min(128,p)$, `base_damping=lambda`, and adaptive damping. Ridge is not folded into the operator, so it is never counted twice. It does not receive the SORF factors or a fast-transform operator; its products use the same dense $X$ supplied to every competitor. SciPy uses a `LinearOperator` wrapper around the same dense $X$ and $\mathtt{damp}=\sqrt{\lambda}$. PyTorch uses the augmented system
+Unbounded elastic-net benchmarking is no longer supported because it is not part of the paper. The lasso differentiation example is a separate demonstration and remains included.
 
-$$
-\begin{bmatrix}X\\ \sqrt{\lambda}I\end{bmatrix}w
-= \begin{bmatrix}y\\0\end{bmatrix},
-$$
+## Setup
 
-since `torch.linalg.lstsq` has no ridge argument. The adapter is named `torch_lstsq_qr` in code and selects the unpivoted QR-based `gels` driver on both CPU and CUDA; the augmented matrix has full column rank for every positive ridge value; the stable manifest identifier remains `torch_qr`. cuML uses `Ridge(alpha=lambda, fit_intercept=False, solver="lsmr")`.
+Use Python 3.12 and uv 0.12.7. From the repository root:
 
-## Synthetic ridge suite: accuracy, stopping, and timing
-
-The cross-method success criterion is the externally recomputed relative KKT residual
-
-$$
-\frac{\left\lVert (X^{\mathsf T}X+\lambda I)w-X^{\mathsf T}y\right\rVert_2}
-{\left\lVert X^{\mathsf T}y\right\rVert_2}
-\le 10^{-6}.
-$$
-
-Native solver status alone never counts as success. Relative error to $w_\star$ is a secondary diagnostic.
-
-Native tolerances live in `configs/tolerances.toml`. Calibrate one tolerance per solver/backend on representative easy, middle, and hard cases, choose the loosest value that passes every external KKT check, then freeze the file before the production sweep. rlaopt stores a residual point per iteration in both the atomic JSON record and W&B; SciPy records its final LSQR diagnostics; cuML records `n_iter_` when exposed. Direct QR has no iteration history. Runtime figures include every run that completes under its frozen native stopping rule; the external KKT pass rate and marginal misses are reported separately, so native-completed cuML or SciPy runs are not dropped solely for narrowly missing the common diagnostic threshold.
-
-Run calibration with, for example, `uv run rlaopt-bench calibrate --backend cpu --solver scipy_lsqr --candidates 1e-4 1e-5 1e-6 1e-7 1e-8`. The command writes all underlying records plus `calibration.json`; copy the selected value into `configs/tolerances.toml` only after inspecting every case.
-
-Use `configs/calibration.toml` for the fixed easy, middle, and hard calibration regimes. Each problem is generated once and retained while all candidate tolerances run with independently initialized solvers. The current tolerances remain frozen after the switch to SORF because they are relative stopping criteria; they are not selected again on production endpoints. The cases in `configs/pilot.toml` instead provide held-out transfer checks. Any KKT failure is reported as evidence that a tolerance did not transfer and is not silently tuned away. CUDA calibration runs through `slurm/calibrate_cuda.sh` inside the pinned image, while 64-core CPU calibration runs through `slurm/calibrate_cpu.sh` on soal-8 or soal-9.
-
-For pilot, production, and maximum-size runs, iterative solvers stop at native convergence, $2p$, or 15 minutes, whichever comes first; QR has only the 15-minute solve timeout. Calibration uses a 5-minute solve limit and smoke tests use 1 minute. Problem generation has a separate 15-minute startup limit and remains outside solver timing. A persistent spawned worker retains the generated problem but places every timed native call behind a parent-enforced process boundary; if a solver exceeds the configured solve limit, the parent terminates that worker and regenerates the same deterministic problem before continuing with the next ridge value. rlaopt additionally checks elapsed time cooperatively on every iteration. A timeout, exception, or native “success” that misses KKT is written as a structured failure, never silently dropped.
-
-SORF generation, dense materialization, and analytic oracle work are excluded from runtime. Each backend generates the same seed-defined problem natively on its own device; generation is numerically cross-checked but is not part of solver timing. Timed regions include preconditioner construction, factorization, and all internal solver setup. GPU timings synchronize immediately before and after the solve and therefore describe GPU-resident inputs. Where a configuration requests one warm-up, it is untimed; iterative warm-ups are capped at 10 iterations, while direct QR performs a full warm-up call. The pilot gives every successful configuration three timed repetitions to measure same-instance variability. Production uses one timed run for each of three problem seeds and summarizes runtime across seeds by its median/min/max. A first-run timeout or accuracy failure is recorded once during the primary sweep and flagged for manual audit rather than automatically consuming two more production attempts. Records include peak process RSS on CPU and peak PyTorch allocator use on CUDA; scheduler and `nvidia-smi` accounting remain necessary because the CUDA allocator value does not include every cuML allocation.
-
-## Reproducible environment
-
-Install the exact uv release first, then sync the lockfile:
-
-```bash
-curl -LsSf https://astral.sh/uv/0.12.7/install.sh | sh
+```sh
 uv sync --frozen
 ```
 
-The project pins Python 3.12, uv 0.12.7, rlaopt 0.1.0 from PyPI, NumPy 2.4.2, SciPy 1.18.1, PyTorch 2.13.0, matplotlib 3.11.1, and W&B 0.29.0. NumPy 2.4.2 is the newest release compatible with cuML 26.8.0's pinned Numba CUDA implementation; NumPy 2.5 removes `numpy.row_stack`, which that implementation still imports. `uv.lock` pins the transitive CPU environment and a separate `gpu` dependency group pins the standalone `cuml-cu13==26.8.0` wheel and its dependencies. GPU jobs use the official NVIDIA CUDA 13.0.2 devel image configured in `containers/cuda.env`; the devel flavor supplies NVRTC for Numba. Its `linux/amd64` base manifest is fixed by digest, and `containers/cuda.def.in` derives a project image containing uv, the frozen GPU environment, and the benchmark package. The H200 supports CUDA 13, and the soal cluster's driver is newer than CUDA 13's minimum requirement.
+This creates `.venv` from the pinned dependencies in [pyproject.toml](pyproject.toml) and [uv.lock](uv.lock). For development tools, use `uv sync --frozen --group dev`.
 
-W&B defaults to offline mode. Atomic JSON files under `artifacts/records/` are the source of truth and remain recoverable if W&B fails; sync them later with `wandb sync` if desired.
+The paper's cluster runs use an Apptainer image with CUDA, all four SCS backends, and Julia/cuClarabel. Installing the local environment alone does not build those native GPU interfaces. See [Stanford cluster setup and execution](docs/cluster.md).
 
-## Synthetic ridge suite: workflow
+## Reproduce the paper figures
 
-Create one manifest per backend:
+The saved paper results are included in [results/paper](results/paper/README.md). After setup, regenerate all figures with:
 
-```bash
-uv run rlaopt-bench manifest --backend cpu --output artifacts/cpu.jsonl
-uv run rlaopt-bench manifest --backend cuda --output artifacts/cuda.jsonl
+```sh
+.venv/bin/python scripts/make_paper_figures.py
 ```
 
-Use `configs/smoke.toml` for one tiny case per solver, `configs/pilot.toml` for the reduced pre-production sweep, and `configs/max_size.toml` for the largest-shape memory probe. Pass the desired file through `--config` when creating a manifest and running its jobs.
+This uses the original trials, additional SCS backends, completed stricter-tolerance reruns, and saved differentiable optimization trace. No solver runs or dataset downloads are needed. PDFs, PNGs, plotted values, and an input audit are written to **`artifacts/paper-figures`**. [FIGURES.md](FIGURES.md) explains the figures and outcome labels.
 
-Run a small calibration/smoke case before freezing tolerances:
+Use `--paper-results PATH` to relocate the saved bundle, or explicit `--ridge`, `--real`, and refinement arguments to plot another campaign. `--output PATH` changes the figure destination. The manuscript lives in the separate `rlaopt-paper` repository; this plotter does not update it automatically.
 
-```bash
-WANDB_MODE=offline uv run rlaopt-bench run-job \
-  --n 256 --p 256 --alpha 1 --seed 0 --solver scipy_lsqr --backend cpu
+Datasets, container images, and unrelated experiment outputs remain outside Git.
+
+### Differentiable optimization
+
+This small example needs no downloaded dataset or GPU:
+
+```sh
+.venv/bin/python scripts/run_differentiable_optimization.py
+.venv/bin/python scripts/make_paper_figures.py --differentiable-only \
+  --differentiable artifacts/differentiable-optimization/result.json
 ```
 
-For a direct smoke grid, submit an array sized from the manifest and route it to a campaign-specific output directory:
+The script uses fixed synthetic data and saves its objective trace. The plot has a linear iteration axis and a logarithmic objective axis. Pass the same `--differentiable` option to include a newly generated trace in full figure regeneration. The default uses the saved paper trace.
 
-```bash
-BACKEND=cpu MANIFEST=artifacts/smoke-cpu.jsonl \
-  CONFIG=configs/smoke.toml OUTPUT_DIR=artifacts/smoke-campaign \
-  sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
-```
+## Run experiments
 
-`CONFIG` must be the same file used to generate `MANIFEST`; it defaults to `configs/synthetic.toml`. For example, submit the CPU smoke grid with
+Start with a small CPU ridge run to check the environment:
 
-```bash
-uv run rlaopt-bench manifest \
+```sh
+WANDB_MODE=offline .venv/bin/rlaopt-bench run-job \
   --config configs/smoke.toml \
-  --backend cpu \
-  --output artifacts/smoke-cpu.jsonl
-
-BACKEND=cpu \
-CONFIG=configs/smoke.toml \
-MANIFEST=artifacts/smoke-cpu.jsonl \
-OUTPUT_DIR=artifacts/smoke-campaign \
-  sbatch --array="0-$(($(wc -l < artifacts/smoke-cpu.jsonl)-1))" slurm/run_array.sh
+  --n 256 --p 256 --alpha 1 --seed 0 \
+  --solver scipy_lsqr --backend cpu \
+  --output artifacts/smoke-local
 ```
 
-For production CPU timing, split the manifest with `scripts/shard_cpu_manifest.py`. The soal QOS counts every pending array element toward its 20-job submission limit, so do not submit the 288 manifest records as individual array elements. Instead, submit six chunks for each CPU shard and six chunks for CUDA. Each chunk executes its round-robin subset sequentially and continues after a launcher failure. Use `--array=0-5%1` for all three arrays, pin the CPU arrays to soal-8 and soal-9, and pin the CUDA array to soal-12. This creates 18 submitted tasks and runs at most one benchmark on each node. `CHUNK_COUNT` must equal the array size, and every array must share the same campaign-specific `OUTPUT_DIR`.
+For the bounded problems, generate a manifest and execute one entry:
 
-Build the derived GPU image once from a login node by submitting:
+```sh
+.venv/bin/rlaopt-bench manifest \
+  --config configs/synthetic_erm_smoke.toml --backend cpu \
+  --output artifacts/erm-smoke/cpu.jsonl
 
-```bash
-sbatch slurm/build_cuda.sh
+.venv/bin/rlaopt-bench run-manifest-job \
+  --config configs/synthetic_erm_smoke.toml \
+  --manifest artifacts/erm-smoke/cpu.jsonl --index 0 \
+  --output artifacts/erm-smoke/results
 ```
 
-The build uses the immutable `linux/amd64` CUDA digest in `containers/cuda.env`, installs uv 0.12.7, and runs `uv sync --frozen --no-dev --group gpu` during the image build. The resulting `containers/rlaopt-cuda-13.0.2.sif` is intentionally ignored by Git. The build writes its SHA-256 digest once to the tracked `.sif.sha256` sidecar; array tasks read that small file instead of repeatedly hashing the 6.6 GB image over NFS. Preserve the SIF and checksum with the experiment artifacts; rebuilding from the same inputs is auditable, but the checksum proves which exact image a run used. If the base tag changes, run `scripts/resolve_cuda_digest.sh` and review the new digest before editing `containers/cuda.env`.
+A manifest lists the exact problem, seed, solver, and backend for every job. Use the same configuration when generating and executing it. Synthetic bounded problems are used for smoke tests and tolerance calibration; the paper's bounded-problem results use real datasets.
 
-After the build succeeds, submit `sbatch slurm/check_cuda.sh` before the GPU smoke grid. It executes the baked environment and performs a float64 cuML LSMR fit alongside PyTorch and rlaopt on one H200 NVL. Inspect `cuda-check-<job-id>.out`; success ends with `PROJECT_ENVIRONMENT_INTEROPERABLE=true`. Both CPU and CUDA jobs submitted through `slurm/run_array.sh` use this SIF; CPU jobs omit `--nv`, so no GPU is exposed. Using one immutable image keeps package versions identical and avoids the severe metadata latency observed when importing PyTorch through thousands of files in a shared NFS virtual environment. SIF startup and checksum lookup occur outside the timed solver region and should be reported as orchestration overhead rather than solver runtime. The array launcher exports the host repository commit and dirty-tree state because Git is not installed in the immutable image. Use a fresh `artifacts/` directory for each production campaign so plotting cannot aggregate records from older generator or image versions.
+For real-data runs, prepare the [datasets](docs/datasets.md), copy the configuration, and set its data paths for your machine before generating and executing a manifest. The supplied [Stanford cluster workflow](docs/cluster.md) documents our Slurm deployment; its node names, storage paths, and production planners need adaptation on other clusters. Write each new campaign to a new output directory so it cannot overwrite completed results. Use `rlaopt-bench --help` for all commands.
 
-Before production, verify the solver mappings on one shared problem with `uv run python scripts/verify_solver_equivalence.py --backend cpu` and `sbatch slurm/verify_solver_equivalence_cuda.sh`. The probe checks every production ridge value against the analytic SVD oracle and checks every pair of backend-local solutions. This explicitly detects inconsistent regularization conventions, including an accidental `lambda` versus `sqrt(lambda)` mapping or sample-count normalization.
+## How to interpret the results
 
-For the maximum-size CPU probe, use `/usr/bin/time -v` around one `run-job` command and compare its maximum resident set size with the `peak_memory_bytes` record. On CUDA, compare the recorded peak PyTorch allocation with `nvidia-smi` and scheduler accounting; allocator memory does not include every cuML/CUDA allocation.
+A run counts as successful only if the solver finishes successfully **and** its returned solution passes the common accuracy check:
 
-Generate figures only after auditing failures:
+| Problem | Common check |
+|---|---|
+| Ridge | Relative residual ≤ `1e-6` |
+| Bounded multinomial / bounded elastic net | Stationarity ≤ `1e-4` and feasibility violation ≤ `1e-6` |
 
-```bash
-uv run rlaopt-bench plot --input artifacts/records --output artifacts/figures
+The ridge results summarize three seeds using the median and min-max range. Each real-data result is one cold solve. Timeouts, iteration limits, memory failures, index overflow, and worker errors are reported separately.
+
+Native tolerances are calibrated before production. Runs that finish successfully but fail the common check are rerun at stricter native tolerances. The figures use the first qualifying attempt in tolerance order; the attempt ledger also reports the total cost of the original run and reruns. All 13 ridge refinements passed. The two stricter GPU-direct SCS attempts on YearPredictionMSD-rf timed out.
+
+See [benchmark methods](docs/benchmark_methods.md) for the mathematical problems, timing boundaries, and tolerance procedure.
+
+## Repository guide
+
+| Location | Contents |
+|---|---|
+| `configs/` | Paper configurations, synthetic smoke/calibration grids, and rerun tolerances |
+| `src/rlaopt_experiments/` | Data preparation, problem definitions, solver adapters, runners, and records |
+| `scripts/` | Figure generation, production planning, refinements, and environment diagnostics |
+| `slurm/`, `containers/`, `julia/` | Cluster jobs and native solver environment |
+| `tests/` | Checks for models, adapters, manifests, execution, and plotting |
+| `results/paper/` | Saved paper inputs and checksums, included in Git |
+| `artifacts/` | New local results and generated figures; ignored by Git |
+
+Atomic JSON trial records are the source of truth. W&B is optional and defaults to offline mode. Old campaign configurations remain readable for the retained problem families; their retired unbounded settings do not create jobs.
+
+## Development checks
+
+```sh
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+  .venv/bin/python -m pytest -q
+.venv/bin/ruff check src tests
 ```
 
-The figure command creates log-log median-runtime scatterplots with native-success seed min--max ranges for fixed-$p$, fixed-$n$, and square families, faceted by $\alpha$ and $\lambda$, plus a machine-readable failure summary. Shared endpoints appear in each applicable scaling panel. Paper analysis should additionally report iteration/matvec throughput, setup time, memory, convergence traces, effective dimension, condition numbers, and GPU-resident CPU/GPU speedups. Points from different spectral profiles or ridge values are never placed in the same panel.
-
-## Synthetic ridge suite: expected cost and limitations
-
-The revised $2^{16}$ endpoints require a new pilot before assigning a production wall-clock estimate. Fifteen-minute per-solve limits remain fixed; generation time and memory are measured separately during the maximum-size probe.
-
-Limitations: SORF factors are structured random orthogonal matrices rather than Haar draws; the response lies in $\mathrm{range}(X)$ and has no observation noise; rank 128 is a fixed resource budget, not tuned per instance; CPU and GPU plots represent only the named machines; GPU-resident timing excludes transfer; and direct methods may exceed memory. Follow-up sensitivity studies can vary Nyström rank, add a controlled orthogonal/noisy response component, and measure end-to-end transfer costs.
+GPU- and Julia-specific behavior also requires the environment checks described in the cluster guide. CPU unit tests alone do not validate those native backends.

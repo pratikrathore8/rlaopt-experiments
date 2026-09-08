@@ -1,0 +1,10 @@
+# cuDSS version pinned by julia/cuclarabel/Manifest.toml, reused by SCS.
+prefix=/opt/scs-cudss
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: cudss
+Description: NVIDIA cuDSS (pinned Julia artifact)
+Version: 0.7.1
+Libs: -L${libdir} -Wl,-rpath,${libdir} -lcudss
+Cflags: -I${includedir}

@@ -6,6 +6,12 @@ from dataclasses import dataclass
 
 import torch
 
+from rlaopt_experiments.structured_orthogonal import (
+    is_power_of_two,
+    materialize_sorf_matrix,
+    sorf_,
+)
+
 
 GENERATOR_VERSION = "sorf1"
 
@@ -46,7 +52,7 @@ class RidgeProblem:
         weights = self.singular_values / (self.singular_values.square() + ridge)
         embedded = torch.zeros(self.spec.p, dtype=self.X.dtype, device=self.X.device)
         embedded[: self.spec.rank] = weights * self.response_coordinates
-        _sorf_(embedded, 0, self.right_signs)
+        sorf_(embedded, 0, self.right_signs)
         return embedded
 
     def diagnostics(self, ridge: float) -> dict[str, float]:
@@ -62,56 +68,6 @@ class RidgeProblem:
         }
 
 
-def _is_power_of_two(value: int) -> bool:
-    return value > 0 and value & (value - 1) == 0
-
-
-def _fwht_(tensor: torch.Tensor, dimension: int) -> None:
-    """Apply the normalized Walsh-Hadamard transform in place."""
-    size = tensor.shape[dimension]
-    if not _is_power_of_two(size):
-        raise ValueError("Hadamard dimensions must be positive powers of two")
-    width = 1
-    while width < size:
-        if tensor.ndim == 1:
-            blocks = tensor.view(size // (2 * width), 2 * width)
-            left = blocks[:, :width]
-            right = blocks[:, width:]
-        elif dimension == 0:
-            rows, columns = tensor.shape
-            blocks = tensor.view(rows // (2 * width), 2 * width, columns)
-            left = blocks[:, :width, :]
-            right = blocks[:, width:, :]
-        elif dimension == 1:
-            rows, columns = tensor.shape
-            blocks = tensor.view(rows, columns // (2 * width), 2 * width)
-            left = blocks[:, :, :width]
-            right = blocks[:, :, width:]
-        else:
-            raise ValueError("FWHT supports vectors and matrix dimensions 0 or 1")
-        saved_left = left.clone()
-        left.add_(right)
-        right.neg_().add_(saved_left)
-        width *= 2
-    tensor.div_(size**0.5)
-
-
-def _random_signs(size: int, generator: torch.Generator) -> torch.Tensor:
-    values = torch.randint(0, 2, (size,), dtype=torch.int8, generator=generator)
-    return values.mul_(2).sub_(1).to(torch.float64)
-
-
-def _sorf_(
-    tensor: torch.Tensor, dimension: int, signs: tuple[torch.Tensor, torch.Tensor, torch.Tensor]
-) -> None:
-    """Apply Q = H D1 H D2 H D3 along one tensor dimension."""
-    broadcast = [1] * tensor.ndim
-    broadcast[dimension] = tensor.shape[dimension]
-    for diagonal in reversed(signs):
-        tensor.mul_(diagonal.view(broadcast))
-        _fwht_(tensor, dimension)
-
-
 def generate_problem(spec: ProblemSpec, device: torch.device | str = "cpu") -> RidgeProblem:
     """Materialize X on ``device`` with independent SORF singular vectors.
 
@@ -119,24 +75,20 @@ def generate_problem(spec: ProblemSpec, device: torch.device | str = "cpu") -> R
     mathematical problem on every backend.  The dense SORF transforms themselves
     run natively on the requested device.
     """
-    if not _is_power_of_two(spec.n) or not _is_power_of_two(spec.p):
+    if not is_power_of_two(spec.n) or not is_power_of_two(spec.p):
         raise ValueError("n and p must be positive powers of two")
     dtype = torch.float64
     target = torch.device(device)
     rank = spec.rank
-    factor_rng = torch.Generator(device="cpu").manual_seed(spec.factor_seed)
-    left_signs = tuple(_random_signs(spec.n, factor_rng) for _ in range(3))
-    right_signs = tuple(_random_signs(spec.p, factor_rng) for _ in range(3))
-
     indices = torch.arange(1, rank + 1, dtype=dtype)
     singular_values = indices.pow(-spec.alpha / 2).to(target)
-    left_signs = tuple(sign.to(target) for sign in left_signs)
-    right_signs = tuple(sign.to(target) for sign in right_signs)
-    x = torch.zeros((spec.n, spec.p), dtype=dtype, device=target)
-    diagonal = torch.arange(rank, device=target)
-    x[diagonal, diagonal] = singular_values
-    _sorf_(x, 0, left_signs)
-    _sorf_(x, 1, right_signs)
+    x, left_signs, right_signs = materialize_sorf_matrix(
+        spec.n,
+        spec.p,
+        singular_values,
+        seed=spec.factor_seed,
+        device=target,
+    )
 
     response_rng = torch.Generator(device="cpu").manual_seed(spec.response_seed)
     coordinates = torch.randn(rank, dtype=dtype, generator=response_rng)
@@ -144,7 +96,7 @@ def generate_problem(spec: ProblemSpec, device: torch.device | str = "cpu") -> R
     coordinates = coordinates.to(target)
     y = torch.zeros(spec.n, dtype=dtype, device=target)
     y[:rank] = coordinates
-    _sorf_(y, 0, left_signs)
+    sorf_(y, 0, left_signs)
     return RidgeProblem(spec, x, y, singular_values, coordinates, right_signs)
 
 

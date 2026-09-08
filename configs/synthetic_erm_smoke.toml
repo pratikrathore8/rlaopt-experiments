@@ -1,0 +1,82 @@
+[experiment]
+suite = "synthetic_erm"
+seeds = [0, 1, 2]
+warmups = 1
+repetitions = 1
+timeout_seconds = 900
+startup_timeout_seconds = 900
+
+# Frozen common external accuracy thresholds.
+[accuracy]
+stationarity = 1.0e-6
+feasibility = 1.0e-6
+calibrated = true
+
+[features]
+generator = "standardized_gaussian"
+decay_exponents = []
+
+[multinomial]
+n_classes = 5
+teacher_scale = 1.0
+box_lower = -1.0
+box_upper = 1.0
+shapes = [
+  { n = 1024, p = 64 },
+  { n = 4096, p = 256 },
+]
+
+[multinomial.solvers]
+cpu = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
+cuda = ["rlaopt_sapphire", "projected_gradient", "jaxopt_lbfgsb"]
+
+[multinomial.execution]
+max_iterations = 10000
+batch_size = 256
+
+[multinomial.execution.native_tolerances_calibrated]
+cpu = true
+cuda = true
+
+[multinomial.execution.native_tolerances.cpu]
+rlaopt_sapphire = 1.0e-7
+projected_gradient = 1.0e-6
+jaxopt_lbfgsb = 1.0e-6
+
+[multinomial.execution.native_tolerances.cuda]
+rlaopt_sapphire = 1.0e-7
+projected_gradient = 1.0e-6
+jaxopt_lbfgsb = 1.0e-6
+
+[elastic_net]
+teacher_density = 0.1
+noise_ratio = 0.1
+teacher_intercept = 0.5
+regularization_fractions = [0.1, 0.01]
+shapes = [
+  { n = 1024, p = 64 },
+  { n = 4096, p = 256 },
+]
+
+# Both variants consume the same generated X and y for each shape, seed, and fraction.
+[elastic_net.bounded_solvers]
+cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
+cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]
+
+[elastic_net.bounded_execution]
+max_iterations = 10000
+batch_size = 256
+
+[elastic_net.bounded_execution.native_tolerances_calibrated]
+cpu = true
+cuda = true
+
+[elastic_net.bounded_execution.native_tolerances.cpu]
+rlaopt_admm = 1.0e-7
+scs = 1.0e-7
+clarabel_qdldl = 1.0e-10
+
+[elastic_net.bounded_execution.native_tolerances.cuda]
+rlaopt_admm = 1.0e-7
+scs_cuda = 1.0e-7
+cuclarabel_cudss = 1.0e-10

@@ -34,7 +34,7 @@ def main() -> None:
     print(f"direct_generation_seconds={time.perf_counter() - started:.6f}", flush=True)
 
     started = time.perf_counter()
-    worker = ProblemWorker(specification, "cpu")
+    worker = ProblemWorker(specification, "cpu", "synthetic_ridge")
     try:
         ready = worker.wait_until_ready(timeout_seconds=120)
         print(f"worker_ready_seconds={time.perf_counter() - started:.6f}", flush=True)

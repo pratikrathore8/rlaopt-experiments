@@ -6,9 +6,6 @@ import argparse
 import json
 from pathlib import Path
 
-from rlaopt_experiments.config import load_experiment, load_solvers, load_tolerances
-from rlaopt_experiments.runner import run_job
-
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="rlaopt-bench")
@@ -17,6 +14,13 @@ def _parser() -> argparse.ArgumentParser:
     manifest.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     manifest.add_argument("--backend", choices=("cpu", "cuda"), required=True)
     manifest.add_argument("--output", type=Path, required=True)
+    manifest_run = subparsers.add_parser("run-manifest-job")
+    manifest_run.add_argument("--manifest", type=Path, required=True)
+    manifest_run.add_argument("--index", type=int, required=True)
+    manifest_run.add_argument(
+        "--config", type=Path, default=Path("configs/synthetic_erm_smoke.toml")
+    )
+    manifest_run.add_argument("--output", type=Path, default=Path("artifacts"))
     run = subparsers.add_parser("run-job")
     for name, kind in (("n", int), ("p", int), ("alpha", float), ("seed", int)):
         run.add_argument(f"--{name}", type=kind, required=True)
@@ -29,7 +33,13 @@ def _parser() -> argparse.ArgumentParser:
     calibration.add_argument("--solver", required=True)
     calibration.add_argument("--backend", choices=("cpu", "cuda"), required=True)
     calibration.add_argument(
-        "--candidates", type=float, nargs="+", default=[1e-4, 1e-5, 1e-6, 1e-7, 1e-8]
+        "--problem-type",
+        choices=("multinomial", "bounded_elastic_net"),
+    )
+    calibration.add_argument(
+        "--candidates",
+        type=float,
+        nargs="+",
     )
     calibration.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     calibration.add_argument("--output", type=Path, default=Path("artifacts/calibration"))
@@ -37,33 +47,116 @@ def _parser() -> argparse.ArgumentParser:
     plot.add_argument("--input", type=Path, default=Path("artifacts/records"))
     plot.add_argument("--config", type=Path, default=Path("configs/synthetic.toml"))
     plot.add_argument("--output", type=Path, default=Path("artifacts/figures"))
+    real_data = subparsers.add_parser("prepare-real-data")
+    selection = real_data.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--all", action="store_true")
+    selection.add_argument("--dataset", action="append", dest="datasets")
+    real_data.add_argument("--data-root", type=Path, required=True)
+    real_data.add_argument("--redownload", action="store_true")
+    real_data.add_argument("--reprocess", action="store_true")
+    verify_real_data = subparsers.add_parser("verify-real-data")
+    verify_selection = verify_real_data.add_mutually_exclusive_group(required=True)
+    verify_selection.add_argument("--all", action="store_true")
+    verify_selection.add_argument("--dataset", action="append", dest="datasets")
+    verify_real_data.add_argument("--data-root", type=Path, required=True)
     return parser
 
 
 def main() -> None:
     args = _parser().parse_args()
-    config = load_experiment(args.config) if hasattr(args, "config") else None
+    if args.command == "prepare-real-data":
+        from rlaopt_experiments.suites.real_erm.data import DATASETS, prepare_datasets
+
+        names = list(DATASETS) if args.all else args.datasets
+        prepare_datasets(
+            names,
+            args.data_root,
+            redownload=args.redownload,
+            reprocess=args.reprocess,
+        )
+        return
+
+    if args.command == "verify-real-data":
+        from rlaopt_experiments.suites.real_erm.data import (
+            DATASETS,
+            verify_prepared_datasets,
+        )
+
+        names = list(DATASETS) if args.all else args.datasets
+        verify_prepared_datasets(names, args.data_root)
+        return
+
     if args.command == "manifest":
-        solvers = load_solvers(args.config, args.backend)
-        jobs = [
-            {
-                "n": shape.n,
-                "p": shape.p,
-                "family": shape.family,
-                "alpha": alpha,
-                "seed": seed,
-                "solver": solver,
-                "backend": args.backend,
-            }
-            for shape in config.shapes
-            for alpha in config.alphas
-            for seed in config.seeds
-            for solver in solvers
-        ]
+        from rlaopt_experiments.manifests import build_manifest
+
+        jobs = build_manifest(args.config, args.backend)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text("\n".join(json.dumps(job, sort_keys=True) for job in jobs) + "\n")
         print(f"wrote {len(jobs)} jobs to {args.output}")
-    elif args.command == "run-job":
+        return
+
+    if args.command == "run-manifest-job":
+        from rlaopt_experiments.execution import read_manifest_job, run_manifest_job
+
+        job = read_manifest_job(args.manifest, args.index)
+        run_manifest_job(job, args.config, args.output)
+        return
+
+    if args.command == "calibrate":
+        from rlaopt_experiments.manifests import configured_suite
+
+        suite = configured_suite(args.config)
+        if suite == "synthetic_erm":
+            if args.problem_type is None:
+                raise ValueError("--problem-type is required when calibrating synthetic_erm")
+            if args.candidates is not None:
+                raise ValueError(
+                    "synthetic_erm calibration candidates must be defined in its TOML file"
+                )
+            from rlaopt_experiments.suites.synthetic_erm.calibration import (
+                calibrate_synthetic_erm,
+            )
+            from rlaopt_experiments.suites.synthetic_erm.config import (
+                load_synthetic_erm_calibration_config,
+            )
+
+            calibration_config = load_synthetic_erm_calibration_config(args.config)
+            selected = calibrate_synthetic_erm(
+                problem_type=args.problem_type,
+                solver=args.solver,
+                backend=args.backend,
+                candidates=list(calibration_config.candidates),
+                config=calibration_config.experiment,
+                output_dir=(args.output / args.backend / args.problem_type / args.solver),
+            )
+        elif suite == "synthetic_ridge":
+            if args.problem_type is not None:
+                raise ValueError("--problem-type is only valid when calibrating synthetic_erm")
+            from rlaopt_experiments.calibration import calibrate
+            from rlaopt_experiments.config import load_experiment
+
+            selected = calibrate(
+                solver=args.solver,
+                backend=args.backend,
+                candidates=args.candidates or [1e-4, 1e-5, 1e-6, 1e-7, 1e-8],
+                config=load_experiment(args.config),
+                output_dir=args.output / args.backend / args.solver,
+            )
+        else:
+            raise ValueError(f"calibration is not implemented for suite: {suite}")
+        print(
+            f"selected native tolerance for "
+            f"{args.backend}/{args.problem_type or 'ridge'}/{args.solver}: {selected:g}"
+        )
+        return
+
+    from rlaopt_experiments.config import load_experiment
+
+    config = load_experiment(args.config) if hasattr(args, "config") else None
+    if args.command == "run-job":
+        from rlaopt_experiments.config import load_tolerances
+        from rlaopt_experiments.runner import run_job
+
         tolerance = load_tolerances(args.tolerances, args.backend)[args.solver]
         run_job(
             n=args.n,
@@ -81,18 +174,8 @@ def main() -> None:
             warmups=config.warmups,
             repetitions=config.repetitions,
             output_dir=args.output,
+            suite=config.suite,
         )
-    elif args.command == "calibrate":
-        from rlaopt_experiments.calibration import calibrate
-
-        selected = calibrate(
-            solver=args.solver,
-            backend=args.backend,
-            candidates=args.candidates,
-            config=config,
-            output_dir=args.output / args.backend / args.solver,
-        )
-        print(f"selected native tolerance for {args.backend}/{args.solver}: {selected:g}")
     else:
         from rlaopt_experiments.plotting import make_figures
 

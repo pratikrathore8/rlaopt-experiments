@@ -1,0 +1,255 @@
+BATCH_PROGRESS batch=1 manifest_index=0 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 88773a820dca5b70ba6c69a3775b30bc.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_044350-88773a820dca5b70ba6c69a3775b30bc
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:            summary/feasibility ▁
+wandb:         summary/native_success ▁
+wandb:              summary/objective ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb:           summary/stationarity ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 1
+wandb:            summary/feasibility 0
+wandb:         summary/native_success 1
+wandb:              summary/objective 0.14251
+wandb:       summary/runtime_eligible 1
+wandb:    summary/runtime_max_seconds 2836.89297
+wandb: summary/runtime_median_seconds 2836.89297
+wandb:    summary/runtime_min_seconds 2836.89297
+wandb:        summary/runtime_seconds 2836.89297
+wandb:           summary/stationarity 0.0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_044350-88773a820dca5b70ba6c69a3775b30bc
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_044350-88773a820dca5b70ba6c69a3775b30bc/logs
+BATCH_PROGRESS batch=1 manifest_index=1 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id cf7ce7eaf6a358daa5b5038f13cac4b8.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_052830-cf7ce7eaf6a358daa5b5038f13cac4b8
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:            summary/feasibility ▁
+wandb:         summary/native_success ▁
+wandb:              summary/objective ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb:           summary/stationarity ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 1
+wandb:            summary/feasibility 0
+wandb:         summary/native_success 1
+wandb:              summary/objective 0.12679
+wandb:       summary/runtime_eligible 1
+wandb:    summary/runtime_max_seconds 2644.09107
+wandb: summary/runtime_median_seconds 2644.09107
+wandb:    summary/runtime_min_seconds 2644.09107
+wandb:        summary/runtime_seconds 2644.09107
+wandb:           summary/stationarity 0.0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_052830-cf7ce7eaf6a358daa5b5038f13cac4b8
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_052830-cf7ce7eaf6a358daa5b5038f13cac4b8/logs
+BATCH_PROGRESS batch=1 manifest_index=2 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id e6068d4a6bd95d7d892946ae1602a5b6.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_061059-e6068d4a6bd95d7d892946ae1602a5b6
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:            summary/feasibility ▁
+wandb:         summary/native_success ▁
+wandb:              summary/objective ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb:           summary/stationarity ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 1
+wandb:            summary/feasibility 0
+wandb:         summary/native_success 1
+wandb:              summary/objective 0.12985
+wandb:       summary/runtime_eligible 1
+wandb:    summary/runtime_max_seconds 2512.71571
+wandb: summary/runtime_median_seconds 2512.71571
+wandb:    summary/runtime_min_seconds 2512.71571
+wandb:        summary/runtime_seconds 2512.71571
+wandb:           summary/stationarity 0.0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_061059-e6068d4a6bd95d7d892946ae1602a5b6
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_061059-e6068d4a6bd95d7d892946ae1602a5b6/logs
+BATCH_PROGRESS batch=1 manifest_index=3 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 4b492f5ebdf95451ab8a2db9ffe43b7b.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_070740-4b492f5ebdf95451ab8a2db9ffe43b7b
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:            summary/feasibility ▁
+wandb:         summary/native_success ▁
+wandb:              summary/objective ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb:           summary/stationarity ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 1
+wandb:            summary/feasibility 0
+wandb:         summary/native_success 0
+wandb:              summary/objective 0.32756
+wandb:       summary/runtime_eligible 0
+wandb:    summary/runtime_max_seconds 3362.90065
+wandb: summary/runtime_median_seconds 3362.90065
+wandb:    summary/runtime_min_seconds 3362.90065
+wandb:        summary/runtime_seconds 3362.90065
+wandb:           summary/stationarity 0.0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_070740-4b492f5ebdf95451ab8a2db9ffe43b7b
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_070740-4b492f5ebdf95451ab8a2db9ffe43b7b/logs
+BATCH_PROGRESS batch=1 manifest_index=4 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 173c1c7cd413509ab2d10cfdcb472184.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_071447-173c1c7cd413509ab2d10cfdcb472184
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:            summary/feasibility ▁
+wandb:         summary/native_success ▁
+wandb:              summary/objective ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb:           summary/stationarity ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 1
+wandb:            summary/feasibility 0
+wandb:         summary/native_success 1
+wandb:              summary/objective 0.32758
+wandb:       summary/runtime_eligible 1
+wandb:    summary/runtime_max_seconds 392.46809
+wandb: summary/runtime_median_seconds 392.46809
+wandb:    summary/runtime_min_seconds 392.46809
+wandb:        summary/runtime_seconds 392.46809
+wandb:           summary/stationarity 0.0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_071447-173c1c7cd413509ab2d10cfdcb472184
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_071447-173c1c7cd413509ab2d10cfdcb472184/logs
+BATCH_PROGRESS batch=1 manifest_index=5 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+/opt/rlaopt-experiments/.venv/lib/python3.12/site-packages/rlaopt/linalg/preconditioners/nystrom.py:144: UserWarning: Reached maximum rank 50 before achieving desired error tolerance 0.01.
+  warn(
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 8eb2321919db5da1bf9b21cc9ffbe90e.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_081534-8eb2321919db5da1bf9b21cc9ffbe90e
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:       summary/external_success ▁
+wandb:         summary/native_success ▁
+wandb:       summary/runtime_eligible ▁
+wandb:    summary/runtime_max_seconds ▁
+wandb: summary/runtime_median_seconds ▁
+wandb:    summary/runtime_min_seconds ▁
+wandb:        summary/runtime_seconds ▁
+wandb: 
+wandb: Run summary:
+wandb:       summary/external_success 0
+wandb:         summary/native_success 0
+wandb:       summary/runtime_eligible 0
+wandb:    summary/runtime_max_seconds 3600
+wandb: summary/runtime_median_seconds 3600
+wandb:    summary/runtime_min_seconds 3600
+wandb:        summary/runtime_seconds 3600
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_081534-8eb2321919db5da1bf9b21cc9ffbe90e
+wandb: Find logs at: ./artifacts/real-erm-production-20260905/results/wandb/offline-run-20260905_081534-8eb2321919db5da1bf9b21cc9ffbe90e/logs
+BATCH_PROGRESS batch=1 manifest_index=6 total=7
+RLAOPT_GIT_COMMIT=c707e4e776eb7b138a32a3a97a0c63b6b43ba8ae
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=6b5865888efafd5ce02cbbb41bcfc37097abb77529a170b9650c9e1c2cdaf793
+Traceback (most recent call last):
+  File "/opt/rlaopt-experiments/.venv/bin/rlaopt-bench", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/cli.py", line 102, in main
+    run_manifest_job(job, args.config, args.output)
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/execution.py", line 89, in run_manifest_job
+    return runners[problem_type](job, config, **execution_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/real_erm/execution.py", line 280, in run_real_bounded_elastic_net_job
+    return _run_job(
+           ^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/real_erm/execution.py", line 211, in _run_job
+    return run_repetitions(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/erm_execution.py", line 71, in run_repetitions
+    first = worker.solve(command, config.timeout_seconds)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/isolation.py", line 142, in solve
+    return self._connection.recv()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 399, in _recv
+    raise EOFError
+EOFError
+BATCH_FAILURE batch=1 manifest_index=6 status=1
+BATCH_SUMMARY batch=1 attempted=7 failures=1
+[2026-09-05T08:19:37.243] error: Detected 1 oom_kill event in StepId=17276363.batch. Some of the step tasks have been OOM Killed.

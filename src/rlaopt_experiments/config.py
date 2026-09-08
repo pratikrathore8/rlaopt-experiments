@@ -26,6 +26,7 @@ class ExperimentConfig:
     nystrom_rank: int
     warmups: int
     repetitions: int
+    suite: str
 
 
 def load_experiment(path: Path) -> ExperimentConfig:

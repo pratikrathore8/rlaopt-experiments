@@ -1,0 +1,431 @@
+[
+  {
+    "trial_id": "2a77c0fcf53b51f98b65b4a9b0ebf472",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/2a77c0fcf53b51f98b65b4a9b0ebf472.json",
+    "original_record_sha256": "0bb31b05385782e04a990ebf28ba1fafb9bf2a6f6d593abd97bb85dd66ee9f56",
+    "original_runtime_seconds": 15.637266654986888,
+    "original_relative_kkt": 2.998875107762897e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "3236e63aaef755ce937df643641fccdf",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/3236e63aaef755ce937df643641fccdf.json",
+    "original_record_sha256": "024c49e11c97e83292489307b4718f52fc3ac9d4ea4fe3fb15dc24efa25b42da",
+    "original_runtime_seconds": 2.1815264262259007,
+    "original_relative_kkt": 1.4593349110307865e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 32768,
+      "p": 16384,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "336be999633b58eb8578148fe8198b84",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/336be999633b58eb8578148fe8198b84.json",
+    "original_record_sha256": "7f7ee83253d9fd39d99057ba6ec2a2c1055ddccc4b3356be6267e3ae8bbff828",
+    "original_runtime_seconds": 422.18923158897087,
+    "original_relative_kkt": 1.501275533674049e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-8",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 1,
+      "solver": "scipy_lsqr",
+      "backend": "cpu"
+    }
+  },
+  {
+    "trial_id": "3adf63b1eb185623b9d44cf6574fa37b",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/3adf63b1eb185623b9d44cf6574fa37b.json",
+    "original_record_sha256": "8cf1337d7c53f55f2362b17637104bf7bc114862f84157919a5549933b11b68d",
+    "original_runtime_seconds": 398.890185381053,
+    "original_relative_kkt": 1.1244826851958308e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-9",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 0,
+      "solver": "scipy_lsqr",
+      "backend": "cpu"
+    }
+  },
+  {
+    "trial_id": "56792c2cdded53f691d89b400c3bfcd2",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/56792c2cdded53f691d89b400c3bfcd2.json",
+    "original_record_sha256": "cdb4c08941f3a576c28db853fabaf6f90d4e7246547ed83e2422a068aa3b3714",
+    "original_runtime_seconds": 15.753763943910599,
+    "original_relative_kkt": 1.051793040763285e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 0,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "69b198dab0b15486aa67f79464c70b68",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/69b198dab0b15486aa67f79464c70b68.json",
+    "original_record_sha256": "1e4c612a5e3e7715f4c7850333243c7ceea503aef37f43d24ee512f4f90ba168",
+    "original_runtime_seconds": 33.870180529076606,
+    "original_relative_kkt": 1.4116334220582484e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-8",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 16384,
+      "p": 16384,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "scipy_lsqr",
+      "backend": "cpu"
+    }
+  },
+  {
+    "trial_id": "801a172c481b58a1a5e474b1100ae56f",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/801a172c481b58a1a5e474b1100ae56f.json",
+    "original_record_sha256": "24d8fb8e10e04e415b920559604ea85bd047752cf159888d238a1efeb27393ef",
+    "original_runtime_seconds": 397.65553297288716,
+    "original_relative_kkt": 3.0850135229207064e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-9",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "scipy_lsqr",
+      "backend": "cpu"
+    }
+  },
+  {
+    "trial_id": "8e3fb08de1a25bef80d72b465b15815f",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/8e3fb08de1a25bef80d72b465b15815f.json",
+    "original_record_sha256": "9f44684448d3a708a1e7c6db77a32b13974da63ac7f4331f304440236a28d740",
+    "original_runtime_seconds": 15.564498290419579,
+    "original_relative_kkt": 1.535740864235069e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 1,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "9654ad404d1152c4905231ab0a2f3ad6",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/9654ad404d1152c4905231ab0a2f3ad6.json",
+    "original_record_sha256": "cac62445328036f16bb9871cd7b118199db1f2a321d563465505fb88a53c6268",
+    "original_runtime_seconds": 1.6192860947921872,
+    "original_relative_kkt": 1.5137486365601834e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 16384,
+      "p": 16384,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "af435de8432f5bf8a48a5a73d7422c44",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/af435de8432f5bf8a48a5a73d7422c44.json",
+    "original_record_sha256": "17d93c2c803ee3af9b6a4d60894f6b35ac39f6dc4abe2c3c0f9eb26a63653e5e",
+    "original_runtime_seconds": 56.5041614479851,
+    "original_relative_kkt": 1.472074492368627e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-8",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 32768,
+      "p": 16384,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "scipy_lsqr",
+      "backend": "cpu"
+    }
+  },
+  {
+    "trial_id": "e72ce76061b8592dad3a9f75f8703edc",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/e72ce76061b8592dad3a9f75f8703edc.json",
+    "original_record_sha256": "c354ec0f072d9df01ae4351e1dd7888ffe70a271c61da6b4ce1c181f952b9fd2",
+    "original_runtime_seconds": 2.400709287263453,
+    "original_relative_kkt": 1.1490365112865895e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 65536,
+      "alpha": 2.0,
+      "ridge": 0.0001,
+      "seed": 2,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "e7b233fd27115edc8f6718cb4d360cc3",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/e7b233fd27115edc8f6718cb4d360cc3.json",
+    "original_record_sha256": "47473773fdeac420f5d8a7d5f5bf53d1a393e579c843023c12f491f1416f7b4b",
+    "original_runtime_seconds": 3.3923996281810105,
+    "original_relative_kkt": 1.5227627703529579e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-12",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 16384,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "cuml_lsmr",
+      "backend": "cuda"
+    }
+  },
+  {
+    "trial_id": "e9b0269e4fde524e8c42c84a43ea8768",
+    "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/e9b0269e4fde524e8c42c84a43ea8768.json",
+    "original_record_sha256": "583a81ca7480592eedb18cab80728893d95bfd41ffc64a6c05dd76e67e66a4ca",
+    "original_runtime_seconds": 108.63500660611317,
+    "original_relative_kkt": 1.263792834225534e-06,
+    "original_image_sha256": "b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e",
+    "image_sha256": "3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d",
+    "node": "soal-9",
+    "cpu_threads": 64,
+    "native_tolerances": [
+      1e-10,
+      1e-11
+    ],
+    "controls": {
+      "suite": "synthetic_ridge",
+      "kkt_tolerance": 1e-06,
+      "timeout_seconds": 900,
+      "startup_timeout_seconds": 900,
+      "warmups": 1,
+      "repetitions": 1,
+      "rank": 128
+    },
+    "problem": {
+      "n": 65536,
+      "p": 16384,
+      "alpha": 2.0,
+      "ridge": 1e-06,
+      "seed": 2,
+      "solver": "scipy_lsqr",
+      "backend": "cpu"
+    }
+  }
+]

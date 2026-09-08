@@ -1,0 +1,15 @@
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+CUDSS = "45b445bb-4962-46a0-9369-b4df9d0f772e"
+Clarabel = "61c947e1-3e6d-4ee4-985a-eec8c727bd6e"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+
+[compat]
+CUDA = "=5.11.3"
+CUDSS = "=0.6.5"
+Clarabel = "=0.11.0"
+PythonCall = "=0.9.31"
+julia = "=1.10.12"
+
+[extras]
+CUDA_Runtime_jll = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"

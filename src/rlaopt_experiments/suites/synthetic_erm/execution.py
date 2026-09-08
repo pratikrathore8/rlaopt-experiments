@@ -1,0 +1,336 @@
+"""Isolated execution for self-contained synthetic ERM manifest jobs."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+from rlaopt_experiments.isolation import ProblemWorker
+from rlaopt_experiments.problems.synthetic_erm import ElasticNetSpec, MultinomialSpec
+from rlaopt_experiments.records import TrialRecord
+from rlaopt_experiments.runner import record_outcome
+from rlaopt_experiments.seeds import derive_seed
+from rlaopt_experiments.suites.erm_execution import run_repetitions, validate_controls
+from rlaopt_experiments.suites.synthetic_erm.config import (
+    SolverExecution,
+    SyntheticErmConfig,
+)
+
+
+def _native_tolerances_calibrated(
+    execution: SolverExecution,
+    backend: str,
+) -> bool:
+    """Return false for calibration configs, which have no frozen tolerances."""
+    if execution.native_tolerances_calibrated is None:
+        return False
+    return execution.tolerances_calibrated_for(backend)
+
+
+def _validate_multinomial_job(
+    job: dict[str, Any],
+    config: SyntheticErmConfig,
+) -> MultinomialSpec:
+    if job.get("suite") != config.suite:
+        raise ValueError("manifest job suite does not match the configuration")
+    if job.get("problem_type") != "multinomial":
+        raise ValueError("execution requires a multinomial manifest job")
+    backend = job.get("backend")
+    if backend not in {"cpu", "cuda"}:
+        raise ValueError("manifest job backend must be 'cpu' or 'cuda'")
+    if job.get("solver") not in getattr(config.multinomial.solvers, backend):
+        raise ValueError("manifest solver is not configured for its backend")
+    spec = MultinomialSpec(**job["problem_spec"])
+    seed = job.get("seed")
+    if not isinstance(seed, int) or seed not in config.seeds:
+        raise ValueError("manifest seed is not configured")
+    if (spec.n, spec.p) not in {(shape.n, shape.p) for shape in config.multinomial.shapes}:
+        raise ValueError("manifest shape is not configured")
+    if (
+        spec.feature_generator != config.features.generator
+        or spec.feature_decay_exponent not in config.features.cases
+    ):
+        raise ValueError("manifest feature model is not configured")
+    expected_spec = MultinomialSpec(
+        n=spec.n,
+        p=spec.p,
+        n_classes=config.multinomial.n_classes,
+        feature_seed=derive_seed(seed, "multinomial_features"),
+        target_seed=derive_seed(seed, "multinomial_targets"),
+        feature_generator=config.features.generator,
+        feature_decay_exponent=spec.feature_decay_exponent,
+        teacher_scale=config.multinomial.teacher_scale,
+        box_lower=config.multinomial.box_lower,
+        box_upper=config.multinomial.box_upper,
+    )
+    if spec != expected_spec:
+        raise ValueError("manifest problem_spec does not match the configuration")
+    if job.get("problem_id") != spec.problem_id:
+        raise ValueError("manifest problem_id does not match problem_spec")
+    if job.get("solver_seed") != derive_seed(seed, "multinomial_solver"):
+        raise ValueError("manifest solver_seed does not match its master seed")
+    return spec
+
+
+def run_multinomial_job(
+    job: dict[str, Any],
+    config: SyntheticErmConfig,
+    *,
+    native_tolerance: float,
+    max_iterations: int,
+    batch_size: int,
+    output_dir: Path,
+    record_run_key: str = "multinomial",
+    record_metadata: dict[str, Any] | None = None,
+) -> list[TrialRecord]:
+    """Execute one multinomial manifest job through an isolated worker."""
+    validate_controls(native_tolerance, max_iterations, batch_size)
+    spec = _validate_multinomial_job(job, config)
+    backend = job["backend"]
+    solver = job["solver"]
+    specification = {
+        "problem_type": "multinomial",
+        "problem_spec": job["problem_spec"],
+    }
+    command = {
+        "solver": solver,
+        "native_tolerance": native_tolerance,
+        "max_iters": max_iterations,
+        "batch_size": batch_size,
+        "solver_seed": job["solver_seed"],
+        "stationarity_tolerance": config.accuracy.stationarity,
+        "feasibility_tolerance": config.accuracy.feasibility,
+    }
+    problem_fields = {
+        "problem_type": "multinomial",
+        "n": spec.n,
+        "p": spec.p,
+        "n_classes": spec.n_classes,
+        "teacher_scale": spec.teacher_scale,
+        "box_lower": spec.box_lower,
+        "box_upper": spec.box_upper,
+        "feature_seed": spec.feature_seed,
+        "target_seed": spec.target_seed,
+        "feature_generator": spec.feature_generator,
+        "feature_decay_exponent": spec.feature_decay_exponent,
+    }
+
+    worker = ProblemWorker(specification, backend, config.suite)
+    try:
+        ready = worker.wait_until_ready(config.startup_timeout_seconds)
+    except BaseException:
+        worker.close()
+        raise
+
+    def persist(
+        outcome: dict[str, Any],
+        repetition: int,
+        runtimes: list[float],
+        *,
+        phase: str,
+        iteration_limit: int | None,
+    ) -> TrialRecord:
+        metadata = (
+            outcome.get("solver_metadata", {})
+            | {
+                "execution_phase": phase,
+                "native_tolerance": native_tolerance,
+                "max_iterations": iteration_limit,
+                "solver_seed": job["solver_seed"],
+                "stationarity_tolerance": config.accuracy.stationarity,
+                "feasibility_tolerance": config.accuracy.feasibility,
+                "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+                "native_tolerances_calibrated": (
+                    _native_tolerances_calibrated(config.multinomial.execution, backend)
+                ),
+            }
+            | (record_metadata or {})
+        )
+        annotated = outcome | {"solver_metadata": metadata}
+        return record_outcome(
+            suite=config.suite,
+            problem_id=spec.problem_id,
+            run_key=record_run_key,
+            problem=problem_fields,
+            solver=solver,
+            backend=backend,
+            seed=job["seed"],
+            repetition=repetition,
+            outcome=annotated,
+            runtimes=runtimes,
+            output_dir=output_dir,
+            worker_metadata=ready.get("worker_metadata", {}),
+            timing_scope=(
+                "device-resident solver invocation; excludes problem generation, "
+                "worker startup, and format conversion; includes solver-side "
+                "JIT compilation when required"
+            ),
+        )
+
+    return run_repetitions(
+        worker=worker,
+        ready=ready,
+        config=config,
+        command=command,
+        max_iterations=max_iterations,
+        persist=persist,
+    )
+
+
+def _validate_elastic_net_job(
+    job: dict[str, Any],
+    config: SyntheticErmConfig,
+    *,
+    bounded: bool,
+) -> ElasticNetSpec:
+    problem_type = "bounded_elastic_net"
+    variant = "bounded"
+    if job.get("suite") != config.suite:
+        raise ValueError("manifest job suite does not match the configuration")
+    if job.get("problem_type") != problem_type:
+        raise ValueError(f"execution requires a {variant} elastic-net manifest job")
+    backend = job.get("backend")
+    if backend not in {"cpu", "cuda"}:
+        raise ValueError("manifest job backend must be cpu or cuda")
+    solvers = config.elastic_net.bounded_solvers
+    if job.get("solver") not in getattr(solvers, backend):
+        raise ValueError("manifest solver is not configured for its backend")
+    spec = ElasticNetSpec(**job["problem_spec"])
+    seed = job.get("seed")
+    if not isinstance(seed, int) or seed not in config.seeds:
+        raise ValueError("manifest seed is not configured")
+    if (spec.n, spec.p) not in {(shape.n, shape.p) for shape in config.elastic_net.shapes}:
+        raise ValueError("manifest shape is not configured")
+    if (
+        spec.feature_generator != config.features.generator
+        or spec.feature_decay_exponent not in config.features.cases
+    ):
+        raise ValueError("manifest feature model is not configured")
+    if spec.regularization_fraction not in config.elastic_net.regularization_fractions:
+        raise ValueError("manifest regularization fraction is not configured")
+    expected_spec = ElasticNetSpec(
+        n=spec.n,
+        p=spec.p,
+        feature_seed=derive_seed(seed, "elastic_net_features"),
+        target_seed=derive_seed(seed, "elastic_net_targets"),
+        feature_generator=config.features.generator,
+        feature_decay_exponent=spec.feature_decay_exponent,
+        teacher_density=config.elastic_net.teacher_density,
+        noise_ratio=config.elastic_net.noise_ratio,
+        teacher_intercept=config.elastic_net.teacher_intercept,
+        regularization_fraction=spec.regularization_fraction,
+    )
+    if spec != expected_spec:
+        raise ValueError("manifest problem_spec does not match the configuration")
+    if job.get("problem_id") != spec.problem_id(bounded=bounded):
+        raise ValueError("manifest problem_id does not match problem_spec")
+    solver_seed_name = "bounded_elastic_net_solver"
+    if job.get("solver_seed") != derive_seed(seed, solver_seed_name):
+        raise ValueError("manifest solver_seed does not match its master seed")
+    return spec
+
+
+def run_bounded_elastic_net_job(
+    job: dict[str, Any],
+    config: SyntheticErmConfig,
+    *,
+    native_tolerance: float,
+    max_iterations: int,
+    batch_size: int,
+    output_dir: Path,
+    record_run_key: str = "bounded_elastic_net",
+    record_metadata: dict[str, Any] | None = None,
+) -> list[TrialRecord]:
+    """Execute one bounded elastic-net manifest job through an isolated worker."""
+    validate_controls(native_tolerance, max_iterations, batch_size)
+    spec = _validate_elastic_net_job(job, config, bounded=True)
+    backend = job["backend"]
+    solver = job["solver"]
+    clarabel_solvers = {"clarabel_qdldl", "cuclarabel_cudss"}
+    specification = {
+        "problem_type": "bounded_elastic_net",
+        "problem_spec": job["problem_spec"],
+        "pre_torch_runtime": "clarabel" if solver in clarabel_solvers else None,
+    }
+    command = {
+        "solver": solver,
+        "native_tolerance": native_tolerance,
+        "max_iters": max_iterations,
+        "batch_size": batch_size,
+        "solver_seed": job["solver_seed"],
+        "stationarity_tolerance": config.accuracy.stationarity,
+        "feasibility_tolerance": config.accuracy.feasibility,
+    }
+    problem_fields = {
+        "problem_type": "bounded_elastic_net",
+        "n": spec.n,
+        "p": spec.p,
+        "teacher_density": spec.teacher_density,
+        "noise_ratio": spec.noise_ratio,
+        "teacher_intercept": spec.teacher_intercept,
+        "regularization_fraction": spec.regularization_fraction,
+        "feature_seed": spec.feature_seed,
+        "target_seed": spec.target_seed,
+        "feature_generator": spec.feature_generator,
+        "feature_decay_exponent": spec.feature_decay_exponent,
+    }
+
+    worker = ProblemWorker(specification, backend, config.suite)
+    try:
+        ready = worker.wait_until_ready(config.startup_timeout_seconds)
+    except BaseException:
+        worker.close()
+        raise
+
+    def persist(
+        outcome: dict[str, Any],
+        repetition: int,
+        runtimes: list[float],
+        *,
+        phase: str,
+        iteration_limit: int | None,
+    ) -> TrialRecord:
+        metadata = (
+            outcome.get("solver_metadata", {})
+            | {
+                "execution_phase": phase,
+                "native_tolerance": native_tolerance,
+                "max_iterations": iteration_limit,
+                "solver_seed": job["solver_seed"],
+                "stationarity_tolerance": config.accuracy.stationarity,
+                "feasibility_tolerance": config.accuracy.feasibility,
+                "accuracy_thresholds_calibrated": config.accuracy.calibrated,
+                "native_tolerances_calibrated": (
+                    _native_tolerances_calibrated(config.elastic_net.bounded_execution, backend)
+                ),
+            }
+            | (record_metadata or {})
+        )
+        return record_outcome(
+            suite=config.suite,
+            problem_id=spec.problem_id(bounded=True),
+            run_key=record_run_key,
+            problem=problem_fields,
+            solver=solver,
+            backend=backend,
+            seed=job["seed"],
+            repetition=repetition,
+            outcome=outcome | {"solver_metadata": metadata},
+            runtimes=runtimes,
+            output_dir=output_dir,
+            worker_metadata=ready.get("worker_metadata", {}),
+            timing_scope=(
+                "native solver invocation; excludes problem generation, worker startup, "
+                "and benchmark-side conic construction and format conversion; includes "
+                "solver-side JIT compilation, internal setup, and transfers when required"
+            ),
+        )
+
+    return run_repetitions(
+        worker=worker,
+        ready=ready,
+        config=config,
+        command=command,
+        max_iterations=max_iterations,
+        persist=persist,
+    )

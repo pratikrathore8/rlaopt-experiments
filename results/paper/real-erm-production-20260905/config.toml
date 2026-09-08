@@ -1,0 +1,122 @@
+[experiment]
+suite = "real_erm"
+# This cluster path is node-local and must be prepared on every execution node.
+data_root = "/scr/pratikr/rlaopt-real-data"
+# The time-constrained production study uses one fixed solver seed and one timing
+# observation per configuration.
+seeds = [300]
+warmups = 0
+repetitions = 1
+timeout_seconds = 3600
+startup_timeout_seconds = 1800
+
+[accuracy]
+stationarity = 1.0e-4
+feasibility = 1.0e-6
+relative_duality_gap = 1.0e-4
+calibrated = true
+
+[multinomial]
+datasets = ["cifar10", "rcv1", "svhn", "news20", "fashion_mnist"]
+box_lower = -1.0
+box_upper = 1.0
+
+[multinomial.solvers]
+cpu = [
+  "rlaopt_sapphire",
+  "projected_gradient",
+  "projected_gradient_no_jit",
+  "jaxopt_lbfgsb",
+  "jaxopt_lbfgsb_no_jit",
+]
+cuda = [
+  "rlaopt_sapphire",
+  "projected_gradient",
+  "projected_gradient_no_jit",
+  "jaxopt_lbfgsb",
+  "jaxopt_lbfgsb_no_jit",
+]
+
+[multinomial.execution]
+max_iterations = 100000
+batch_size = 256
+
+[multinomial.execution.native_tolerances_calibrated]
+cpu = true
+cuda = true
+
+[multinomial.execution.native_tolerances.cpu]
+# JIT changes execution of the same JAXopt loop, not its native stopping rule.
+rlaopt_sapphire = 1.0e-7
+projected_gradient = 1.0e-6
+projected_gradient_no_jit = 1.0e-6
+jaxopt_lbfgsb = 1.0e-6
+jaxopt_lbfgsb_no_jit = 1.0e-6
+
+[multinomial.execution.native_tolerances.cuda]
+rlaopt_sapphire = 1.0e-7
+projected_gradient = 1.0e-6
+projected_gradient_no_jit = 1.0e-6
+jaxopt_lbfgsb = 1.0e-6
+jaxopt_lbfgsb_no_jit = 1.0e-6
+
+[elastic_net]
+datasets = ["acsincome", "e2006", "realsim", "yearpredictionmsd", "yolanda"]
+regularization_fractions = [0.1]
+
+[elastic_net.vanilla_solvers]
+cpu = [
+  "rlaopt_sapphire",
+  "sklearn_coordinate_descent",
+  "jaxopt_proximal_gradient",
+  "jaxopt_proximal_gradient_no_jit",
+]
+cuda = [
+  "rlaopt_sapphire",
+  "cuml_coordinate_descent",
+  "jaxopt_proximal_gradient",
+  "jaxopt_proximal_gradient_no_jit",
+]
+
+[elastic_net.vanilla_execution]
+max_iterations = 100000
+batch_size = 256
+
+[elastic_net.vanilla_execution.native_tolerances_calibrated]
+cpu = true
+cuda = true
+
+[elastic_net.vanilla_execution.native_tolerances.cpu]
+# JIT changes execution of the same JAXopt loop, not its native stopping rule.
+rlaopt_sapphire = 1.0e-5
+sklearn_coordinate_descent = 1.0e-4
+jaxopt_proximal_gradient = 1.0e-5
+jaxopt_proximal_gradient_no_jit = 1.0e-5
+
+[elastic_net.vanilla_execution.native_tolerances.cuda]
+rlaopt_sapphire = 1.0e-5
+cuml_coordinate_descent = 1.0e-4
+jaxopt_proximal_gradient = 1.0e-5
+jaxopt_proximal_gradient_no_jit = 1.0e-5
+
+[elastic_net.bounded_solvers]
+cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
+cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]
+
+[elastic_net.bounded_execution]
+max_iterations = 100000
+batch_size = 256
+
+[elastic_net.bounded_execution.native_tolerances_calibrated]
+cpu = true
+cuda = true
+
+[elastic_net.bounded_execution.native_tolerances.cpu]
+rlaopt_admm = 1.0e-7
+scs = 1.0e-7
+clarabel_qdldl = 1.0e-10
+
+[elastic_net.bounded_execution.native_tolerances.cuda]
+rlaopt_admm = 1.0e-7
+scs_cuda = 1.0e-7
+cuclarabel_cudss = 1.0e-10

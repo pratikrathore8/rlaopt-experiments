@@ -40,6 +40,7 @@ def calibrate(
             kkt_tolerance=config.kkt_tolerance,
             timeout_seconds=config.timeout_seconds,
             startup_timeout_seconds=config.startup_timeout_seconds,
+            suite=config.suite,
             rank=config.nystrom_rank,
             output_dir=output_dir,
             case_index=case_index,
