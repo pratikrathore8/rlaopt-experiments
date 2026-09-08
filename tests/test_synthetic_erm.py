@@ -130,42 +130,41 @@ def test_multinomial_gradient_matches_autograd():
     )
 
 
-def test_elastic_net_variants_share_exactly_the_same_data_and_scaling():
+def test_bounded_elastic_net_generation_is_reproducible_and_scaled():
     spec = _elastic_net_spec()
-    unbounded = generate_elastic_net_problem(spec, bounded=False, device="cpu")
+    problem = generate_elastic_net_problem(spec, bounded=True, device="cpu")
     bounded = generate_elastic_net_problem(spec, bounded=True, device="cpu")
 
-    torch.testing.assert_close(unbounded.X, bounded.X, rtol=0, atol=0)
-    torch.testing.assert_close(unbounded.y, bounded.y, rtol=0, atol=0)
+    torch.testing.assert_close(problem.X, bounded.X, rtol=0, atol=0)
+    torch.testing.assert_close(problem.y, bounded.y, rtol=0, atol=0)
     torch.testing.assert_close(
-        unbounded.teacher_weights,
+        problem.teacher_weights,
         bounded.teacher_weights,
         rtol=0,
         atol=0,
     )
-    assert unbounded.problem_id != bounded.problem_id
-    assert unbounded.X.dtype == torch.float64
+    assert problem.X.dtype == torch.float64
     torch.testing.assert_close(
-        unbounded.X.mean(dim=0), torch.zeros(16, dtype=torch.float64), atol=1e-15, rtol=0
+        problem.X.mean(dim=0), torch.zeros(16, dtype=torch.float64), atol=1e-15, rtol=0
     )
-    assert float(unbounded.y.mean()) == pytest.approx(float(unbounded.teacher_intercept))
-    assert float(unbounded.y.var(correction=0)) == pytest.approx(1.0)
-    assert int(torch.count_nonzero(unbounded.teacher_weights)) == math.ceil(
+    assert float(problem.y.mean()) == pytest.approx(float(problem.teacher_intercept))
+    assert float(problem.y.var(correction=0)) == pytest.approx(1.0)
+    assert int(torch.count_nonzero(problem.teacher_weights)) == math.ceil(
         spec.teacher_density * spec.p
     )
-    effective_signal = unbounded.X @ unbounded.teacher_weights
-    realized_noise = unbounded.y - effective_signal - unbounded.teacher_intercept
+    effective_signal = problem.X @ problem.teacher_weights
+    realized_noise = problem.y - effective_signal - problem.teacher_intercept
     realized_ratio = realized_noise.square().mean().sqrt() / effective_signal.square().mean().sqrt()
     assert float(realized_ratio) == pytest.approx(spec.noise_ratio)
 
-    centered_x = unbounded.X - unbounded.X.mean(dim=0)
-    centered_y = unbounded.y - unbounded.y.mean()
+    centered_x = problem.X - problem.X.mean(dim=0)
+    centered_y = problem.y - problem.y.mean()
     expected_lambda_max = float(
         torch.linalg.vector_norm(centered_x.mT @ centered_y, ord=float("inf")) / spec.n
     )
-    assert unbounded.lambda_max == pytest.approx(expected_lambda_max)
-    assert unbounded.lambda_l1 == pytest.approx(spec.regularization_fraction * expected_lambda_max)
-    assert unbounded.lambda_l2 == pytest.approx(unbounded.lambda_l1)
+    assert problem.lambda_max == pytest.approx(expected_lambda_max)
+    assert problem.lambda_l1 == pytest.approx(spec.regularization_fraction * expected_lambda_max)
+    assert problem.lambda_l2 == pytest.approx(problem.lambda_l1)
 
 
 def test_elastic_net_loss_gradient_matches_autograd_and_constraint_is_measured():
@@ -199,64 +198,26 @@ def test_elastic_net_loss_gradient_matches_autograd_and_constraint_is_measured()
     infeasible[0] = -0.25
     assert float(problem.constraint_violation(infeasible)) == pytest.approx(0.25)
 
-    unbounded = generate_elastic_net_problem(
-        _elastic_net_spec(),
-        bounded=False,
-        device="cpu",
-    )
-    assert float(unbounded.constraint_violation(weights.detach())) == 0.0
 
-
-def test_elastic_net_kkt_metrics_and_duality_gap_match_the_formulation():
+def test_bounded_elastic_net_zero_solution_satisfies_kkt_at_lambda_max():
     spec = replace(_elastic_net_spec(), regularization_fraction=1.0)
-    unbounded = generate_elastic_net_problem(spec, bounded=False, device="cpu")
-    bounded = generate_elastic_net_problem(spec, bounded=True, device="cpu")
+    problem = generate_elastic_net_problem(spec, bounded=True, device="cpu")
     weights = torch.zeros(spec.p, dtype=torch.float64)
-    intercept = unbounded.y.mean()
-
-    dual = unbounded.dual_candidate(weights, intercept)
-    assert float(unbounded.dual_equality_violation(dual)) < 1e-15
-    primal = unbounded.objective(weights, intercept)
-    dual_objective = unbounded.dual_objective(dual)
-    torch.testing.assert_close(primal, dual_objective, atol=1e-14, rtol=1e-14)
-    assert float(unbounded.relative_duality_gap(weights, intercept)) < 1e-14
-
-    random_weights = torch.randn(
-        spec.p,
-        dtype=torch.float64,
-        generator=torch.Generator().manual_seed(24),
-    )
-    random_intercept = torch.tensor(0.3, dtype=torch.float64)
-    random_dual = unbounded.dual_candidate(random_weights, random_intercept)
-    assert float(unbounded.dual_equality_violation(random_dual)) < 1e-15
-    assert float(unbounded.dual_objective(random_dual)) <= float(
-        unbounded.objective(random_weights, random_intercept)
-    )
-    assert float(unbounded.relative_duality_gap(random_weights, random_intercept)) >= 0
-
     assert (
         float(
-            unbounded.kkt_residual(
+            problem.kkt_residual(
                 weights,
-                intercept,
-                activity_tolerance=1e-8,
-            )
-        )
-        < 1e-14
-    )
-    assert (
-        float(
-            bounded.kkt_residual(
-                weights,
-                intercept,
+                problem.y.mean(),
                 activity_tolerance=1e-8,
             )
         )
         < 1e-14
     )
 
-    with pytest.raises(ValueError, match="not valid for bounded"):
-        bounded.relative_duality_gap(weights, intercept)
+
+def test_elastic_net_generator_rejects_retired_unbounded_variant():
+    with pytest.raises(ValueError, match="Only bounded"):
+        generate_elastic_net_problem(_elastic_net_spec(), bounded=False, device="cpu")
 
 
 def test_metric_activity_tolerances_are_explicit_and_validated():

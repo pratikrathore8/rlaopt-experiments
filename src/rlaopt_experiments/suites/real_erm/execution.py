@@ -71,10 +71,8 @@ def _validate_elastic_net_job(
     *,
     bounded: bool,
 ) -> RealElasticNetSpec:
-    problem_type = "bounded_elastic_net" if bounded else "vanilla_elastic_net"
-    configured = (
-        config.elastic_net.bounded_solvers if bounded else config.elastic_net.vanilla_solvers
-    )
+    problem_type = "bounded_elastic_net"
+    configured = config.elastic_net.bounded_solvers
     _, _, seed = _validate_common_job(
         job,
         config,
@@ -122,17 +120,10 @@ def _run_job(
         "problem_spec": job["problem_spec"],
         "pre_torch_runtime": "clarabel" if solver in clarabel_solvers else None,
     }
-    accuracy_fields = (
-        {
-            "relative_duality_gap_tolerance": config.accuracy.relative_duality_gap,
-            "feasibility_tolerance": config.accuracy.feasibility,
-        }
-        if problem_type == "vanilla_elastic_net"
-        else {
-            "stationarity_tolerance": config.accuracy.stationarity,
-            "feasibility_tolerance": config.accuracy.feasibility,
-        }
-    )
+    accuracy_fields = {
+        "stationarity_tolerance": config.accuracy.stationarity,
+        "feasibility_tolerance": config.accuracy.feasibility,
+    }
     command = {
         "solver": solver,
         "native_tolerance": native_tolerance,
@@ -238,30 +229,6 @@ def run_real_multinomial_job(
         spec=spec,
         problem_type="multinomial",
         execution=config.multinomial.execution,
-        native_tolerance=native_tolerance,
-        max_iterations=max_iterations,
-        batch_size=batch_size,
-        output_dir=output_dir,
-    )
-
-
-def run_real_vanilla_elastic_net_job(
-    job: dict[str, Any],
-    config: RealErmConfig,
-    *,
-    native_tolerance: float,
-    max_iterations: int,
-    batch_size: int,
-    output_dir: Path,
-) -> list[TrialRecord]:
-    """Execute one real vanilla elastic-net job through an isolated worker."""
-    spec = _validate_elastic_net_job(job, config, bounded=False)
-    return _run_job(
-        job,
-        config,
-        spec=spec,
-        problem_type="vanilla_elastic_net",
-        execution=config.elastic_net.vanilla_execution,
         native_tolerance=native_tolerance,
         max_iterations=max_iterations,
         batch_size=batch_size,

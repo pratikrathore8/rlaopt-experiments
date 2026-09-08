@@ -10,7 +10,6 @@ startup_timeout_seconds = 900
 [accuracy]
 stationarity = 1.0e-6
 feasibility = 1.0e-6
-relative_duality_gap = 1.0e-6
 calibrated = true
 
 [features]
@@ -60,28 +59,6 @@ shapes = [
 ]
 
 # Both variants consume the same generated X and y for each shape, seed, and fraction.
-[elastic_net.vanilla_solvers]
-cpu = ["rlaopt_sapphire", "sklearn_coordinate_descent", "jaxopt_proximal_gradient"]
-cuda = ["rlaopt_sapphire", "cuml_coordinate_descent", "jaxopt_proximal_gradient"]
-
-[elastic_net.vanilla_execution]
-max_iterations = 10000
-batch_size = 256
-
-[elastic_net.vanilla_execution.native_tolerances_calibrated]
-cpu = true
-cuda = true
-
-[elastic_net.vanilla_execution.native_tolerances.cpu]
-rlaopt_sapphire = 1.0e-5
-sklearn_coordinate_descent = 1.0e-4
-jaxopt_proximal_gradient = 1.0e-5
-
-[elastic_net.vanilla_execution.native_tolerances.cuda]
-rlaopt_sapphire = 1.0e-5
-cuml_coordinate_descent = 1.0e-4
-jaxopt_proximal_gradient = 1.0e-5
-
 [elastic_net.bounded_solvers]
 cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]
 cuda = ["rlaopt_admm", "scs_cuda", "cuclarabel_cudss"]

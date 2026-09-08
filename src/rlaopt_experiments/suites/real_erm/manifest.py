@@ -45,15 +45,13 @@ def build_real_multinomial_manifest(
     return jobs
 
 
-def _elastic_net_manifest(
+def build_real_bounded_elastic_net_manifest(
     config: RealErmConfig,
     backend: str,
-    *,
-    bounded: bool,
 ) -> list[dict[str, Any]]:
     _require_backend(backend)
-    problem_type = "bounded_elastic_net" if bounded else "vanilla_elastic_net"
-    solvers = config.elastic_net.bounded_solvers if bounded else config.elastic_net.vanilla_solvers
+    problem_type = "bounded_elastic_net"
+    solvers = config.elastic_net.bounded_solvers
     jobs: list[dict[str, Any]] = []
     for dataset in config.elastic_net.datasets:
         for fraction in config.elastic_net.regularization_fractions:
@@ -68,7 +66,7 @@ def _elastic_net_manifest(
                         {
                             "suite": config.suite,
                             "problem_type": problem_type,
-                            "problem_id": spec.problem_id(bounded=bounded),
+                            "problem_id": spec.problem_id(bounded=True),
                             "problem_spec": asdict(spec),
                             "seed": seed,
                             "solver_seed": derive_seed(seed, f"{problem_type}_solver"),
@@ -79,27 +77,11 @@ def _elastic_net_manifest(
     return jobs
 
 
-def build_real_vanilla_elastic_net_manifest(
-    config: RealErmConfig,
-    backend: str,
-) -> list[dict[str, Any]]:
-    return _elastic_net_manifest(config, backend, bounded=False)
-
-
-def build_real_bounded_elastic_net_manifest(
-    config: RealErmConfig,
-    backend: str,
-) -> list[dict[str, Any]]:
-    return _elastic_net_manifest(config, backend, bounded=True)
-
-
 def build_real_erm_manifest(config: RealErmConfig, backend: str) -> list[dict[str, Any]]:
     """Return every executable real-data ERM job for one backend."""
-    jobs = (
-        build_real_multinomial_manifest(config, backend)
-        + build_real_vanilla_elastic_net_manifest(config, backend)
-        + build_real_bounded_elastic_net_manifest(config, backend)
-    )
+    jobs = build_real_multinomial_manifest(
+        config, backend
+    ) + build_real_bounded_elastic_net_manifest(config, backend)
     return [
         job for job in jobs if config.solver_subset is None or job["solver"] in config.solver_subset
     ]

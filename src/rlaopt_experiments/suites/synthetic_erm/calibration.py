@@ -18,13 +18,11 @@ from rlaopt_experiments.suites.synthetic_erm.config import (
 from rlaopt_experiments.suites.synthetic_erm.execution import (
     run_bounded_elastic_net_job,
     run_multinomial_job,
-    run_vanilla_elastic_net_job,
 )
 from rlaopt_experiments.suites.synthetic_erm.manifest import build_synthetic_erm_manifest
 
 _PROBLEM_TYPES = {
     "multinomial",
-    "vanilla_elastic_net",
     "bounded_elastic_net",
 }
 
@@ -37,8 +35,6 @@ def _execution(
 ) -> tuple[SolverExecution, ErmRunner]:
     if problem_type == "multinomial":
         return config.multinomial.execution, run_multinomial_job
-    if problem_type == "vanilla_elastic_net":
-        return config.elastic_net.vanilla_execution, run_vanilla_elastic_net_job
     if problem_type == "bounded_elastic_net":
         return config.elastic_net.bounded_execution, run_bounded_elastic_net_job
     raise ValueError(f"unsupported synthetic ERM problem type: {problem_type}")

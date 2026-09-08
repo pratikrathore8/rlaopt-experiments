@@ -43,22 +43,6 @@ def test_load_synthetic_erm_smoke_config() -> None:
     )
     assert config.multinomial.shapes == (ErmShape(1024, 64), ErmShape(4096, 256))
     assert config.elastic_net.regularization_fractions == (0.1, 0.01)
-    assert "sklearn_coordinate_descent" in config.elastic_net.vanilla_solvers.cpu
-    assert config.elastic_net.vanilla_execution.native_tolerances_calibrated is not None
-    assert config.elastic_net.vanilla_execution.native_tolerances_calibrated.cpu
-    assert config.elastic_net.vanilla_execution.native_tolerances_calibrated.cuda
-    assert dict(config.elastic_net.vanilla_execution.native_tolerances.cuda) == {
-        "cuml_coordinate_descent": 1e-4,
-        "jaxopt_proximal_gradient": 1e-5,
-        "rlaopt_sapphire": 1e-5,
-    }
-    assert (
-        config.elastic_net.vanilla_execution.native_tolerances.for_solver(
-            "cpu", "sklearn_coordinate_descent"
-        )
-        == 1e-4
-    )
-    assert config.elastic_net.vanilla_execution.max_iterations == 10_000
     assert "cuclarabel_cudss" in config.elastic_net.bounded_solvers.cuda
     assert config.elastic_net.bounded_execution.max_iterations == 10_000
     assert config.elastic_net.bounded_execution.native_tolerances_calibrated is not None
@@ -77,10 +61,8 @@ def test_load_synthetic_erm_calibration_config_without_frozen_tolerances() -> No
     assert calibration.candidates == (1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9, 1e-10)
     assert calibration.experiment.accuracy.stationarity == 1e-4
     assert calibration.experiment.accuracy.feasibility == 1e-6
-    assert calibration.experiment.accuracy.relative_duality_gap == 1e-4
     for execution in (
         calibration.experiment.multinomial.execution,
-        calibration.experiment.elastic_net.vanilla_execution,
         calibration.experiment.elastic_net.bounded_execution,
     ):
         assert execution.native_tolerances is None
@@ -103,7 +85,6 @@ def test_calibration_config_rejects_frozen_native_tolerances(tmp_path: Path) -> 
 def test_elastic_net_variants_share_one_data_grid() -> None:
     config = load_synthetic_erm_config(CONFIG)
 
-    assert not hasattr(config.elastic_net, "vanilla_shapes")
     assert not hasattr(config.elastic_net, "bounded_shapes")
     assert config.elastic_net.shapes
 
@@ -117,7 +98,6 @@ def test_suite_and_calibration_state_are_required() -> None:
         AccuracyThresholds(
             stationarity=1e-6,
             feasibility=1e-8,
-            relative_duality_gap=1e-6,
         )
 
 
@@ -169,7 +149,6 @@ def test_accuracy_thresholds_must_be_positive() -> None:
         AccuracyThresholds(
             stationarity=0.0,
             feasibility=1e-8,
-            relative_duality_gap=1e-6,
             calibrated=False,
         )
 
@@ -184,8 +163,18 @@ def test_shapes_must_be_nonempty() -> None:
             noise_ratio=config.elastic_net.noise_ratio,
             teacher_intercept=config.elastic_net.teacher_intercept,
             regularization_fractions=config.elastic_net.regularization_fractions,
-            vanilla_solvers=config.elastic_net.vanilla_solvers,
             bounded_solvers=config.elastic_net.bounded_solvers,
-            vanilla_execution=config.elastic_net.vanilla_execution,
             bounded_execution=config.elastic_net.bounded_execution,
         )
+
+
+def test_retired_settings_preserve_bounded_campaign_config(tmp_path: Path) -> None:
+    source = Path("configs/synthetic_erm_smoke.toml").read_text()
+    legacy = source.replace("[accuracy]", "[accuracy]\nrelative_duality_gap = 1e-4")
+    legacy += "\n[elastic_net.vanilla_solvers]\ncpu = ['retired_solver']\ncuda = []\n"
+    legacy += "\n[elastic_net.vanilla_execution]\nmax_iterations = 100000\n"
+    path = tmp_path / "legacy.toml"
+    path.write_text(legacy)
+    assert load_synthetic_erm_config(path) == load_synthetic_erm_config(
+        Path("configs/synthetic_erm_smoke.toml")
+    )

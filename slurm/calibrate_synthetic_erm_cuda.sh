@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
 #SBATCH --time=1-00:00:00
-#SBATCH --array=0-8%4
+#SBATCH --array=0-5%4
 #SBATCH --job-name=rlaopt-erm-cuda-calibrate
 #SBATCH --output=cuda-erm-calibrate-%A_%a.out
 
@@ -23,9 +23,6 @@ PROBLEM_TYPES=(
   multinomial
   multinomial
   multinomial
-  vanilla_elastic_net
-  vanilla_elastic_net
-  vanilla_elastic_net
   bounded_elastic_net
   bounded_elastic_net
   bounded_elastic_net
@@ -34,9 +31,6 @@ SOLVERS=(
   rlaopt_sapphire
   projected_gradient
   jaxopt_lbfgsb
-  rlaopt_sapphire
-  cuml_coordinate_descent
-  jaxopt_proximal_gradient
   rlaopt_admm
   scs_cuda
   cuclarabel_cudss

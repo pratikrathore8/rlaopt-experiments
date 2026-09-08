@@ -19,7 +19,6 @@ candidates = [1.0e-4, 1.0e-5, 1.0e-6, 1.0e-7, 1.0e-8, 1.0e-9, 1.0e-10]
 [accuracy]
 stationarity = 1.0e-4
 feasibility = 1.0e-6
-relative_duality_gap = 1.0e-4
 calibrated = false
 
 [features]
@@ -55,14 +54,6 @@ shapes = [
   { n = 1024, p = 64 },
   { n = 4096, p = 256 },
 ]
-
-[elastic_net.vanilla_solvers]
-cpu = ["rlaopt_sapphire", "sklearn_coordinate_descent", "jaxopt_proximal_gradient"]
-cuda = ["rlaopt_sapphire", "cuml_coordinate_descent", "jaxopt_proximal_gradient"]
-
-[elastic_net.vanilla_execution]
-max_iterations = 10000
-batch_size = 256
 
 [elastic_net.bounded_solvers]
 cpu = ["rlaopt_admm", "scs", "clarabel_qdldl"]

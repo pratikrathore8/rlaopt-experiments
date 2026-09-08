@@ -76,39 +76,6 @@ def test_run_manifest_job_uses_strict_configured_controls(
     assert captured["config"].multinomial.execution.tolerances_calibrated_for("cpu")
 
 
-def test_run_manifest_job_dispatches_vanilla_elastic_net_controls(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    job = next(
-        item
-        for item in build_manifest(CONFIG, "cpu")
-        if item["problem_type"] == "vanilla_elastic_net"
-    )
-    captured: dict[str, Any] = {}
-
-    def fake_run(
-        selected_job: dict[str, Any],
-        config: Any,
-        **controls: Any,
-    ) -> list:
-        captured.update({"job": selected_job, "config": config, **controls})
-        return []
-
-    monkeypatch.setattr(
-        "rlaopt_experiments.execution.run_vanilla_elastic_net_job",
-        fake_run,
-    )
-
-    assert run_manifest_job(job, CONFIG, tmp_path) == []
-    assert captured["job"] == job
-    assert captured["native_tolerance"] == 1e-5
-    assert captured["max_iterations"] == 10_000
-    assert captured["batch_size"] == 256
-    assert captured["output_dir"] == tmp_path
-    assert captured["config"].elastic_net.vanilla_execution.tolerances_calibrated_for("cpu")
-
-
 def test_run_manifest_job_dispatches_bounded_elastic_net_controls(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

@@ -91,9 +91,7 @@ class RealMultinomialExperiment:
 class RealElasticNetExperiment:
     datasets: tuple[str, ...]
     regularization_fractions: tuple[float, ...]
-    vanilla_solvers: BackendSolvers
     bounded_solvers: BackendSolvers
-    vanilla_execution: SolverExecution
     bounded_execution: SolverExecution
 
     def __post_init__(self) -> None:
@@ -104,11 +102,6 @@ class RealElasticNetExperiment:
             for fraction in self.regularization_fractions
         ):
             raise ValueError("regularization fractions must be finite and positive")
-        _validate_solver_tolerances(
-            self.vanilla_solvers,
-            self.vanilla_execution,
-            "vanilla elastic net",
-        )
         _validate_solver_tolerances(
             self.bounded_solvers,
             self.bounded_execution,
@@ -152,7 +145,6 @@ class RealErmConfig:
             configured = set()
             for solvers in (
                 self.multinomial.solvers,
-                self.elastic_net.vanilla_solvers,
                 self.elastic_net.bounded_solvers,
             ):
                 configured.update(solvers.cpu + solvers.cuda)
@@ -215,9 +207,10 @@ def load_real_erm_config(path: Path) -> RealErmConfig:
         "experiment",
     )
     accuracy_data = dict(root["accuracy"])
+    accuracy_data.pop("relative_duality_gap", None)  # Legacy campaign configs.
     _require_keys(
         accuracy_data,
-        {"stationarity", "feasibility", "relative_duality_gap", "calibrated"},
+        {"stationarity", "feasibility", "calibrated"},
         "accuracy",
     )
 
@@ -235,14 +228,14 @@ def load_real_erm_config(path: Path) -> RealErmConfig:
     )
 
     elastic_net_data = dict(root["elastic_net"])
+    for retired in ("vanilla_solvers", "vanilla_execution"):
+        elastic_net_data.pop(retired, None)  # Legacy campaign configs.
     _require_keys(
         elastic_net_data,
         {
             "datasets",
             "regularization_fractions",
-            "vanilla_solvers",
             "bounded_solvers",
-            "vanilla_execution",
             "bounded_execution",
         },
         "elastic_net",
@@ -250,14 +243,8 @@ def load_real_erm_config(path: Path) -> RealErmConfig:
     elastic_net = RealElasticNetExperiment(
         datasets=tuple(elastic_net_data.pop("datasets")),
         regularization_fractions=tuple(elastic_net_data.pop("regularization_fractions")),
-        vanilla_solvers=_backend_solvers(
-            elastic_net_data.pop("vanilla_solvers"), "vanilla elastic-net solvers"
-        ),
         bounded_solvers=_backend_solvers(
             elastic_net_data.pop("bounded_solvers"), "bounded elastic-net solvers"
-        ),
-        vanilla_execution=_execution(
-            elastic_net_data.pop("vanilla_execution"), "vanilla elastic-net execution"
         ),
         bounded_execution=_execution(
             elastic_net_data.pop("bounded_execution"), "bounded elastic-net execution"

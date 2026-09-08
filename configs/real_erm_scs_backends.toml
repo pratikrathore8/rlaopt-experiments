@@ -17,7 +17,6 @@ startup_timeout_seconds = 1800
 [accuracy]
 stationarity = 1.0e-4
 feasibility = 1.0e-6
-relative_duality_gap = 1.0e-4
 calibrated = true
 
 [multinomial]
@@ -67,41 +66,6 @@ jaxopt_lbfgsb_no_jit = 1.0e-6
 [elastic_net]
 datasets = ["acsincome", "e2006", "realsim", "yearpredictionmsd", "yolanda"]
 regularization_fractions = [0.1]
-
-[elastic_net.vanilla_solvers]
-cpu = [
-  "rlaopt_sapphire",
-  "sklearn_coordinate_descent",
-  "jaxopt_proximal_gradient",
-  "jaxopt_proximal_gradient_no_jit",
-]
-cuda = [
-  "rlaopt_sapphire",
-  "cuml_coordinate_descent",
-  "jaxopt_proximal_gradient",
-  "jaxopt_proximal_gradient_no_jit",
-]
-
-[elastic_net.vanilla_execution]
-max_iterations = 100000
-batch_size = 256
-
-[elastic_net.vanilla_execution.native_tolerances_calibrated]
-cpu = true
-cuda = true
-
-[elastic_net.vanilla_execution.native_tolerances.cpu]
-# JIT changes execution of the same JAXopt loop, not its native stopping rule.
-rlaopt_sapphire = 1.0e-5
-sklearn_coordinate_descent = 1.0e-4
-jaxopt_proximal_gradient = 1.0e-5
-jaxopt_proximal_gradient_no_jit = 1.0e-5
-
-[elastic_net.vanilla_execution.native_tolerances.cuda]
-rlaopt_sapphire = 1.0e-5
-cuml_coordinate_descent = 1.0e-4
-jaxopt_proximal_gradient = 1.0e-5
-jaxopt_proximal_gradient_no_jit = 1.0e-5
 
 [elastic_net.bounded_solvers]
 cpu = ["scs_cpu_indirect"]

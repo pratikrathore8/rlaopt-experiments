@@ -13,7 +13,6 @@ from rlaopt_experiments.suites.real_erm.config import load_real_erm_config
 from rlaopt_experiments.suites.real_erm.execution import (
     run_real_bounded_elastic_net_job,
     run_real_multinomial_job,
-    run_real_vanilla_elastic_net_job,
 )
 
 
@@ -60,7 +59,6 @@ class FakeWorker:
             "accuracy": {
                 "stationarity": 1e-5,
                 "feasibility": 0.0,
-                "relative_duality_gap": 1e-5,
                 "objective": 0.5,
                 "external_success": True,
             },
@@ -83,12 +81,6 @@ def reset_fake_workers() -> None:
     ("problem_type", "solver", "runner", "expected_tolerance"),
     [
         ("multinomial", "jaxopt_lbfgsb", run_real_multinomial_job, 1e-6),
-        (
-            "vanilla_elastic_net",
-            "sklearn_coordinate_descent",
-            run_real_vanilla_elastic_net_job,
-            1e-4,
-        ),
         (
             "bounded_elastic_net",
             "clarabel_qdldl",
@@ -154,7 +146,7 @@ def test_real_job_execution_records_production_controls(
 
 @pytest.mark.parametrize(
     "problem_type",
-    ["multinomial", "vanilla_elastic_net", "bounded_elastic_net"],
+    ["multinomial", "bounded_elastic_net"],
 )
 def test_top_level_dispatch_selects_real_runner(
     problem_type: str,
@@ -162,9 +154,7 @@ def test_top_level_dispatch_selects_real_runner(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     job = next(
-        item
-        for item in build_manifest(CONFIG, "cpu")
-        if item["problem_type"] == problem_type
+        item for item in build_manifest(CONFIG, "cpu") if item["problem_type"] == problem_type
     )
     captured: dict[str, Any] = {}
 
@@ -174,7 +164,6 @@ def test_top_level_dispatch_selects_real_runner(
 
     runner_name = {
         "multinomial": "run_real_multinomial_job",
-        "vanilla_elastic_net": "run_real_vanilla_elastic_net_job",
         "bounded_elastic_net": "run_real_bounded_elastic_net_job",
     }[problem_type]
     monkeypatch.setattr(f"rlaopt_experiments.execution.{runner_name}", fake_run)
@@ -210,9 +199,7 @@ def test_real_execution_uses_distinct_record_ids_for_solver_seeds(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     config_path = tmp_path / "three-seed-real-erm.toml"
-    config_path.write_text(
-        CONFIG.read_text().replace("seeds = [300]", "seeds = [300, 301, 302]")
-    )
+    config_path.write_text(CONFIG.read_text().replace("seeds = [300]", "seeds = [300, 301, 302]"))
     config = load_real_erm_config(config_path)
     jobs = [
         job
@@ -255,8 +242,12 @@ def test_scs_supplement_persists_transferred_tolerance(tmp_path, monkeypatch, ba
     monkeypatch.setattr("rlaopt_experiments.suites.real_erm.execution.ProblemWorker", FakeWorker)
     monkeypatch.setattr("rlaopt_experiments.runner.wandb_run", lambda *a, **k: nullcontext(None))
     records = run_real_bounded_elastic_net_job(
-        job, config, native_tolerance=1e-7, max_iterations=100_000,
-        batch_size=256, output_dir=tmp_path,
+        job,
+        config,
+        native_tolerance=1e-7,
+        max_iterations=100_000,
+        batch_size=256,
+        output_dir=tmp_path,
     )
     assert FakeWorker.instances[0].commands[0]["solver"] == job["solver"]
     record = records[0]

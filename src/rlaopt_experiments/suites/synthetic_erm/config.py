@@ -60,13 +60,11 @@ class BackendSolvers:
 class AccuracyThresholds:
     stationarity: float
     feasibility: float
-    relative_duality_gap: float
     calibrated: bool
 
     def __post_init__(self) -> None:
         _positive(self.stationarity, "stationarity threshold")
         _positive(self.feasibility, "feasibility threshold")
-        _positive(self.relative_duality_gap, "relative-duality-gap threshold")
 
 
 @dataclass(frozen=True)
@@ -199,9 +197,7 @@ class ElasticNetExperiment:
     noise_ratio: float
     teacher_intercept: float
     regularization_fractions: tuple[float, ...]
-    vanilla_solvers: BackendSolvers
     bounded_solvers: BackendSolvers
-    vanilla_execution: SolverExecution
     bounded_execution: SolverExecution
 
     def __post_init__(self) -> None:
@@ -215,21 +211,18 @@ class ElasticNetExperiment:
         _unique_nonempty(self.regularization_fractions, "regularization_fractions")
         for fraction in self.regularization_fractions:
             _positive(fraction, "regularization fraction")
+        execution = self.bounded_execution
         for backend in ("cpu", "cuda"):
-            for variant, solvers, execution in (
-                ("vanilla", self.vanilla_solvers, self.vanilla_execution),
-                ("bounded", self.bounded_solvers, self.bounded_execution),
-            ):
-                if execution.native_tolerances is not None:
-                    configured = set(getattr(solvers, backend))
-                    tolerance_names = {
-                        name for name, _ in getattr(execution.native_tolerances, backend)
-                    }
-                    if tolerance_names != configured:
-                        raise ValueError(
-                            f"{backend} native tolerances must exactly match "
-                            f"{variant} elastic-net solvers"
-                        )
+            if execution.native_tolerances is not None:
+                configured = set(getattr(self.bounded_solvers, backend))
+                tolerance_names = {
+                    name for name, _ in getattr(execution.native_tolerances, backend)
+                }
+                if tolerance_names != configured:
+                    raise ValueError(
+                        f"{backend} native tolerances must exactly match "
+                        "bounded elastic-net solvers"
+                    )
 
 
 @dataclass(frozen=True)
@@ -344,9 +337,12 @@ def _parse_synthetic_erm_config(
         },
         "experiment",
     )
+    root = dict(root)
+    root["accuracy"] = dict(root["accuracy"])
+    root["accuracy"].pop("relative_duality_gap", None)  # Legacy campaign configs.
     _require_keys(
         root["accuracy"],
-        {"stationarity", "feasibility", "relative_duality_gap", "calibrated"},
+        {"stationarity", "feasibility", "calibrated"},
         "accuracy",
     )
     accuracy = AccuracyThresholds(**root["accuracy"])
@@ -385,6 +381,8 @@ def _parse_synthetic_erm_config(
     )
 
     elastic_net_data = dict(root["elastic_net"])
+    for retired in ("vanilla_solvers", "vanilla_execution"):
+        elastic_net_data.pop(retired, None)  # Legacy campaign configs.
     _require_keys(
         elastic_net_data,
         {
@@ -393,24 +391,18 @@ def _parse_synthetic_erm_config(
             "noise_ratio",
             "teacher_intercept",
             "regularization_fractions",
-            "vanilla_solvers",
             "bounded_solvers",
-            "vanilla_execution",
             "bounded_execution",
         },
         "elastic_net",
     )
-    vanilla_execution_data = elastic_net_data.pop("vanilla_execution")
     bounded_execution_data = elastic_net_data.pop("bounded_execution")
     execution_parser = _calibration_execution if calibration else _solver_execution
-    vanilla_execution = execution_parser(vanilla_execution_data, "vanilla elastic-net execution")
     bounded_execution = execution_parser(bounded_execution_data, "bounded elastic-net execution")
     elastic_net = ElasticNetExperiment(
         shapes=_shapes(elastic_net_data.pop("shapes")),
-        vanilla_execution=vanilla_execution,
         bounded_execution=bounded_execution,
         regularization_fractions=tuple(elastic_net_data.pop("regularization_fractions")),
-        vanilla_solvers=_backend_solvers(elastic_net_data.pop("vanilla_solvers")),
         bounded_solvers=_backend_solvers(elastic_net_data.pop("bounded_solvers")),
         **elastic_net_data,
     )

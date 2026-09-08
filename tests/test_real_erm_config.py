@@ -21,7 +21,6 @@ def test_load_real_erm_production_config() -> None:
     assert config.timeout_seconds == 3600
     assert config.accuracy.stationarity == 1e-4
     assert config.accuracy.feasibility == 1e-6
-    assert config.accuracy.relative_duality_gap == 1e-4
     assert config.elastic_net.regularization_fractions == (0.1,)
     assert set(config.multinomial.solvers.cpu) == {
         "rlaopt_sapphire",
@@ -30,26 +29,15 @@ def test_load_real_erm_production_config() -> None:
         "jaxopt_lbfgsb",
         "jaxopt_lbfgsb_no_jit",
     }
-    assert set(config.elastic_net.vanilla_solvers.cpu) == {
-        "rlaopt_sapphire",
-        "sklearn_coordinate_descent",
-        "jaxopt_proximal_gradient",
-        "jaxopt_proximal_gradient_no_jit",
-    }
     for backend in ("cpu", "cuda"):
         multinomial_tolerances = config.multinomial.execution.native_tolerances
-        vanilla_tolerances = config.elastic_net.vanilla_execution.native_tolerances
         assert multinomial_tolerances is not None
-        assert vanilla_tolerances is not None
         assert multinomial_tolerances.for_solver(
             backend, "projected_gradient_no_jit"
         ) == multinomial_tolerances.for_solver(backend, "projected_gradient")
         assert multinomial_tolerances.for_solver(
             backend, "jaxopt_lbfgsb_no_jit"
         ) == multinomial_tolerances.for_solver(backend, "jaxopt_lbfgsb")
-        assert vanilla_tolerances.for_solver(
-            backend, "jaxopt_proximal_gradient_no_jit"
-        ) == vanilla_tolerances.for_solver(backend, "jaxopt_proximal_gradient")
     assert config.multinomial.datasets == (
         "cifar10",
         "rcv1",
@@ -73,24 +61,18 @@ def test_real_erm_manifest_is_complete_and_deterministic(backend: str) -> None:
     second = build_manifest(CONFIG, backend)
 
     assert first == second
-    assert len(first) == 60
+    assert len(first) == 40
     assert len({json.dumps(job, sort_keys=True) for job in first}) == len(first)
     assert {job["suite"] for job in first} == {"real_erm"}
     assert {job["backend"] for job in first} == {backend}
     assert {job["seed"] for job in first} == {300}
     by_problem = {
-        problem_type: [job for job in first if job["problem_type"] == problem_type]
-        for problem_type in {
-            "multinomial",
-            "vanilla_elastic_net",
-            "bounded_elastic_net",
-        }
+        kind: [j for j in first if j["problem_type"] == kind]
+        for kind in ("multinomial", "bounded_elastic_net")
     }
     assert len(by_problem["multinomial"]) == 25
-    assert len(by_problem["vanilla_elastic_net"]) == 20
     assert len(by_problem["bounded_elastic_net"]) == 15
     assert len({job["problem_id"] for job in by_problem["multinomial"]}) == 5
-    assert len({job["problem_id"] for job in by_problem["vanilla_elastic_net"]}) == 5
     assert len({job["problem_id"] for job in by_problem["bounded_elastic_net"]}) == 5
     assert {
         job["problem_spec"]["regularization_fraction"] for job in by_problem["bounded_elastic_net"]
@@ -140,3 +122,13 @@ def test_real_erm_cpu_and_cuda_manifests_use_the_same_problems() -> None:
         return {(job["problem_type"], job["problem_id"], job["seed"]) for job in jobs}
 
     assert problems(cpu) == problems(cuda)
+
+
+def test_retired_settings_preserve_bounded_campaign_config(tmp_path: Path) -> None:
+    source = Path("configs/real_erm.toml").read_text()
+    legacy = source.replace("[accuracy]", "[accuracy]\nrelative_duality_gap = 1e-4")
+    legacy += "\n[elastic_net.vanilla_solvers]\ncpu = ['retired_solver']\ncuda = []\n"
+    legacy += "\n[elastic_net.vanilla_execution]\nmax_iterations = 100000\n"
+    path = tmp_path / "legacy.toml"
+    path.write_text(legacy)
+    assert load_real_erm_config(path) == load_real_erm_config(Path("configs/real_erm.toml"))

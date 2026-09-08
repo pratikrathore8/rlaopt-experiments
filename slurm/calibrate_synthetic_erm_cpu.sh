@@ -8,7 +8,7 @@
 #SBATCH --hint=nomultithread
 #SBATCH --mem=128G
 #SBATCH --time=1-00:00:00
-#SBATCH --array=0-8%2
+#SBATCH --array=0-5%2
 #SBATCH --job-name=rlaopt-erm-cpu-calibrate
 #SBATCH --output=cpu-erm-calibrate-%A_%a.out
 
@@ -23,9 +23,6 @@ PROBLEM_TYPES=(
   multinomial
   multinomial
   multinomial
-  vanilla_elastic_net
-  vanilla_elastic_net
-  vanilla_elastic_net
   bounded_elastic_net
   bounded_elastic_net
   bounded_elastic_net
@@ -34,9 +31,6 @@ SOLVERS=(
   rlaopt_sapphire
   projected_gradient
   jaxopt_lbfgsb
-  rlaopt_sapphire
-  sklearn_coordinate_descent
-  jaxopt_proximal_gradient
   rlaopt_admm
   scs
   clarabel_qdldl

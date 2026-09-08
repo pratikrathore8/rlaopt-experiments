@@ -32,7 +32,7 @@ class RealErmSuite(SyntheticErmSuite):
         if problem_type == "multinomial":
             spec = RealMultinomialSpec(**specification["problem_spec"])
             return build_real_multinomial_problem(spec, device=device)
-        if problem_type in {"vanilla_elastic_net", "bounded_elastic_net"}:
+        if problem_type == "bounded_elastic_net":
             spec = RealElasticNetSpec(**specification["problem_spec"])
             return build_real_elastic_net_problem(
                 spec,
@@ -43,11 +43,7 @@ class RealErmSuite(SyntheticErmSuite):
 
     def problem_metadata(self, problem: MultinomialProblem | ElasticNetProblem) -> dict[str, Any]:
         problem_type = (
-            "multinomial"
-            if isinstance(problem, MultinomialProblem)
-            else "bounded_elastic_net"
-            if problem.bounded
-            else "vanilla_elastic_net"
+            "multinomial" if isinstance(problem, MultinomialProblem) else "bounded_elastic_net"
         )
         dataset = problem.spec.dataset_spec
         problem_id = (

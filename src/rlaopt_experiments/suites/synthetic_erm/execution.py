@@ -183,8 +183,8 @@ def _validate_elastic_net_job(
     *,
     bounded: bool,
 ) -> ElasticNetSpec:
-    problem_type = "bounded_elastic_net" if bounded else "vanilla_elastic_net"
-    variant = "bounded" if bounded else "vanilla"
+    problem_type = "bounded_elastic_net"
+    variant = "bounded"
     if job.get("suite") != config.suite:
         raise ValueError("manifest job suite does not match the configuration")
     if job.get("problem_type") != problem_type:
@@ -192,7 +192,7 @@ def _validate_elastic_net_job(
     backend = job.get("backend")
     if backend not in {"cpu", "cuda"}:
         raise ValueError("manifest job backend must be cpu or cuda")
-    solvers = config.elastic_net.bounded_solvers if bounded else config.elastic_net.vanilla_solvers
+    solvers = config.elastic_net.bounded_solvers
     if job.get("solver") not in getattr(solvers, backend):
         raise ValueError("manifest solver is not configured for its backend")
     spec = ElasticNetSpec(**job["problem_spec"])
@@ -224,114 +224,10 @@ def _validate_elastic_net_job(
         raise ValueError("manifest problem_spec does not match the configuration")
     if job.get("problem_id") != spec.problem_id(bounded=bounded):
         raise ValueError("manifest problem_id does not match problem_spec")
-    solver_seed_name = "bounded_elastic_net_solver" if bounded else "vanilla_elastic_net_solver"
+    solver_seed_name = "bounded_elastic_net_solver"
     if job.get("solver_seed") != derive_seed(seed, solver_seed_name):
         raise ValueError("manifest solver_seed does not match its master seed")
     return spec
-
-
-def run_vanilla_elastic_net_job(
-    job: dict[str, Any],
-    config: SyntheticErmConfig,
-    *,
-    native_tolerance: float,
-    max_iterations: int,
-    batch_size: int,
-    output_dir: Path,
-    record_run_key: str = "vanilla_elastic_net",
-    record_metadata: dict[str, Any] | None = None,
-) -> list[TrialRecord]:
-    """Execute one vanilla elastic-net manifest job through an isolated worker."""
-    validate_controls(native_tolerance, max_iterations, batch_size)
-    spec = _validate_elastic_net_job(job, config, bounded=False)
-    backend = job["backend"]
-    solver = job["solver"]
-    specification = {
-        "problem_type": "vanilla_elastic_net",
-        "problem_spec": job["problem_spec"],
-    }
-    command = {
-        "solver": solver,
-        "native_tolerance": native_tolerance,
-        "max_iters": max_iterations,
-        "batch_size": batch_size,
-        "solver_seed": job["solver_seed"],
-        "relative_duality_gap_tolerance": config.accuracy.relative_duality_gap,
-        "feasibility_tolerance": config.accuracy.feasibility,
-    }
-    problem_fields = {
-        "problem_type": "vanilla_elastic_net",
-        "n": spec.n,
-        "p": spec.p,
-        "teacher_density": spec.teacher_density,
-        "noise_ratio": spec.noise_ratio,
-        "teacher_intercept": spec.teacher_intercept,
-        "regularization_fraction": spec.regularization_fraction,
-        "feature_seed": spec.feature_seed,
-        "target_seed": spec.target_seed,
-        "feature_generator": spec.feature_generator,
-        "feature_decay_exponent": spec.feature_decay_exponent,
-    }
-
-    worker = ProblemWorker(specification, backend, config.suite)
-    try:
-        ready = worker.wait_until_ready(config.startup_timeout_seconds)
-    except BaseException:
-        worker.close()
-        raise
-
-    def persist(
-        outcome: dict[str, Any],
-        repetition: int,
-        runtimes: list[float],
-        *,
-        phase: str,
-        iteration_limit: int | None,
-    ) -> TrialRecord:
-        metadata = (
-            outcome.get("solver_metadata", {})
-            | {
-                "execution_phase": phase,
-                "native_tolerance": native_tolerance,
-                "max_iterations": iteration_limit,
-                "solver_seed": job["solver_seed"],
-                "relative_duality_gap_tolerance": config.accuracy.relative_duality_gap,
-                "feasibility_tolerance": config.accuracy.feasibility,
-                "accuracy_thresholds_calibrated": config.accuracy.calibrated,
-                "native_tolerances_calibrated": (
-                    _native_tolerances_calibrated(config.elastic_net.vanilla_execution, backend)
-                ),
-            }
-            | (record_metadata or {})
-        )
-        return record_outcome(
-            suite=config.suite,
-            problem_id=spec.problem_id(bounded=False),
-            run_key=record_run_key,
-            problem=problem_fields,
-            solver=solver,
-            backend=backend,
-            seed=job["seed"],
-            repetition=repetition,
-            outcome=outcome | {"solver_metadata": metadata},
-            runtimes=runtimes,
-            output_dir=output_dir,
-            worker_metadata=ready.get("worker_metadata", {}),
-            timing_scope=(
-                "device-resident solver invocation; excludes problem generation, "
-                "worker startup, and format conversion; includes solver-side "
-                "JIT compilation when required"
-            ),
-        )
-
-    return run_repetitions(
-        worker=worker,
-        ready=ready,
-        config=config,
-        command=command,
-        max_iterations=max_iterations,
-        persist=persist,
-    )
 
 
 def run_bounded_elastic_net_job(

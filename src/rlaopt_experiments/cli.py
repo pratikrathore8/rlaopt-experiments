@@ -34,7 +34,7 @@ def _parser() -> argparse.ArgumentParser:
     calibration.add_argument("--backend", choices=("cpu", "cuda"), required=True)
     calibration.add_argument(
         "--problem-type",
-        choices=("multinomial", "vanilla_elastic_net", "bounded_elastic_net"),
+        choices=("multinomial", "bounded_elastic_net"),
     )
     calibration.add_argument(
         "--candidates",

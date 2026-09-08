@@ -27,9 +27,9 @@ def _multinomial_specification(n: int = 64, p: int = 8) -> dict:
     }
 
 
-def _vanilla_elastic_net_specification() -> dict:
+def _bounded_elastic_net_specification() -> dict:
     return {
-        "problem_type": "vanilla_elastic_net",
+        "problem_type": "bounded_elastic_net",
         "problem_spec": {
             "n": 96,
             "p": 12,
@@ -43,11 +43,6 @@ def _vanilla_elastic_net_specification() -> dict:
             "regularization_fraction": 0.1,
         },
     }
-
-
-def _bounded_elastic_net_specification() -> dict:
-    specification = _vanilla_elastic_net_specification()
-    return specification | {"problem_type": "bounded_elastic_net"}
 
 
 def test_multinomial_suite_executes_and_adjudicates_jaxopt_lbfgsb() -> None:
@@ -107,60 +102,10 @@ def test_multinomial_suite_dispatches_no_jit_variants(solver: str) -> None:
     assert outcome["solver_metadata"]["first_jit_compilation_included"] is False
 
 
-def test_vanilla_elastic_net_suite_executes_and_uses_external_gap() -> None:
-    suite = get_suite("synthetic_erm")
-    problem = suite.generate(
-        _vanilla_elastic_net_specification(),
-        device=torch.device("cpu"),
-    )
-
-    outcome = suite.execute(
-        problem,
-        {
-            "solver": "sklearn_coordinate_descent",
-            "native_tolerance": 1e-10,
-            "max_iters": 10_000,
-            "relative_duality_gap_tolerance": 1e-6,
-            "feasibility_tolerance": 1e-8,
-        },
-        backend="cpu",
-    )
-
-    assert outcome["native_success"]
-    assert outcome["runtime_eligible"]
-    assert outcome["accuracy"]["external_success"]
-    assert outcome["accuracy"]["relative_duality_gap"] <= 1e-6
-    assert outcome["accuracy"]["feasibility"] == 0.0
-    assert outcome["accuracy"]["stationarity"] <= 1e-6
-    assert outcome["diagnostics"]["bounded"] is False
-
-
-def test_vanilla_elastic_net_suite_dispatches_no_jit_variant() -> None:
-    suite = get_suite("synthetic_erm")
-    problem = suite.generate(
-        _vanilla_elastic_net_specification(),
-        device=torch.device("cpu"),
-    )
-
-    outcome = suite.execute(
-        problem,
-        {
-            "solver": "jaxopt_proximal_gradient_no_jit",
-            "native_tolerance": 1e-12,
-            "max_iters": 2,
-            "relative_duality_gap_tolerance": 1.0,
-            "feasibility_tolerance": 1e-8,
-        },
-        backend="cpu",
-    )
-
-    assert outcome["solver_metadata"]["jit_enabled"] is False
-    assert outcome["solver_metadata"]["first_jit_compilation_included"] is False
-
-
 @pytest.mark.parametrize("solver", ["scs", "scs_cpu_indirect", "scs_cuda", "scs_cuda_direct"])
 def test_bounded_elastic_net_suite_executes_and_uses_external_kkt(
-    monkeypatch: pytest.MonkeyPatch, solver: str,
+    monkeypatch: pytest.MonkeyPatch,
+    solver: str,
 ) -> None:
     suite = get_suite("synthetic_erm")
     problem = suite.generate(

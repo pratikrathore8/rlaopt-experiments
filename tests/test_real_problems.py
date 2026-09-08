@@ -54,24 +54,19 @@ def test_build_real_elastic_net_problem_materializes_random_features(tmp_path, m
         regularization_fraction=0.1,
     )
 
-    unbounded = build_real_elastic_net_problem(spec, bounded=False, device="cpu")
     bounded = build_real_elastic_net_problem(spec, bounded=True, device="cpu")
 
-    assert unbounded.X.shape == (4, 5)
-    assert unbounded.X.dtype == torch.float64
-    assert unbounded.y.dtype == torch.float64
-    assert unbounded.teacher_weights is None
-    assert unbounded.teacher_intercept is None
-    torch.testing.assert_close(unbounded.X, bounded.X, rtol=0.0, atol=0.0)
-    torch.testing.assert_close(unbounded.y, bounded.y, rtol=0.0, atol=0.0)
-    centered = unbounded.y - unbounded.y.mean()
-    expected_lambda_max = float((unbounded.X.mT @ centered).abs().max() / spec.n)
-    assert unbounded.lambda_max == expected_lambda_max
-    assert unbounded.lambda_l1 == 0.1 * expected_lambda_max
-    assert unbounded.lambda_l2 == 0.1 * expected_lambda_max
-    assert not unbounded.bounded
+    assert bounded.X.shape == (4, 5)
+    assert bounded.X.dtype == torch.float64
+    assert bounded.y.dtype == torch.float64
+    assert bounded.teacher_weights is None
+    assert bounded.teacher_intercept is None
+    centered = bounded.y - bounded.y.mean()
+    expected_lambda_max = float((bounded.X.mT @ centered).abs().max() / spec.n)
+    assert bounded.lambda_max == expected_lambda_max
+    assert bounded.lambda_l1 == 0.1 * expected_lambda_max
+    assert bounded.lambda_l2 == 0.1 * expected_lambda_max
     assert bounded.bounded
-    assert unbounded.problem_id != bounded.problem_id
 
 
 def test_real_suite_builds_multinomial_problem_from_sparse_cache(tmp_path, monkeypatch) -> None:

@@ -341,10 +341,8 @@ class ElasticNetProblem:
         return self.X.mT @ residual / self.spec.n, residual.mean()
 
     def constraint_violation(self, weights: torch.Tensor) -> torch.Tensor:
-        """Return zero when unbounded, otherwise the largest [0, 1] violation."""
+        """Return the largest [0, 1] violation."""
         self._validate_weights(weights)
-        if not self.bounded:
-            return torch.zeros((), dtype=weights.dtype, device=weights.device)
         lower = torch.clamp(-weights, min=0.0)
         upper = torch.clamp(weights - 1.0, min=0.0)
         return torch.maximum(lower.max(), upper.max())
@@ -358,80 +356,24 @@ class ElasticNetProblem:
     ) -> torch.Tensor:
         """Return the largest primal KKT stationarity violation.
 
-        For unbounded elastic net, weights near zero use the l1 subgradient
-        condition. For bounded elastic net, weights near zero or one use the
+        Weights near zero or one use the
         corresponding one-sided box condition. Feasibility is separate.
         """
         self._validate_weights(weights)
         _validate_tolerance(activity_tolerance, "activity_tolerance")
         loss_gradient, intercept_gradient = self.loss_gradient(weights, intercept)
         smooth_gradient = loss_gradient + self.lambda_l2 * weights
-        if self.bounded:
-            if 2 * activity_tolerance >= 1:
-                raise ValueError("activity_tolerance makes the weight bounds overlap")
-            gradient = smooth_gradient + self.lambda_l1
-            at_lower = weights <= activity_tolerance
-            at_upper = weights >= 1 - activity_tolerance
-            weight_violations = torch.where(
-                at_lower,
-                torch.relu(-gradient),
-                torch.where(at_upper, torch.relu(gradient), gradient.abs()),
-            )
-        else:
-            at_zero = weights.abs() <= activity_tolerance
-            signed_residual = smooth_gradient + self.lambda_l1 * torch.sign(weights)
-            weight_violations = torch.where(
-                at_zero,
-                torch.relu(smooth_gradient.abs() - self.lambda_l1),
-                signed_residual.abs(),
-            )
+        if 2 * activity_tolerance >= 1:
+            raise ValueError("activity_tolerance makes the weight bounds overlap")
+        gradient = smooth_gradient + self.lambda_l1
+        at_lower = weights <= activity_tolerance
+        at_upper = weights >= 1 - activity_tolerance
+        weight_violations = torch.where(
+            at_lower,
+            torch.relu(-gradient),
+            torch.where(at_upper, torch.relu(gradient), gradient.abs()),
+        )
         return torch.maximum(weight_violations.max(), intercept_gradient.abs())
-
-    def dual_candidate(
-        self,
-        weights: torch.Tensor,
-        intercept: torch.Tensor | float,
-    ) -> torch.Tensor:
-        """Construct a dual-feasible point for unbounded elastic net."""
-        self._require_unbounded()
-        self._validate_weights(weights)
-        residual = self.X @ weights + intercept - self.y
-        return (residual - residual.mean()) / self.spec.n
-
-    def dual_equality_violation(self, dual: torch.Tensor) -> torch.Tensor:
-        """Return the absolute violation of the intercept's dual equality."""
-        self._require_unbounded()
-        self._validate_dual(dual)
-        return dual.sum().abs()
-
-    def dual_objective(self, dual: torch.Tensor) -> torch.Tensor:
-        """Evaluate the unbounded elastic-net dual at a feasible point."""
-        self._require_unbounded()
-        self._validate_dual(dual)
-        conjugate_argument = -(self.X.mT @ dual)
-        soft_thresholded = torch.sign(conjugate_argument) * torch.relu(
-            conjugate_argument.abs() - self.lambda_l1
-        )
-        return (
-            -(self.y @ dual)
-            - 0.5 * self.spec.n * dual.square().sum()
-            - 0.5 * soft_thresholded.square().sum() / self.lambda_l2
-        )
-
-    def relative_duality_gap(
-        self,
-        weights: torch.Tensor,
-        intercept: torch.Tensor | float,
-    ) -> torch.Tensor:
-        """Return the gap from the uniformly constructed dual certificate."""
-        self._require_unbounded()
-        primal = self.objective(weights, intercept)
-        dual = self.dual_objective(self.dual_candidate(weights, intercept))
-        scale = torch.maximum(
-            torch.ones((), dtype=primal.dtype, device=primal.device),
-            torch.maximum(primal.abs(), dual.abs()),
-        )
-        return (primal - dual) / scale
 
     def diagnostics(self) -> dict[str, float | int | bool | None]:
         diagnostics: dict[str, float | int | bool | None] = {
@@ -454,14 +396,6 @@ class ElasticNetProblem:
         if weights.shape != (self.spec.p,):
             raise ValueError(f"weights must have shape {(self.spec.p,)}")
 
-    def _validate_dual(self, dual: torch.Tensor) -> None:
-        if dual.shape != (self.spec.n,):
-            raise ValueError(f"dual must have shape {(self.spec.n,)}")
-
-    def _require_unbounded(self) -> None:
-        if self.bounded:
-            raise ValueError("the vanilla elastic-net dual is not valid for bounded elastic net")
-
 
 def generate_elastic_net_problem(
     spec: ElasticNetSpec,
@@ -469,13 +403,15 @@ def generate_elastic_net_problem(
     bounded: bool,
     device: torch.device | str,
 ) -> ElasticNetProblem:
-    """Generate one standardized regression dataset for both EN variants.
+    """Generate one standardized regression dataset for bounded elastic net.
 
     The response is scaled but not centered after adding noise, preserving the
     explicit unregularized intercept. Both elastic-net weights equal
     regularization_fraction times lambda_max, where lambda_max is computed after
     centering for the fitted intercept.
     """
+    if not bounded:
+        raise ValueError("Only bounded elastic-net experiments are supported")
     features = _features(
         spec.n,
         spec.p,

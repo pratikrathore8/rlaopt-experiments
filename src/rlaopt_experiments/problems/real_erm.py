@@ -173,6 +173,8 @@ def build_real_elastic_net_problem(
     device: torch.device | str,
 ) -> ElasticNetProblem:
     """Load one regression corpus and set both penalties from its lambda-max scale."""
+    if not bounded:
+        raise ValueError("Only bounded elastic-net experiments are supported")
     target_device = torch.device(device)
     prepared = load_prepared_dataset(spec.dataset, Path(spec.data_root))
     features = _materialize_solver_matrix(prepared.spec, prepared.matrix, target_device)
