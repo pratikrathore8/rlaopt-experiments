@@ -1,0 +1,53 @@
+BATCH_PROGRESS batch=0 manifest_index=0 total=1
+RLAOPT_GIT_COMMIT=e387c4eeb03798fb95af9797046a96b66994d3f4
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=3f1bfeab2a437cd18cdb21449708fd1eca60d1841e571d0556d7b9b06fde6d2d
+Traceback (most recent call last):
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/erm_execution.py", line 71, in run_repetitions
+    first = worker.solve(command, config.timeout_seconds)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/isolation.py", line 142, in solve
+    return self._connection.recv()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 399, in _recv
+    raise EOFError
+EOFError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/rlaopt-experiments/.venv/bin/rlaopt-bench", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/cli.py", line 102, in main
+    run_manifest_job(job, args.config, args.output)
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/execution.py", line 89, in run_manifest_job
+    return runners[problem_type](job, config, **execution_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/real_erm/execution.py", line 283, in run_real_bounded_elastic_net_job
+    return _run_job(
+           ^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/real_erm/execution.py", line 214, in _run_job
+    return run_repetitions(
+           ^^^^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/suites/erm_execution.py", line 91, in run_repetitions
+    worker.close()
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/isolation.py", line 156, in close
+    self._connection.send({"kind": "stop"})
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 427, in _send_bytes
+    self._send(header + buf)
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 384, in _send
+    n = write(self._handle, buf)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+BATCH_FAILURE batch=0 manifest_index=0 status=1
+BATCH_SUMMARY batch=0 attempted=1 failures=1
+[2026-09-06T15:55:09.680] error: Detected 1 oom_kill event in StepId=17301471.batch. Some of the step tasks have been OOM Killed.

@@ -667,8 +667,11 @@ def differentiable_figure(path, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ridge", type=Path, default=Path("artifacts/production-20260831"))
-    parser.add_argument("--real", type=Path, default=Path("artifacts/real-erm-production-20260905"))
+    parser.add_argument("--ridge", type=Path, default=None)
+    parser.add_argument("--real", type=Path, default=None)
+    parser.add_argument("--paper-results", type=Path, default=Path("results/paper"),
+                        help="Saved paper inputs used when no campaign overrides are supplied")
+    parser.add_argument("--ridge-config", type=Path, help="Ridge grid; defaults to the campaign config")
     parser.add_argument("--output", type=Path, default=Path("artifacts/paper-figures"))
     parser.add_argument("--accuracy-refinement", action="store_true")
     parser.add_argument(
@@ -680,10 +683,27 @@ def main():
     parser.add_argument("--real-supplement", type=Path, action="append", default=[])
     parser.add_argument("--real-refinement", type=Path, action="append", default=[])
     parser.add_argument("--differentiable", type=Path,
-                        default=Path("artifacts/differentiable-optimization/result.json"))
+                        default=None)
     parser.add_argument("--differentiable-only", action="store_true",
                         help="Regenerate only the differentiable optimization figure")
     args = parser.parse_args()
+    if not any((args.ridge, args.real, args.ridge_refinement,
+                args.real_supplement, args.real_refinement)):
+        args.ridge = args.paper_results / "production-20260831"
+        args.real = args.paper_results / "real-erm-production-20260905"
+        args.ridge_refinement = args.paper_results / "ridge-tolerance-refinement-20260906"
+        args.real_supplement = [args.paper_results / "real-erm-scs-backends-20260906-64threads"]
+        args.real_refinement = [args.paper_results / "scs-yearpredictionmsd-tolerance-20260906" / tol
+                                for tol in ("1e-8", "1e-9")]
+        args.accuracy_refinement = True
+        args.all_figures = True
+    args.ridge = args.ridge or Path("artifacts/production-20260831")
+    args.real = args.real or Path("artifacts/real-erm-production-20260905")
+    args.differentiable = args.differentiable or args.paper_results / "differentiable-optimization/result.json"
+    args.ridge_config = args.ridge_config or (
+        args.ridge / "config.toml" if (args.ridge / "config.toml").exists()
+        else Path("configs/synthetic.toml")
+    )
     if (args.ridge_refinement or args.real_refinement) and not args.accuracy_refinement:
         parser.error("Refinement inputs require --accuracy-refinement")
     main_only = args.accuracy_refinement and not args.all_figures
@@ -704,7 +724,7 @@ def main():
         differentiable_figure(args.differentiable, args.output)
         print(f"Updated diff_solver_plot.pdf/png in {args.output}")
         return
-    config = tomllib.loads(Path("configs/synthetic.toml").read_text())["experiment"]
+    config = tomllib.loads(args.ridge_config.read_text())["experiment"]
     ridge = {}
     sources = []
     for path in sorted((args.ridge / "records").glob("*.json")):
@@ -951,7 +971,7 @@ def main():
             }
         )
     write_csv(args.output / "dataset_regimes.csv", dataset_rows)
-    sources.extend([Path(__file__), Path("configs/synthetic.toml"), args.real / "config.toml"])
+    sources.extend([Path(__file__), args.ridge_config, args.real / "config.toml"])
     sources.extend(root / "config.toml" for root in args.real_supplement)
     sources.append(Path(__file__).with_name("paper_refinement.py"))
     audit = {

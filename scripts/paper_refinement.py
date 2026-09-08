@@ -82,7 +82,7 @@ def apply_ridge_refinement(records, root, key, sources):
         candidates_path = root / "candidates.json"
         sources.append(candidates_path)
         for job in json.loads(candidates_path.read_text()):
-            original_path = Path(job["original_record"])
+            original_path = root / "original-records" / Path(job["original_record"]).name
             if (
                 hashlib.sha256(original_path.read_bytes()).hexdigest()
                 != job["original_record_sha256"]
@@ -108,7 +108,10 @@ def apply_ridge_refinement(records, root, key, sources):
                         raise ValueError("Attempt does not match predefined ladder")
                     if attempts and (qualified(attempts[-1]) or not attempts[-1]["native_success"]):
                         raise ValueError("Ridge refinement continued after its stopping condition")
-                    row = load_attempt(Path(attempt["record"]), sources)
+                    record_path = Path(attempt["record"])
+                    # Recorded absolute paths are provenance, not a dependency on the old host.
+                    relative = record_path.parts[record_path.parts.index(job["trial_id"]) + 1:]
+                    row = load_attempt(summary_path.parent.joinpath(*relative), sources)
                     if row["metadata"].get("cuda_image_sha256") != job["image_sha256"]:
                         raise ValueError("Ridge refinement image differs from frozen plan")
                     if (

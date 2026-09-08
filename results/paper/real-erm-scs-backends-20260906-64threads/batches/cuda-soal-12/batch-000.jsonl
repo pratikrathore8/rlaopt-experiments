@@ -1,0 +1,1 @@
+{"backend": "cuda", "problem_id": "real-erm1-elastic-net-acsincome-2b627b6d2b0a-bounded-rf0.1", "problem_spec": {"data_root": "/scr/pratikr/rlaopt-real-data", "dataset": "acsincome", "regularization_fraction": 0.1}, "problem_type": "bounded_elastic_net", "seed": 300, "solver": "scs_cuda_direct", "solver_seed": 9089236936278414212, "suite": "real_erm"}

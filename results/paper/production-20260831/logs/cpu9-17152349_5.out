@@ -1,0 +1,1576 @@
+CHUNK_PROGRESS chunk=5 manifest_index=5 attempted=1
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 6286d5d9e81153afb1acca9250064e0a.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172352-6286d5d9e81153afb1acca9250064e0a
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.02706
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172352-6286d5d9e81153afb1acca9250064e0a
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172352-6286d5d9e81153afb1acca9250064e0a/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id aa260de7f8bf5df487d4aa5211eec1cd.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172354-aa260de7f8bf5df487d4aa5211eec1cd
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.02598
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172354-aa260de7f8bf5df487d4aa5211eec1cd
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172354-aa260de7f8bf5df487d4aa5211eec1cd/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 6cf3b0adbb325d69bbb900815c5162a9.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172354-6cf3b0adbb325d69bbb900815c5162a9
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.02642
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172354-6cf3b0adbb325d69bbb900815c5162a9
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172354-6cf3b0adbb325d69bbb900815c5162a9/logs
+CHUNK_PROGRESS chunk=5 manifest_index=11 attempted=2
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id bf498e9f934457a4bd983c03ade5aa40.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172410-bf498e9f934457a4bd983c03ade5aa40
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.00397
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172410-bf498e9f934457a4bd983c03ade5aa40
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172410-bf498e9f934457a4bd983c03ade5aa40/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0c64abffafcd578c9b62919387600e30.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172411-0c64abffafcd578c9b62919387600e30
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.0134
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172411-0c64abffafcd578c9b62919387600e30
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172411-0c64abffafcd578c9b62919387600e30/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 30309b64deee5a3189e0c88950a3f454.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172411-30309b64deee5a3189e0c88950a3f454
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.01409
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172411-30309b64deee5a3189e0c88950a3f454
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172411-30309b64deee5a3189e0c88950a3f454/logs
+CHUNK_PROGRESS chunk=5 manifest_index=17 attempted=3
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0102e430d7b25f288bc54f79d0bdf575.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172426-0102e430d7b25f288bc54f79d0bdf575
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.03053
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172426-0102e430d7b25f288bc54f79d0bdf575
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172426-0102e430d7b25f288bc54f79d0bdf575/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id a61acb0f773a51fc912709003c530124.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172428-a61acb0f773a51fc912709003c530124
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.02985
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172428-a61acb0f773a51fc912709003c530124
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172428-a61acb0f773a51fc912709003c530124/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 3618f08c95b85289a7a44a2e020dcf00.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172429-3618f08c95b85289a7a44a2e020dcf00
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.02959
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172429-3618f08c95b85289a7a44a2e020dcf00
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172429-3618f08c95b85289a7a44a2e020dcf00/logs
+CHUNK_PROGRESS chunk=5 manifest_index=23 attempted=4
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id d3a4efe7ec8f5fb3838d8c9621e73331.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172445-d3a4efe7ec8f5fb3838d8c9621e73331
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.08
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172445-d3a4efe7ec8f5fb3838d8c9621e73331
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172445-d3a4efe7ec8f5fb3838d8c9621e73331/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 372519dca15f564e898267e0fc6a9b1a.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172446-372519dca15f564e898267e0fc6a9b1a
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.09506
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172446-372519dca15f564e898267e0fc6a9b1a
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172446-372519dca15f564e898267e0fc6a9b1a/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 9fecf0e56d515e228fb0821edfe8355d.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172447-9fecf0e56d515e228fb0821edfe8355d
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.10448
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172447-9fecf0e56d515e228fb0821edfe8355d
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172447-9fecf0e56d515e228fb0821edfe8355d/logs
+CHUNK_PROGRESS chunk=5 manifest_index=29 attempted=5
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 7a4b2f0802ec5348b1bb9e39dcb5e540.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172504-7a4b2f0802ec5348b1bb9e39dcb5e540
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.58224
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172504-7a4b2f0802ec5348b1bb9e39dcb5e540
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172504-7a4b2f0802ec5348b1bb9e39dcb5e540/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id d95c68eea4dc54e4b6e1904e22015f86.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172507-d95c68eea4dc54e4b6e1904e22015f86
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.54289
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172507-d95c68eea4dc54e4b6e1904e22015f86
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172507-d95c68eea4dc54e4b6e1904e22015f86/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 30ecee9138d15f838de0919b7db6eda7.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172509-30ecee9138d15f838de0919b7db6eda7
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.54244
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172509-30ecee9138d15f838de0919b7db6eda7
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172509-30ecee9138d15f838de0919b7db6eda7/logs
+CHUNK_PROGRESS chunk=5 manifest_index=35 attempted=6
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 74db28c9d1d053bfbb95a6a38f49bd20.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172526-74db28c9d1d053bfbb95a6a38f49bd20
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.03683
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172526-74db28c9d1d053bfbb95a6a38f49bd20
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172526-74db28c9d1d053bfbb95a6a38f49bd20/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 10101368f28c56fda1e6ff5311fc6569.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172527-10101368f28c56fda1e6ff5311fc6569
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.15594
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172527-10101368f28c56fda1e6ff5311fc6569
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172527-10101368f28c56fda1e6ff5311fc6569/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id abb40842c6f6532b8542f8f930416c72.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172529-abb40842c6f6532b8542f8f930416c72
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 1.05781
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172529-abb40842c6f6532b8542f8f930416c72
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172529-abb40842c6f6532b8542f8f930416c72/logs
+CHUNK_PROGRESS chunk=5 manifest_index=41 attempted=7
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 20857c9544d05eaa93d9c3f25c039f86.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172629-20857c9544d05eaa93d9c3f25c039f86
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.39593
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172629-20857c9544d05eaa93d9c3f25c039f86
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172629-20857c9544d05eaa93d9c3f25c039f86/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 9463152931cc5edb870f109e813baa20.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172659-9463152931cc5edb870f109e813baa20
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.30006
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172659-9463152931cc5edb870f109e813baa20
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172659-9463152931cc5edb870f109e813baa20/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id a48fa232bace5357aa151da4340da8d0.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172726-a48fa232bace5357aa151da4340da8d0
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.37469
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172726-a48fa232bace5357aa151da4340da8d0
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172726-a48fa232bace5357aa151da4340da8d0/logs
+CHUNK_PROGRESS chunk=5 manifest_index=47 attempted=8
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id f005c280b1e354ec8d864aca87220698.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172803-f005c280b1e354ec8d864aca87220698
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 1.62592
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172803-f005c280b1e354ec8d864aca87220698
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172803-f005c280b1e354ec8d864aca87220698/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 929b88a3f4d152d1877dea3928ff998e.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172816-929b88a3f4d152d1877dea3928ff998e
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 10.4159
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172816-929b88a3f4d152d1877dea3928ff998e
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172816-929b88a3f4d152d1877dea3928ff998e/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id da1a89bc3c5f51118ed89802f7aecdb8.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172835-da1a89bc3c5f51118ed89802f7aecdb8
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 17.4383
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172835-da1a89bc3c5f51118ed89802f7aecdb8
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172835-da1a89bc3c5f51118ed89802f7aecdb8/logs
+CHUNK_PROGRESS chunk=5 manifest_index=53 attempted=9
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 5cb281c231405cfe8b999a6373cd7ea5.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172936-5cb281c231405cfe8b999a6373cd7ea5
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.52102
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_172936-5cb281c231405cfe8b999a6373cd7ea5
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_172936-5cb281c231405cfe8b999a6373cd7ea5/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 2820a67942b95356b76be58c6388e06a.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173005-2820a67942b95356b76be58c6388e06a
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.603
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173005-2820a67942b95356b76be58c6388e06a
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_173005-2820a67942b95356b76be58c6388e06a/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id fb440a3a39f75f4bb37547531ff90834.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173033-fb440a3a39f75f4bb37547531ff90834
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.47534
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173033-fb440a3a39f75f4bb37547531ff90834
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_173033-fb440a3a39f75f4bb37547531ff90834/logs
+CHUNK_PROGRESS chunk=5 manifest_index=59 attempted=10
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 6a6758e588905bec9072d707b30dcc4d.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173650-6a6758e588905bec9072d707b30dcc4d
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 34.67387
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173650-6a6758e588905bec9072d707b30dcc4d
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_173650-6a6758e588905bec9072d707b30dcc4d/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id aea275bcd32d5b68bd44220a295a09f5.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173814-aea275bcd32d5b68bd44220a295a09f5
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 67.86252
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173814-aea275bcd32d5b68bd44220a295a09f5
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_173814-aea275bcd32d5b68bd44220a295a09f5/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id a9e80bcb6e6c5bce89a81102ac23f6ad.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173941-a9e80bcb6e6c5bce89a81102ac23f6ad
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 73.38201
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_173941-a9e80bcb6e6c5bce89a81102ac23f6ad
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_173941-a9e80bcb6e6c5bce89a81102ac23f6ad/logs
+CHUNK_PROGRESS chunk=5 manifest_index=65 attempted=11
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+Traceback (most recent call last):
+  File "/opt/rlaopt-experiments/.venv/bin/rlaopt-bench", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/cli.py", line 67, in main
+    run_job(
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/runner.py", line 230, in run_job
+    warmup = worker.solve(
+             ^^^^^^^^^^^^^
+  File "/opt/rlaopt-experiments/src/rlaopt_experiments/isolation.py", line 144, in solve
+    return self._connection.recv()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+          ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 430, in _recv_bytes
+    buf = self._recv(4)
+          ^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 399, in _recv
+    raise EOFError
+EOFError
+CHUNK_FAILURE chunk=5 manifest_index=65 status=1
+CHUNK_PROGRESS chunk=5 manifest_index=71 attempted=12
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id ed7a16d779445a75bfa162b06fc879f4.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_175121-ed7a16d779445a75bfa162b06fc879f4
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 12.1749
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_175121-ed7a16d779445a75bfa162b06fc879f4
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_175121-ed7a16d779445a75bfa162b06fc879f4/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id d40b002c8a9f53859e429e8c4710e33a.
+wandb: setting up run d40b002c8a9f53859e429e8c4710e33a
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_175237-d40b002c8a9f53859e429e8c4710e33a
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 57.74104
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_175237-d40b002c8a9f53859e429e8c4710e33a
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_175237-d40b002c8a9f53859e429e8c4710e33a/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 801a172c481b58a1a5e474b1100ae56f.
+wandb: setting up run 801a172c481b58a1a5e474b1100ae56f
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_175931-801a172c481b58a1a5e474b1100ae56f
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 1e-05
+wandb:         summary/runtime_seconds 397.65553
+wandb:                 summary/success 0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_175931-801a172c481b58a1a5e474b1100ae56f
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_175931-801a172c481b58a1a5e474b1100ae56f/logs
+CHUNK_PROGRESS chunk=5 manifest_index=77 attempted=13
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 3a5069a5586c5c5888825b0c7602d95b.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180114-3a5069a5586c5c5888825b0c7602d95b
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 21.0017
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180114-3a5069a5586c5c5888825b0c7602d95b
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180114-3a5069a5586c5c5888825b0c7602d95b/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 7704d7c2341955dabcddb6e8f9ae4b9a.
+wandb: setting up run 7704d7c2341955dabcddb6e8f9ae4b9a
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180200-7704d7c2341955dabcddb6e8f9ae4b9a
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 21.01351
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180200-7704d7c2341955dabcddb6e8f9ae4b9a
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180200-7704d7c2341955dabcddb6e8f9ae4b9a/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 2253d22384ce55d7a85b4c969f575074.
+wandb: setting up run 2253d22384ce55d7a85b4c969f575074
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180244-2253d22384ce55d7a85b4c969f575074
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 21.15541
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180244-2253d22384ce55d7a85b4c969f575074
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180244-2253d22384ce55d7a85b4c969f575074/logs
+CHUNK_PROGRESS chunk=5 manifest_index=83 attempted=14
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 04b11e4034165582ac39f479f7f2a2fe.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180347-04b11e4034165582ac39f479f7f2a2fe
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 3.24723
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180347-04b11e4034165582ac39f479f7f2a2fe
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180347-04b11e4034165582ac39f479f7f2a2fe/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id c38b909a9da256fcb319fbbf8f6a9964.
+wandb: setting up run c38b909a9da256fcb319fbbf8f6a9964
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180412-c38b909a9da256fcb319fbbf8f6a9964
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 20.28054
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180412-c38b909a9da256fcb319fbbf8f6a9964
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180412-c38b909a9da256fcb319fbbf8f6a9964/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id e4793e6b0ab5552ea284dba1fcae3a41.
+wandb: setting up run e4793e6b0ab5552ea284dba1fcae3a41
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180449-e4793e6b0ab5552ea284dba1fcae3a41
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 34.62137
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180449-e4793e6b0ab5552ea284dba1fcae3a41
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180449-e4793e6b0ab5552ea284dba1fcae3a41/logs
+CHUNK_PROGRESS chunk=5 manifest_index=89 attempted=15
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0ad0fb05450f56e3bfdbd2ae4039737c.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180630-0ad0fb05450f56e3bfdbd2ae4039737c
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 21.14255
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180630-0ad0fb05450f56e3bfdbd2ae4039737c
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180630-0ad0fb05450f56e3bfdbd2ae4039737c/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 08c116edad7f56f6949900ff7a59ce31.
+wandb: setting up run 08c116edad7f56f6949900ff7a59ce31
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180715-08c116edad7f56f6949900ff7a59ce31
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 20.88996
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180715-08c116edad7f56f6949900ff7a59ce31
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180715-08c116edad7f56f6949900ff7a59ce31/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 21a11acc98b6534393c14b027cd24c36.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180800-21a11acc98b6534393c14b027cd24c36
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 20.88127
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180800-21a11acc98b6534393c14b027cd24c36
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180800-21a11acc98b6534393c14b027cd24c36/logs
+CHUNK_PROGRESS chunk=5 manifest_index=95 attempted=16
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id d7abcf406ea75b6eaf8b7175c1c4734e.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180945-d7abcf406ea75b6eaf8b7175c1c4734e
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 8.39851
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_180945-d7abcf406ea75b6eaf8b7175c1c4734e
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_180945-d7abcf406ea75b6eaf8b7175c1c4734e/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id ee07b0f9504159258ed02d459402c9a3.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181003-ee07b0f9504159258ed02d459402c9a3
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 13.27443
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181003-ee07b0f9504159258ed02d459402c9a3
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181003-ee07b0f9504159258ed02d459402c9a3/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0d379889c01655f6bffd69a93636273d.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181022-0d379889c01655f6bffd69a93636273d
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 14.52184
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181022-0d379889c01655f6bffd69a93636273d
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181022-0d379889c01655f6bffd69a93636273d/logs
+CHUNK_PROGRESS chunk=5 manifest_index=101 attempted=17
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 21e9231c0ab95a0e9f2b8922429a67a3.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181306-21e9231c0ab95a0e9f2b8922429a67a3
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 35.62593
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181306-21e9231c0ab95a0e9f2b8922429a67a3
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181306-21e9231c0ab95a0e9f2b8922429a67a3/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 417ddacb22f258de942ed02920a35592.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181422-417ddacb22f258de942ed02920a35592
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 35.44702
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181422-417ddacb22f258de942ed02920a35592
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181422-417ddacb22f258de942ed02920a35592/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id acb9690e413e55a8ba067fc1510ca255.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181536-acb9690e413e55a8ba067fc1510ca255
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 35.76216
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181536-acb9690e413e55a8ba067fc1510ca255
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181536-acb9690e413e55a8ba067fc1510ca255/logs
+CHUNK_PROGRESS chunk=5 manifest_index=107 attempted=18
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0394d06eac9b5473906e07bcf7661015.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181715-0394d06eac9b5473906e07bcf7661015
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 3.28679
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181715-0394d06eac9b5473906e07bcf7661015
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181715-0394d06eac9b5473906e07bcf7661015/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 3544e80908e55994bae4d8736b9accde.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181736-3544e80908e55994bae4d8736b9accde
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 15.82931
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181736-3544e80908e55994bae4d8736b9accde
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181736-3544e80908e55994bae4d8736b9accde/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id e9b0269e4fde524e8c42c84a43ea8768.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181928-e9b0269e4fde524e8c42c84a43ea8768
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 1e-05
+wandb:         summary/runtime_seconds 108.63501
+wandb:                 summary/success 0
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181928-e9b0269e4fde524e8c42c84a43ea8768
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181928-e9b0269e4fde524e8c42c84a43ea8768/logs
+CHUNK_PROGRESS chunk=5 manifest_index=113 attempted=19
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0f74ecedfe875671b04c121c4dd271ec.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181949-0f74ecedfe875671b04c121c4dd271ec
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.86829
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181949-0f74ecedfe875671b04c121c4dd271ec
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181949-0f74ecedfe875671b04c121c4dd271ec/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 9dbda6c075ae515298d70f6fd14a0678.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181953-9dbda6c075ae515298d70f6fd14a0678
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.86788
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181953-9dbda6c075ae515298d70f6fd14a0678
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181953-9dbda6c075ae515298d70f6fd14a0678/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 1e4b16e36d395632a992538911997fb4.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181955-1e4b16e36d395632a992538911997fb4
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.86886
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_181955-1e4b16e36d395632a992538911997fb4
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_181955-1e4b16e36d395632a992538911997fb4/logs
+CHUNK_PROGRESS chunk=5 manifest_index=119 attempted=20
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 9ed7bdc3618c55dcaf67084668d45fe7.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182015-9ed7bdc3618c55dcaf67084668d45fe7
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.77113
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182015-9ed7bdc3618c55dcaf67084668d45fe7
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182015-9ed7bdc3618c55dcaf67084668d45fe7/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 44f122d8e35d550ebfc02c99cdf0d8d4.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182019-44f122d8e35d550ebfc02c99cdf0d8d4
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 2.24051
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182019-44f122d8e35d550ebfc02c99cdf0d8d4
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182019-44f122d8e35d550ebfc02c99cdf0d8d4/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 4f8600d47a255070a7b3c4e569f8ff5b.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182022-4f8600d47a255070a7b3c4e569f8ff5b
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 2.62415
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182022-4f8600d47a255070a7b3c4e569f8ff5b
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182022-4f8600d47a255070a7b3c4e569f8ff5b/logs
+CHUNK_PROGRESS chunk=5 manifest_index=125 attempted=21
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 9d0ab3a3f5f257bba11b2789ddd7c5cc.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182042-9d0ab3a3f5f257bba11b2789ddd7c5cc
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.86901
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182042-9d0ab3a3f5f257bba11b2789ddd7c5cc
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182042-9d0ab3a3f5f257bba11b2789ddd7c5cc/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id fee4a65ebe9c542fb970b38f36101548.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182045-fee4a65ebe9c542fb970b38f36101548
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.86743
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182045-fee4a65ebe9c542fb970b38f36101548
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182045-fee4a65ebe9c542fb970b38f36101548/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 32aa24b40b055258b03cee24f512a5bd.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182048-32aa24b40b055258b03cee24f512a5bd
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 0.86827
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182048-32aa24b40b055258b03cee24f512a5bd
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182048-32aa24b40b055258b03cee24f512a5bd/logs
+CHUNK_PROGRESS chunk=5 manifest_index=131 attempted=22
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 5422ba3a34a75cf5bed6ea3d3f100156.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182126-5422ba3a34a75cf5bed6ea3d3f100156
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 2.95091
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182126-5422ba3a34a75cf5bed6ea3d3f100156
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182126-5422ba3a34a75cf5bed6ea3d3f100156/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 878b8c2aec6f520cb148318f168444da.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182133-878b8c2aec6f520cb148318f168444da
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 3.96186
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182133-878b8c2aec6f520cb148318f168444da
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182133-878b8c2aec6f520cb148318f168444da/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 0b7ce19cefe65b3b8af8193f436ed4f5.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182139-0b7ce19cefe65b3b8af8193f436ed4f5
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 4.44758
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182139-0b7ce19cefe65b3b8af8193f436ed4f5
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182139-0b7ce19cefe65b3b8af8193f436ed4f5/logs
+CHUNK_PROGRESS chunk=5 manifest_index=137 attempted=23
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id f6c6174674a252dbb7f14b90b2067376.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182221-f6c6174674a252dbb7f14b90b2067376
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 4.03801
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182221-f6c6174674a252dbb7f14b90b2067376
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182221-f6c6174674a252dbb7f14b90b2067376/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 9dcaffc153735fc38011fed09b45e992.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182231-9dcaffc153735fc38011fed09b45e992
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 3.99794
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182231-9dcaffc153735fc38011fed09b45e992
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182231-9dcaffc153735fc38011fed09b45e992/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id c17ff148704b5f14908a18307e5a6a56.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182240-c17ff148704b5f14908a18307e5a6a56
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 4.00508
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182240-c17ff148704b5f14908a18307e5a6a56
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182240-c17ff148704b5f14908a18307e5a6a56/logs
+CHUNK_PROGRESS chunk=5 manifest_index=143 attempted=24
+RLAOPT_GIT_COMMIT=772f73321328a29689deddfceeb9a7c26ae13159
+RLAOPT_GIT_DIRTY=0
+RLAOPT_CUDA_IMAGE_SHA256=b54e5e682a428d9dadd7cbd906f64a8e826daf414aa81997eaa600cb84fe891e
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 67a412ce1ab75b929abebf652c5a1568.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182315-67a412ce1ab75b929abebf652c5a1568
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 1.32588
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182315-67a412ce1ab75b929abebf652c5a1568
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182315-67a412ce1ab75b929abebf652c5a1568/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 968a60ef0fde5be99776411bc39c24b3.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182324-968a60ef0fde5be99776411bc39c24b3
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 6.39588
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182324-968a60ef0fde5be99776411bc39c24b3
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182324-968a60ef0fde5be99776411bc39c24b3/logs
+wandb: WARNING `resume` will be ignored since W&B syncing is set to `offline`. Starting a new run with run id 50718b667d6f5c119f21be99bacd1893.
+wandb: Tracking run with wandb version 0.29.0
+wandb: W&B syncing is set to `offline` in this directory. Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Run data is saved locally in /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182411-50718b667d6f5c119f21be99bacd1893
+wandb: View this run in the terminal with `wandb leet`
+wandb: 
+wandb: Run history:
+wandb:            summary/relative_kkt ▁
+wandb: summary/relative_solution_error ▁
+wandb:         summary/runtime_seconds ▁
+wandb:                 summary/success ▁
+wandb: 
+wandb: Run summary:
+wandb:            summary/relative_kkt 0.0
+wandb: summary/relative_solution_error 0.0
+wandb:         summary/runtime_seconds 45.34628
+wandb:                 summary/success 1
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /sailhome/pratikr/rlaopt-experiments/artifacts/production-20260831/wandb/offline-run-20260831_182411-50718b667d6f5c119f21be99bacd1893
+wandb: Find logs at: ./artifacts/production-20260831/wandb/offline-run-20260831_182411-50718b667d6f5c119f21be99bacd1893/logs
+CHUNK_SUMMARY chunk=5 attempted=24 failures=1
+[2026-08-31T18:24:14.898] error: Detected 1 oom_kill event in StepId=17152349.batch. Some of the step tasks have been OOM Killed.

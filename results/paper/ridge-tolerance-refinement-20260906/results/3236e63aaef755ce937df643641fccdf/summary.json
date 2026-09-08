@@ -1,0 +1,20 @@
+{
+  "trial_id": "3236e63aaef755ce937df643641fccdf",
+  "original_record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/original-records/3236e63aaef755ce937df643641fccdf.json",
+  "original_runtime_seconds": 2.1815264262259007,
+  "attempts": [
+    {
+      "native_tolerance": 1e-10,
+      "native_status": "native_complete",
+      "native_success": true,
+      "external_success": true,
+      "runtime_seconds": 2.729192439932376,
+      "attempt_wall_seconds": 16.466013723053038,
+      "relative_kkt": 1.5985545738237287e-07,
+      "record": "/sailhome/pratikr/rlaopt-experiments/artifacts/ridge-tolerance-refinement-20260906/results/3236e63aaef755ce937df643641fccdf/native-1e-10/records/1b60552fbd7151adb60674eb3c61f1a9.json"
+    }
+  ],
+  "qualifying_runtime_seconds": 2.729192439932376,
+  "refinement_wall_seconds": 16.466050153132528,
+  "total_measured_solver_seconds_including_original": 4.910718866158277
+}
